@@ -132,6 +132,10 @@ class ApiClient {
     return localStorage.getItem('auth_token');
   }
 
+  public getBaseUrl(): string {
+    return this.baseUrl;
+  }
+
   private setToken(token: string): void {
     if (typeof window === 'undefined') return;
     localStorage.setItem('auth_token', token);

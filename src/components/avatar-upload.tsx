@@ -74,7 +74,7 @@ export function AvatarUpload({
       if (response.data) {
         // Сохраняем аватар через отдельный API вызов
         try {
-          const saveResponse = await fetch(`${apiClient.baseUrl}/users/avatar/save`, {
+          const saveResponse = await fetch(`${apiClient.getBaseUrl()}/users/avatar/save`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${apiClient.getToken()}`,
