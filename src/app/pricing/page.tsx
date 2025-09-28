@@ -4,9 +4,12 @@ import { Badge } from "@/components/ui/badge"
 import { Check, Zap, Star, Sparkles } from "lucide-react"
 import { PricingCard } from "@/components/pricing-card"
 import { getPricingPlans } from "@/lib/pricing"
+import { useAuth } from "@/contexts/auth-context"
+import { getPointsText } from "@/lib/grammar"
 
 export default function PricingPage() {
   const plans = getPricingPlans()
+  const { isAuthenticated, points } = useAuth()
 
   return (
     <div className="space-y-12">
@@ -19,7 +22,7 @@ export default function PricingPage() {
         <h1 className="text-4xl font-bold">Выберите ваш тариф</h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
           Платите только за то, что используете. Без скрытых комиссий и подписок.
-          Получите +6 поинтов при регистрации!
+          {!isAuthenticated && " Получите +6 поинтов при регистрации!"}
         </p>
       </div>
 
@@ -161,15 +164,31 @@ export default function PricingPage() {
       {/* CTA */}
       <div className="text-center py-12 bg-gradient-to-r from-primary/10 to-blue-500/10 rounded-3xl">
         <h2 className="text-2xl font-bold mb-4">Готовы начать?</h2>
-        <p className="text-muted-foreground mb-6">
-          Зарегистрируйтесь и получите +6 поинтов для бесплатного тестирования
-        </p>
-        <Button size="lg" asChild>
-          <a href="/studio">
-            <Sparkles className="w-5 h-5 mr-2" />
-            Начать создавать
-          </a>
-        </Button>
+        {isAuthenticated ? (
+          <div className="space-y-4">
+            <p className="text-muted-foreground mb-6">
+              У вас {getPointsText(points)}. Начните создавать изображения прямо сейчас!
+            </p>
+            <Button size="lg" asChild>
+              <a href="/studio">
+                <Sparkles className="w-5 h-5 mr-2" />
+                Начать создавать
+              </a>
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <p className="text-muted-foreground mb-6">
+              Зарегистрируйтесь и получите +6 поинтов для бесплатного тестирования
+            </p>
+            <Button size="lg" asChild>
+              <a href="/studio">
+                <Sparkles className="w-5 h-5 mr-2" />
+                Начать создавать
+              </a>
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   )
