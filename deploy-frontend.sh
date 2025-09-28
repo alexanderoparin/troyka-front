@@ -159,7 +159,7 @@ pm2 list
 
 # Показываем последние логи
 log "Показываем последние логи..."
-pm2 logs $SERVICE_NAME --lines 10
+pm2 logs $SERVICE_NAME --lines 10 --nostream
 
 success "🎉 Деплой фронтенда успешно завершён!"
 log "Frontend is running on: http://213.171.4.47"
