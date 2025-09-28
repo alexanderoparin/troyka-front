@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { DevSignInButton } from "@/components/dev-signin-button"
 import { 
   User, 
   Settings, 

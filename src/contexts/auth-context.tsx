@@ -123,7 +123,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isLoading: false,
       points: 0,
     }))
-    return { success: false, error: response.error }
+    return { success: false, error: response.error || 'Неизвестная ошибка' }
   }, [])
 
   const register = useCallback(async (userData: RegisterRequest) => {
@@ -172,7 +172,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isLoading: false,
       points: 0,
     }))
-    return { success: false, error: response.error }
+    return { success: false, error: response.error || 'Неизвестная ошибка' }
   }, [])
 
   const logout = useCallback(() => {
@@ -192,7 +192,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (response.data !== undefined) {
           setState(prev => ({
             ...prev,
-            points: response.data,
+            points: response.data || 0,
           }))
           console.log('Поинты обновлены:', response.data)
         }
