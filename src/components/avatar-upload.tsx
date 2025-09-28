@@ -67,7 +67,7 @@ export function AvatarUpload({
     // Загружаем файл
     setIsUploading(true)
     try {
-      const response = await apiClient.uploadFile(file)
+      const response = await apiClient.uploadAvatar(file)
       
       if (response.data) {
         toast({

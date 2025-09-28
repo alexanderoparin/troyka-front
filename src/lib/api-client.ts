@@ -242,6 +242,70 @@ class ApiClient {
     }
   }
 
+  // Avatar Upload API
+  async uploadAvatar(file: File): Promise<ApiResponse<string>> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const url = `${this.baseUrl}/user/avatar`;
+    const token = this.getToken();
+    
+    if (!token) {
+      return {
+        data: undefined,
+        error: 'Требуется авторизация',
+        status: 401,
+      };
+    }
+
+    const headers: Record<string, string> = {
+      'Authorization': `Bearer ${token}`,
+    };
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: formData,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        return {
+          data: undefined,
+          error: errorData.message || `HTTP ${response.status}`,
+          status: response.status,
+        };
+      }
+
+      const result = await response.json();
+      return {
+        data: result.avatarUrl || result.url || result,
+        error: undefined,
+        status: response.status,
+      };
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        return {
+          data: undefined,
+          error: 'Превышено время ожидания',
+          status: 408,
+        };
+      }
+      return {
+        data: undefined,
+        error: error.message || 'Ошибка загрузки аватара',
+        status: 0,
+      };
+    }
+  }
+
   // Get file URL
   getFileUrl(filename: string): string {
     // Если filename уже полный URL, возвращаем как есть
