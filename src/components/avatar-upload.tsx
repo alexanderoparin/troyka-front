@@ -72,28 +72,9 @@ export function AvatarUpload({
       const response = await apiClient.uploadAvatar(file)
       
       if (response.data) {
-        // Сохраняем аватар через отдельный API вызов
-        try {
-          const saveResponse = await fetch(`${apiClient.getBaseUrl()}/users/avatar/save`, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${apiClient.getAuthToken()}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ avatarUrl: response.data })
-          })
-          
-          if (!saveResponse.ok) {
-            throw new Error('Ошибка сохранения аватара')
-          }
-        } catch (error) {
-          console.warn('Не удалось сохранить аватар в профиле:', error)
-          // Продолжаем выполнение, так как файл уже загружен
-        }
-        
         toast({
           title: "Успешно",
-          description: "Аватар обновлен"
+          description: "Аватар загружен"
         })
         
         // Обновляем информацию о пользователе
