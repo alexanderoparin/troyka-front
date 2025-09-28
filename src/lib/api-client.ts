@@ -1,0 +1,324 @@
+// API клиент для работы с Java бэкендом
+export interface ApiResponse<T> {
+  data?: T;
+  error?: string;
+  status: number;
+}
+
+export interface AuthResponse {
+  token: string;
+  username: string;
+  email: string;
+  role: string;
+  expiresAt: string;
+}
+
+export interface LoginRequest {
+  username: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  username: string;
+  email: string;
+  password: string;
+  firstName?: string;
+  lastName?: string;
+}
+
+export interface ImageRequest {
+  prompt: string;
+  imageUrls?: string[];
+  numImages?: number;
+  outputFormat?: 'JPEG' | 'PNG';
+}
+
+export interface ImageResponse {
+  description: string;
+  imageUrls: string[];
+}
+
+export interface UserInfo {
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  points?: number;
+}
+
+export interface ImageGenerationHistory {
+  imageUrl: string;
+  prompt: string;
+  createdAt: string;
+}
+
+class ApiClient {
+  private baseUrl: string;
+  private timeout: number;
+
+  constructor() {
+    this.baseUrl = process.env.NEXT_PUBLIC_JAVA_API_URL || 'http://localhost:8080';
+    this.timeout = parseInt(process.env.NEXT_PUBLIC_JAVA_API_TIMEOUT || '30000');
+  }
+
+  private async request<T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<ApiResponse<T>> {
+    const url = `${this.baseUrl}${endpoint}`;
+    
+    const defaultHeaders: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    // Добавляем JWT токен если есть
+    const token = this.getToken();
+    if (token) {
+      defaultHeaders['Authorization'] = `Bearer ${token}`;
+    }
+
+    const config: RequestInit = {
+      ...options,
+      headers: {
+        ...defaultHeaders,
+        ...options.headers,
+      },
+    };
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+
+      const response = await fetch(url, {
+        ...config,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return {
+          error: data.message || data.error || 'Произошла ошибка',
+          status: response.status,
+        };
+      }
+
+      return {
+        data,
+        status: response.status,
+      };
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        return {
+          error: 'Превышено время ожидания запроса',
+          status: 408,
+        };
+      }
+
+      return {
+        error: error.message || 'Ошибка сети',
+        status: 0,
+      };
+    }
+  }
+
+  // Управление токенами
+  private getToken(): string | null {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('auth_token');
+  }
+
+  private setToken(token: string): void {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem('auth_token', token);
+  }
+
+  private removeToken(): void {
+    if (typeof window === 'undefined') return;
+    localStorage.removeItem('auth_token');
+  }
+
+  // Auth API
+  async login(credentials: LoginRequest): Promise<ApiResponse<AuthResponse>> {
+    const response = await this.request<AuthResponse>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(credentials),
+    });
+
+    if (response.data) {
+      this.setToken(response.data.token);
+    }
+
+    return response;
+  }
+
+  async register(userData: RegisterRequest): Promise<ApiResponse<AuthResponse>> {
+    const response = await this.request<AuthResponse>('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(userData),
+    });
+
+    if (response.data) {
+      this.setToken(response.data.token);
+    }
+
+    return response;
+  }
+
+  logout(): void {
+    this.removeToken();
+  }
+
+  isAuthenticated(): boolean {
+    return !!this.getToken();
+  }
+
+  // Image Generation API
+  async generateImage(request: ImageRequest): Promise<ApiResponse<ImageResponse>> {
+    return this.request<ImageResponse>('/fal/image/run/create', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    });
+  }
+
+  // File Upload API
+  async uploadFile(file: File): Promise<ApiResponse<string>> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const url = `${this.baseUrl}/files/upload`;
+    const token = this.getToken();
+    
+    // Устанавливаем только Authorization, Content-Type браузер установит автоматически
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: formData,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return {
+          error: errorData.message || errorData.error || 'Ошибка загрузки файла',
+          status: response.status,
+        };
+      }
+
+      const fileUrl = await response.text();
+      // Если URL относительный, делаем его абсолютным
+      const fullUrl = fileUrl.startsWith('http') ? fileUrl : `${this.baseUrl}${fileUrl}`;
+      return {
+        data: fullUrl,
+        status: response.status,
+      };
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        return {
+          error: 'Превышено время ожидания загрузки',
+          status: 408,
+        };
+      }
+
+      return {
+        error: error.message || 'Ошибка загрузки файла',
+        status: 0,
+      };
+    }
+  }
+
+  // Get file URL
+  getFileUrl(filename: string): string {
+    // Если filename уже полный URL, возвращаем как есть
+    if (filename.startsWith('http')) {
+      return filename;
+    }
+    // Если filename начинается с /files/, добавляем baseUrl
+    if (filename.startsWith('/files/')) {
+      return `${this.baseUrl}${filename}`;
+    }
+    // Иначе добавляем /files/ к filename
+    return `${this.baseUrl}/files/${filename}`;
+  }
+
+  // User API
+  async getUserInfo(): Promise<ApiResponse<UserInfo>> {
+    return this.request<UserInfo>('/users/me');
+  }
+
+  async getImageHistory(): Promise<ApiResponse<ImageGenerationHistory[]>> {
+    return this.request<ImageGenerationHistory[]>('/users/me/image-history');
+  }
+
+  // Get user points/balance
+  async getUserPoints(): Promise<ApiResponse<number>> {
+    const url = `${this.baseUrl}/fal/user/points`;
+    const token = this.getToken();
+    
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return {
+          error: errorData.message || errorData.error || 'Ошибка получения баланса',
+          status: response.status,
+        };
+      }
+
+      const points = await response.json();
+      return {
+        data: points,
+        status: response.status,
+      };
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        return {
+          error: 'Превышено время ожидания запроса',
+          status: 408,
+        };
+      }
+
+      return {
+        error: error.message || 'Ошибка получения баланса',
+        status: 0,
+      };
+    }
+  }
+
+  // Health Check
+  async healthCheck(): Promise<ApiResponse<any>> {
+    return this.request('/health');
+  }
+}
+
+// Экспортируем singleton instance
+export const apiClient = new ApiClient();

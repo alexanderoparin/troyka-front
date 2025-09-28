@@ -1,0 +1,183 @@
+"use client"
+
+import { useAuth } from "@/contexts/auth-context"
+import { useImageHistory } from "@/hooks/use-image-history"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { 
+  History,
+  Image as ImageIcon,
+  ExternalLink,
+  AlertCircle,
+  ArrowLeft,
+  Download
+} from "lucide-react"
+import { ImageEditButton } from "@/components/image-edit-button"
+import { formatDate } from "@/lib/utils"
+import { apiClient } from "@/lib/api-client"
+import Link from "next/link"
+import Image from "next/image"
+
+export default function HistoryPage() {
+  const { isAuthenticated, isLoading } = useAuth()
+  const { history: imageHistory, isLoading: historyLoading, error: historyError, refetch } = useImageHistory()
+  const router = useRouter()
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="text-center space-y-8 py-20">
+        <div className="space-y-4">
+          <AlertCircle className="h-16 w-16 text-muted-foreground mx-auto" />
+          <h1 className="text-3xl font-bold">Требуется авторизация</h1>
+          <p className="text-lg text-muted-foreground max-w-md mx-auto">
+            Войдите в аккаунт, чтобы просмотреть историю генерации
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button size="lg" onClick={() => router.push("/login")}>
+            <ImageIcon className="w-5 h-5 mr-2" />
+            Войти в аккаунт
+          </Button>
+          <Button variant="outline" size="lg" asChild>
+            <Link href="/">На главную</Link>
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-8 max-w-6xl mx-auto">
+      {/* Header */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/account">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Назад к аккаунту
+            </Link>
+          </Button>
+        </div>
+        <h1 className="text-3xl font-bold">История генерации изображений</h1>
+        <p className="text-muted-foreground">
+          Все ваши созданные изображения
+        </p>
+      </div>
+
+      {/* History Content */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <History className="h-5 w-5" />
+            Созданные изображения
+          </CardTitle>
+          <CardDescription>
+            {imageHistory?.length || 0} изображений в истории
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {historyLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : historyError ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <AlertCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p className="text-lg mb-2">Ошибка загрузки истории</p>
+              <p className="mb-4">{historyError}</p>
+              <Button onClick={refetch} variant="outline">
+                Попробовать снова
+          </Button>
+        </div>
+          ) : imageHistory && imageHistory.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {imageHistory.map((item, index) => (
+                <div key={index} className="group border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+                  <div className="relative aspect-square bg-muted">
+                  <Image
+                      src={apiClient.getFileUrl(item.imageUrl)}
+                      alt={item.prompt}
+                    fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-200"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        asChild
+                        className="h-8 w-8 p-0"
+                      >
+                        <a
+                          href={apiClient.getFileUrl(item.imageUrl)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </a>
+                      </Button>
+                      <ImageEditButton
+                        imageUrl={item.imageUrl}
+                        originalPrompt={item.prompt}
+                        onImageEdited={() => {
+                          // Обновляем историю после редактирования
+                          refetch();
+                        }}
+                      />
+                      </div>
+                  </div>
+                  <div className="p-4">
+                    <p className="text-sm font-medium line-clamp-2 mb-2" title={item.prompt}>
+                      {item.prompt}
+                    </p>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span>{formatDate(new Date(item.createdAt))}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        asChild
+                        className="h-6 px-2 text-xs"
+                      >
+                        <a
+                          href={apiClient.getFileUrl(item.imageUrl)}
+                          download
+                          target="_blank"
+                          rel="noopener noreferrer"
+                      >
+                        <Download className="h-3 w-3 mr-1" />
+                        Скачать
+                        </a>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+          ))}
+        </div>
+          ) : (
+            <div className="text-center py-12 text-muted-foreground">
+              <ImageIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p className="text-lg mb-2">История генерации пуста</p>
+              <p className="mb-4">Создайте первое изображение в студии</p>
+              <Button asChild>
+                <Link href="/studio">
+                  <ImageIcon className="w-4 h-4 mr-2" />
+                  Создать изображение
+                </Link>
+          </Button>
+        </div>
+      )}
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
