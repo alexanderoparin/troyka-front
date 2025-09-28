@@ -255,7 +255,7 @@ class ApiClient {
     const formData = new FormData();
     formData.append('file', file);
 
-    const url = `${this.baseUrl}/files/upload`;
+    const url = `${this.baseUrl}/users/avatar/upload`;
     const token = this.getToken();
     
     if (!token) {
@@ -293,8 +293,9 @@ class ApiClient {
       }
 
       const result = await response.text();
-      // /files/upload возвращает просто URL
-      const avatarUrl = result;
+      // Извлекаем URL из ответа (формат: "Аватар успешно загружен и сохранен: http://...")
+      const urlMatch = result.match(/http:\/\/[^\s]+/);
+      const avatarUrl = urlMatch ? urlMatch[0] : result;
       
       return {
         data: avatarUrl,
