@@ -5,11 +5,12 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useToast } from "@/components/ui/use-toast"
 import { apiClient } from "@/lib/api-client"
-import { Camera, Upload, X } from "lucide-react"
+import { Camera, Upload, X, User } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 
 interface AvatarUploadProps {
   currentAvatar?: string
+  userName?: string
   onAvatarChange?: (newAvatarUrl: string) => void
   size?: "sm" | "md" | "lg"
   className?: string
@@ -17,6 +18,7 @@ interface AvatarUploadProps {
 
 export function AvatarUpload({ 
   currentAvatar, 
+  userName,
   onAvatarChange, 
   size = "md",
   className = "" 
@@ -104,15 +106,35 @@ export function AvatarUpload({
   }
 
   const handleRemoveAvatar = async () => {
-    // TODO: Реализовать удаление аватара на бэкенде
-    toast({
-      title: "Информация",
-      description: "Функция удаления аватара будет добавлена позже"
-    })
+    try {
+      const response = await apiClient.deleteUserAvatar()
+      
+      if (response.status === 200) {
+        toast({
+          title: "Успешно",
+          description: "Аватар удален"
+        })
+        
+        // Обновляем информацию о пользователе
+        await refreshUserInfo()
+        
+        // Уведомляем родительский компонент
+        onAvatarChange?.('')
+      } else {
+        throw new Error(response.error || 'Ошибка удаления')
+      }
+    } catch (error) {
+      console.error('Ошибка удаления аватара:', error)
+      toast({
+        title: "Ошибка",
+        description: "Не удалось удалить аватар",
+        variant: "destructive"
+      })
+    }
   }
 
   const getInitials = (name?: string) => {
-    if (!name) return "?"
+    if (!name) return null
     return name
       .split(' ')
       .map(word => word[0])
@@ -129,7 +151,7 @@ export function AvatarUpload({
           alt="Аватар пользователя"
         />
         <AvatarFallback className="text-xs font-medium">
-          {getInitials(currentAvatar)}
+          {getInitials(userName) || <User className="h-4 w-4" />}
         </AvatarFallback>
       </Avatar>
       

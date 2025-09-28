@@ -8,6 +8,7 @@ interface AuthState {
   isAuthenticated: boolean
   isLoading: boolean
   points: number
+  avatar: string | null
 }
 
 interface AuthContextType extends AuthState {
@@ -26,6 +27,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isAuthenticated: false,
     isLoading: true,
     points: 0,
+    avatar: null,
   })
 
   // Проверяем аутентификацию при загрузке
@@ -33,9 +35,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const checkAuth = async () => {
       if (apiClient.isAuthenticated()) {
         try {
-          const [userResponse, pointsResponse] = await Promise.all([
+          const [userResponse, pointsResponse, avatarResponse] = await Promise.all([
             apiClient.getUserInfo(),
-            apiClient.getUserPoints()
+            apiClient.getUserPoints(),
+            apiClient.getUserAvatar()
           ])
           
           if (userResponse.data) {
@@ -44,6 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               isAuthenticated: true,
               isLoading: false,
               points: pointsResponse.data || 0,
+              avatar: avatarResponse.data || null,
             })
           } else {
             // Токен недействителен
@@ -53,6 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               isAuthenticated: false,
               isLoading: false,
               points: 0,
+              avatar: null,
             })
           }
         } catch (error) {
@@ -63,6 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             isAuthenticated: false,
             isLoading: false,
             points: 0,
+            avatar: null,
           })
         }
       } else {
@@ -71,6 +77,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           isAuthenticated: false,
           isLoading: false,
           points: 0,
+          avatar: null,
         }))
       }
     }
@@ -86,9 +93,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (response.data) {
       // После успешного логина получаем полную информацию о пользователе
       try {
-        const [userInfoResponse, pointsResponse] = await Promise.all([
+        const [userInfoResponse, pointsResponse, avatarResponse] = await Promise.all([
           apiClient.getUserInfo(),
-          apiClient.getUserPoints()
+          apiClient.getUserPoints(),
+          apiClient.getUserAvatar()
         ])
         
         if (userInfoResponse.data) {
@@ -97,6 +105,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             isAuthenticated: true,
             isLoading: false,
             points: pointsResponse.data || 0,
+            avatar: avatarResponse.data || null,
           })
           return { success: true, error: null }
         }
@@ -112,7 +121,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           },
           isAuthenticated: true,
           isLoading: false,
-          points: 0,
+          points: 6, // Новые пользователи получают 6 баллов при регистрации
+          avatar: null,
         })
         return { success: true, error: null }
       }
@@ -123,6 +133,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isAuthenticated: false,
       isLoading: false,
       points: 0,
+      avatar: null,
     }))
     return { success: false, error: response.error || 'Неизвестная ошибка' }
   }, [])
@@ -135,9 +146,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (response.data) {
       // После успешной регистрации получаем полную информацию о пользователе
       try {
-        const [userInfoResponse, pointsResponse] = await Promise.all([
+        const [userInfoResponse, pointsResponse, avatarResponse] = await Promise.all([
           apiClient.getUserInfo(),
-          apiClient.getUserPoints()
+          apiClient.getUserPoints(),
+          apiClient.getUserAvatar()
         ])
         
         if (userInfoResponse.data) {
@@ -146,6 +158,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             isAuthenticated: true,
             isLoading: false,
             points: pointsResponse.data || 0,
+            avatar: avatarResponse.data || null,
           })
           return { success: true, error: null }
         }
@@ -162,6 +175,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           isAuthenticated: true,
           isLoading: false,
           points: 6, // Новые пользователи получают 6 баллов при регистрации
+          avatar: null,
         })
         return { success: true, error: null }
       }
@@ -172,6 +186,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isAuthenticated: false,
       isLoading: false,
       points: 0,
+      avatar: null,
     }))
     return { success: false, error: response.error || 'Неизвестная ошибка' }
   }, [])
@@ -183,6 +198,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isAuthenticated: false,
       isLoading: false,
       points: 0,
+      avatar: null,
     })
   }, [])
 
@@ -206,11 +222,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const refreshUserInfo = useCallback(async () => {
     if (state.isAuthenticated) {
       try {
-        const userResponse = await apiClient.getUserInfo()
+        const [userResponse, avatarResponse] = await Promise.all([
+          apiClient.getUserInfo(),
+          apiClient.getUserAvatar()
+        ])
         if (userResponse.data) {
           setState(prev => ({
             ...prev,
-            user: userResponse.data,
+            user: userResponse.data!,
+            avatar: avatarResponse.data || null,
           }))
         }
       } catch (error) {

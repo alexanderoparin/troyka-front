@@ -247,7 +247,7 @@ class ApiClient {
     const formData = new FormData();
     formData.append('file', file);
 
-    const url = `${this.baseUrl}/user/avatar`;
+    const url = `${this.baseUrl}/users/avatar/upload`;
     const token = this.getToken();
     
     if (!token) {
@@ -284,9 +284,13 @@ class ApiClient {
         };
       }
 
-      const result = await response.json();
+      const result = await response.text();
+      // Извлекаем URL из ответа (формат: "Аватар успешно загружен и сохранен: http://...")
+      const urlMatch = result.match(/http:\/\/[^\s]+/);
+      const avatarUrl = urlMatch ? urlMatch[0] : result;
+      
       return {
-        data: result.avatarUrl || result.url || result,
+        data: avatarUrl,
         error: undefined,
         status: response.status,
       };
@@ -301,6 +305,132 @@ class ApiClient {
       return {
         data: undefined,
         error: error.message || 'Ошибка загрузки аватара',
+        status: 0,
+      };
+    }
+  }
+
+  // Get user avatar
+  async getUserAvatar(): Promise<ApiResponse<string>> {
+    const url = `${this.baseUrl}/users/avatar`;
+    const token = this.getToken();
+    
+    if (!token) {
+      return {
+        data: undefined,
+        error: 'Требуется авторизация',
+        status: 401,
+      };
+    }
+
+    const headers: Record<string, string> = {
+      'Authorization': `Bearer ${token}`,
+    };
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return {
+            data: undefined,
+            error: undefined,
+            status: 404,
+          };
+        }
+        const errorData = await response.json().catch(() => ({}));
+        return {
+          data: undefined,
+          error: errorData.message || `HTTP ${response.status}`,
+          status: response.status,
+        };
+      }
+
+      const result = await response.text();
+      return {
+        data: result,
+        error: undefined,
+        status: response.status,
+      };
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        return {
+          data: undefined,
+          error: 'Превышено время ожидания',
+          status: 408,
+        };
+      }
+      return {
+        data: undefined,
+        error: error.message || 'Ошибка получения аватара',
+        status: 0,
+      };
+    }
+  }
+
+  // Delete user avatar
+  async deleteUserAvatar(): Promise<ApiResponse<void>> {
+    const url = `${this.baseUrl}/users/avatar`;
+    const token = this.getToken();
+    
+    if (!token) {
+      return {
+        data: undefined,
+        error: 'Требуется авторизация',
+        status: 401,
+      };
+    }
+
+    const headers: Record<string, string> = {
+      'Authorization': `Bearer ${token}`,
+    };
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        return {
+          data: undefined,
+          error: errorData.message || `HTTP ${response.status}`,
+          status: response.status,
+        };
+      }
+
+      return {
+        data: undefined,
+        error: undefined,
+        status: response.status,
+      };
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        return {
+          data: undefined,
+          error: 'Превышено время ожидания',
+          status: 408,
+        };
+      }
+      return {
+        data: undefined,
+        error: error.message || 'Ошибка удаления аватара',
         status: 0,
       };
     }

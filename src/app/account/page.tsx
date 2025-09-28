@@ -26,7 +26,7 @@ import Link from "next/link"
 import Image from "next/image"
 
 export default function AccountPage() {
-  const { user, isAuthenticated, isLoading, logout } = useAuth()
+  const { user, isAuthenticated, isLoading, logout, avatar } = useAuth()
   const { history: imageHistory, isLoading: historyLoading, error: historyError } = useImageHistory()
   const router = useRouter()
 
@@ -92,7 +92,8 @@ export default function AccountPage() {
             <CardContent className="space-y-4">
               <div className="flex items-center gap-3">
                 <AvatarUpload 
-                  currentAvatar={user.avatar}
+                  currentAvatar={avatar}
+                  userName={user?.username}
                   size="md"
                 />
                 <div>

@@ -28,7 +28,7 @@ import {
 import { getPointsText } from "@/lib/grammar"
 
 export function Header() {
-  const { user, isAuthenticated, isLoading, logout, points } = useAuth()
+  const { user, isAuthenticated, isLoading, logout, points, avatar } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
@@ -92,7 +92,8 @@ export function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0">
                     <AvatarUpload 
-                      currentAvatar={user?.avatar}
+                      currentAvatar={avatar}
+                      userName={user?.username}
                       size="sm"
                       className="h-8 w-8"
                     />
