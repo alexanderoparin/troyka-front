@@ -77,7 +77,7 @@ export function AvatarUpload({
           const saveResponse = await fetch(`${apiClient.getBaseUrl()}/users/avatar/save`, {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${apiClient.getToken()}`,
+              'Authorization': `Bearer ${apiClient.getAuthToken()}`,
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({ avatarUrl: response.data })
