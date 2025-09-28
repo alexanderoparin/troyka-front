@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { AvatarUpload } from "@/components/avatar-upload"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { 
   User, 
@@ -89,13 +90,12 @@ export function Header() {
             ) : isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src="" alt={user?.username || ""} />
-                      <AvatarFallback>
-                        {user?.username?.charAt(0) || user?.email?.charAt(0) || "U"}
-                      </AvatarFallback>
-                    </Avatar>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0">
+                    <AvatarUpload 
+                      currentAvatar={user?.avatar}
+                      size="sm"
+                      className="h-8 w-8"
+                    />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56" align="end" forceMount>

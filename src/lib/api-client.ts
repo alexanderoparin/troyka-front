@@ -45,6 +45,7 @@ export interface UserInfo {
   lastName: string;
   role: string;
   points?: number;
+  avatar?: string;
 }
 
 export interface ImageGenerationHistory {

@@ -19,6 +19,7 @@ import {
   ExternalLink
 } from "lucide-react"
 import { ImageEditButton } from "@/components/image-edit-button"
+import { AvatarUpload } from "@/components/avatar-upload"
 import { formatDate } from "@/lib/utils"
 import { apiClient } from "@/lib/api-client"
 import Link from "next/link"
@@ -90,9 +91,10 @@ export default function AccountPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <User className="h-6 w-6 text-primary" />
-                </div>
+                <AvatarUpload 
+                  currentAvatar={user.avatar}
+                  size="md"
+                />
                 <div>
                   <p className="font-medium">
                     {user.firstName && user.lastName 

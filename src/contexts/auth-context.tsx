@@ -15,6 +15,7 @@ interface AuthContextType extends AuthState {
   register: (userData: RegisterRequest) => Promise<{ success: boolean; error: string | null }>
   logout: () => void
   refreshPoints: () => Promise<void>
+  refreshUserInfo: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -202,6 +203,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [state.isAuthenticated])
 
+  const refreshUserInfo = useCallback(async () => {
+    if (state.isAuthenticated) {
+      try {
+        const userResponse = await apiClient.getUserInfo()
+        if (userResponse.data) {
+          setState(prev => ({
+            ...prev,
+            user: userResponse.data,
+          }))
+        }
+      } catch (error) {
+        console.error('Ошибка обновления информации о пользователе:', error)
+      }
+    }
+  }, [state.isAuthenticated])
+
   return (
     <AuthContext.Provider value={{
       ...state,
@@ -209,6 +226,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       register,
       logout,
       refreshPoints,
+      refreshUserInfo,
     }}>
       {children}
     </AuthContext.Provider>
