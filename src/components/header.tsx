@@ -92,7 +92,7 @@ export function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0">
                     <AvatarUpload 
-                      currentAvatar={avatar}
+                      currentAvatar={avatar || undefined}
                       userName={user?.username}
                       size="sm"
                       className="h-8 w-8"

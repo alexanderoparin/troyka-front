@@ -92,7 +92,7 @@ export default function AccountPage() {
             <CardContent className="space-y-4">
               <div className="flex items-center gap-3">
                 <AvatarUpload 
-                  currentAvatar={avatar}
+                  currentAvatar={avatar || undefined}
                   userName={user?.username}
                   size="md"
                 />
