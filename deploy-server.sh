@@ -115,6 +115,19 @@ NODE_ENV=production
 PORT=$PORT
 EOF
 
+# Проверка бэкенда
+log "🔍 Проверяем бэкенд..."
+if [ -d "/opt/troyka-back" ]; then
+    success "Бэкенд найден в /opt/troyka-back"
+    if systemctl is-active --quiet troyka-back; then
+        success "Бэкенд запущен"
+    else
+        warning "Бэкенд не запущен. Запустите его командой: systemctl start troyka-back"
+    fi
+else
+    warning "Бэкенд не найден в /opt/troyka-back"
+fi
+
 success "Переменные окружения настроены"
 
 # Создание PM2 конфигурации
