@@ -55,6 +55,36 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Исправляем проблемы с прокруткой на iOS */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: none;
+  }
+  
+  /* Исправляем проблемы с прокруткой на мобильных устройствах */
+  html {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: none;
+  }
+  
+  /* Улучшаем работу с touch на iOS */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Исправляем проблемы с viewport на iOS */
+  @supports (-webkit-touch-callout: none) {
+    body {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    
+    main {
+      height: 100%;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
   }
 }
 

@@ -14,7 +14,6 @@ export const metadata: Metadata = {
   description: 'Создавайте профессиональные изображения товаров с помощью искусственного интеллекта. Получите +6 поинтов при регистрации!',
   keywords: 'ИИ, генерация изображений, товары, искусственный интеллект, фотосъемка товаров',
   authors: [{ name: 'TROYKA.AI' }],
-  viewport: 'width=device-width, initial-scale=1',
   robots: 'index, follow',
   openGraph: {
     title: 'TROYKA.AI - Генерация изображений товаров с ИИ',
@@ -47,6 +46,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ru" suppressHydrationWarning>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+      </head>
       <body className={inter.className}>
         <ThemeProvider
           attribute="class"
