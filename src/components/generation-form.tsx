@@ -159,7 +159,7 @@ export function GenerationForm() {
         onFileRemoved={handleFileRemoved}
         uploadedFiles={uploadedImages}
         maxFiles={1}
-        accept="image/*"
+                  accept="image/*"
         className="w-full"
       />
 

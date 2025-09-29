@@ -69,13 +69,40 @@ export function AvatarUpload({
     // Загружаем файл
     setIsUploading(true)
     try {
-      const response = await apiClient.uploadAvatar(file)
+      const response = await apiClient.uploadFile(file)
       
       if (response.data) {
-        toast({
-          title: "Успешно",
-          description: "Аватар загружен"
-        })
+        // Сохраняем аватар через ваш endpoint
+        try {
+          const formData = new FormData()
+          formData.append('file', file)
+          
+          const saveResponse = await fetch(`${apiClient.getBaseUrl()}/users/avatar/upload`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${apiClient.getAuthToken()}`,
+            },
+            body: formData
+          })
+          
+          if (saveResponse.ok) {
+            toast({
+              title: "Успешно",
+              description: "Аватар загружен и сохранен"
+            })
+          } else {
+            toast({
+              title: "Частично успешно",
+              description: "Файл загружен, но не сохранен как аватар"
+            })
+          }
+        } catch (error) {
+          console.warn('Не удалось сохранить аватар:', error)
+          toast({
+            title: "Частично успешно",
+            description: "Файл загружен, но не сохранен как аватар"
+          })
+        }
         
         // Обновляем информацию о пользователе
         await refreshUserInfo()

@@ -41,7 +41,7 @@ chmod +x deploy.sh
 ### Ручной деплой
 
 1. **Сборка проекта:**
-   ```bash
+```bash
    npm run build
    ```
 
@@ -52,12 +52,12 @@ chmod +x deploy.sh
    - `.env.local` - переменные окружения
 
 3. **Установка зависимостей на сервере:**
-   ```bash
+```bash
    npm ci --production
    ```
 
 4. **Запуск:**
-   ```bash
+```bash
    npm start
    ```
 
