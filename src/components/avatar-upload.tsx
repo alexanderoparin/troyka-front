@@ -26,6 +26,7 @@ export function AvatarUpload({
   const [isUploading, setIsUploading] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [showMenu, setShowMenu] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
   const { refreshUserInfo } = useAuth()
@@ -171,7 +172,9 @@ export function AvatarUpload({
       .slice(0, 2)
   }
 
-  const handleAvatarClick = () => {
+  const handleAvatarClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
     setShowMenu(!showMenu)
   }
 
@@ -184,6 +187,18 @@ export function AvatarUpload({
     handleRemoveAvatar()
     setShowMenu(false)
   }
+
+  // Определяем мобильное устройство
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || 'ontouchstart' in window)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // Закрываем меню при клике вне компонента
   useEffect(() => {
@@ -205,7 +220,7 @@ export function AvatarUpload({
   return (
     <div className={`relative inline-block avatar-upload-container ${className}`}>
       <Avatar 
-        className={`${sizeClasses[size]} cursor-pointer group`}
+        className={`${sizeClasses[size]} cursor-pointer group ${isMobile && !showMenu ? 'ring-2 ring-blue-500/50' : ''}`}
         onClick={handleAvatarClick}
       >
         <AvatarImage 
@@ -219,7 +234,7 @@ export function AvatarUpload({
       
       {/* Overlay с кнопками - показывается при hover на десктопе или при клике на мобильных */}
       <div className={`absolute inset-0 flex items-center justify-center bg-black/50 rounded-full transition-opacity ${
-        showMenu ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+        showMenu ? 'opacity-100' : (isMobile ? 'opacity-0' : 'opacity-0 group-hover:opacity-100')
       }`}>
         <div className="flex gap-1">
           <Button
