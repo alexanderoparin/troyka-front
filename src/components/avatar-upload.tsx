@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useToast } from "@/components/ui/use-toast"
@@ -25,6 +25,7 @@ export function AvatarUpload({
 }: AvatarUploadProps) {
   const [isUploading, setIsUploading] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [showMenu, setShowMenu] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
   const { refreshUserInfo } = useAuth()
@@ -170,9 +171,43 @@ export function AvatarUpload({
       .slice(0, 2)
   }
 
+  const handleAvatarClick = () => {
+    setShowMenu(!showMenu)
+  }
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click()
+    setShowMenu(false)
+  }
+
+  const handleRemoveClick = () => {
+    handleRemoveAvatar()
+    setShowMenu(false)
+  }
+
+  // Закрываем меню при клике вне компонента
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showMenu && !(event.target as Element).closest('.avatar-upload-container')) {
+        setShowMenu(false)
+      }
+    }
+
+    if (showMenu) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showMenu])
+
   return (
-    <div className={`relative inline-block ${className}`}>
-      <Avatar className={`${sizeClasses[size]} cursor-pointer group`}>
+    <div className={`relative inline-block avatar-upload-container ${className}`}>
+      <Avatar 
+        className={`${sizeClasses[size]} cursor-pointer group`}
+        onClick={handleAvatarClick}
+      >
         <AvatarImage 
           src={previewUrl || currentAvatar} 
           alt="Аватар пользователя"
@@ -182,14 +217,16 @@ export function AvatarUpload({
         </AvatarFallback>
       </Avatar>
       
-      {/* Overlay с кнопками */}
-      <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+      {/* Overlay с кнопками - показывается при hover на десктопе или при клике на мобильных */}
+      <div className={`absolute inset-0 flex items-center justify-center bg-black/50 rounded-full transition-opacity ${
+        showMenu ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+      }`}>
         <div className="flex gap-1">
           <Button
             size="sm"
             variant="secondary"
             className="h-6 w-6 p-0"
-            onClick={() => fileInputRef.current?.click()}
+            onClick={handleUploadClick}
             disabled={isUploading}
           >
             {isUploading ? (
@@ -204,7 +241,7 @@ export function AvatarUpload({
               size="sm"
               variant="destructive"
               className="h-6 w-6 p-0"
-              onClick={handleRemoveAvatar}
+              onClick={handleRemoveClick}
             >
               <X className="h-3 w-3" />
             </Button>
