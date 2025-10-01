@@ -448,9 +448,12 @@ class ApiClient {
 
   // Get file URL
   getFileUrl(filename: string): string {
-    // Если filename уже полный URL, заменяем HTTP на HTTPS для mixed-content
+    // Если filename уже полный URL, заменяем HTTP на HTTPS и IP на домен
     if (filename.startsWith('http://')) {
-      return filename.replace('http://', 'https://');
+      let url = filename.replace('http://', 'https://');
+      // Заменяем IP адрес на домен для правильного SSL
+      url = url.replace('213.171.4.47:8080', '24reshai.ru');
+      return url;
     }
     if (filename.startsWith('https://')) {
       return filename;
