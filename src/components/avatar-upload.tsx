@@ -175,16 +175,30 @@ export function AvatarUpload({
   const handleAvatarClick = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    setShowMenu(!showMenu)
+    // Если есть аватар, открываем меню для замены/удаления
+    // Если нет аватара, сразу открываем загрузку
+    if (currentAvatar) {
+      setShowMenu(!showMenu)
+    } else {
+      handleUploadClick()
+    }
   }
 
-  const handleUploadClick = () => {
+  const handleUploadClick = (e?: React.MouseEvent) => {
+    e?.preventDefault()
+    e?.stopPropagation()
     fileInputRef.current?.click()
     setShowMenu(false)
   }
 
-  const handleRemoveClick = () => {
-    handleRemoveAvatar()
+  const handleRemoveClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    // Подтверждение удаления
+    if (window.confirm('Вы уверены, что хотите удалить аватар?')) {
+      handleRemoveAvatar()
+    }
     setShowMenu(false)
   }
 
