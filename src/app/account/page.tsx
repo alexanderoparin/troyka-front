@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator"
 import { 
   User, 
   Mail, 
+  Phone,
   LogOut,
   AlertCircle,
   Calendar,
@@ -106,6 +107,12 @@ export default function AccountPage() {
                     <Mail className="h-3 w-3" />
                     {user.email}
                   </div>
+                  {user.phone && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Phone className="h-3 w-3" />
+                      {user.phone}
+                    </div>
+                  )}
                 </div>
               </div>
               
@@ -124,16 +131,26 @@ export default function AccountPage() {
                 </div>
               </div>
 
-              {(user.firstName || user.lastName) && (
+              {(user.firstName || user.lastName || user.phone) && (
                 <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <p className="text-muted-foreground">Имя</p>
-                    <p className="font-medium">{user.firstName || "—"}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Фамилия</p>
-                    <p className="font-medium">{user.lastName || "—"}</p>
-                  </div>
+                  {user.firstName && (
+                    <div>
+                      <p className="text-muted-foreground">Имя</p>
+                      <p className="font-medium">{user.firstName}</p>
+                    </div>
+                  )}
+                  {user.lastName && (
+                    <div>
+                      <p className="text-muted-foreground">Фамилия</p>
+                      <p className="font-medium">{user.lastName}</p>
+                    </div>
+                  )}
+                  {user.phone && (
+                    <div className="col-span-2">
+                      <p className="text-muted-foreground">Телефон</p>
+                      <p className="font-medium">{user.phone}</p>
+                    </div>
+                  )}
                 </div>
               )}
             </CardContent>

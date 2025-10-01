@@ -20,6 +20,7 @@ const registerSchema = z.object({
   password: z.string().min(6, "Пароль должен содержать минимум 6 символов"),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
+  phone: z.string().optional(),
 })
 
 type RegisterFormData = z.infer<typeof registerSchema>
@@ -154,6 +155,20 @@ export default function RegisterPage() {
                 />
                 {errors.password && (
                   <p className="text-sm text-destructive">{errors.password.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="phone">Телефон</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  {...register("phone")}
+                  placeholder="+7 (999) 123-45-67"
+                  disabled={isLoading}
+                />
+                {errors.phone && (
+                  <p className="text-sm text-destructive">{errors.phone.message}</p>
                 )}
               </div>
 

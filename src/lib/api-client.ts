@@ -24,6 +24,7 @@ export interface RegisterRequest {
   password: string;
   firstName?: string;
   lastName?: string;
+  phone?: string;
 }
 
 export interface ImageRequest {
@@ -43,6 +44,7 @@ export interface UserInfo {
   email: string;
   firstName: string;
   lastName: string;
+  phone?: string;
   role: string;
   points?: number;
   avatar?: string;
