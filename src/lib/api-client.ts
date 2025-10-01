@@ -448,8 +448,11 @@ class ApiClient {
 
   // Get file URL
   getFileUrl(filename: string): string {
-    // Если filename уже полный URL, возвращаем как есть
-    if (filename.startsWith('http')) {
+    // Если filename уже полный URL, заменяем HTTP на HTTPS для mixed-content
+    if (filename.startsWith('http://')) {
+      return filename.replace('http://', 'https://');
+    }
+    if (filename.startsWith('https://')) {
       return filename;
     }
     // Если filename начинается с /files/, добавляем baseUrl
