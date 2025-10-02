@@ -56,6 +56,15 @@ export interface ImageGenerationHistory {
   createdAt: string;
 }
 
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  newPassword: string;
+}
+
 class ApiClient {
   private baseUrl: string;
   private timeout: number;
@@ -523,6 +532,21 @@ class ApiClient {
         status: 0,
       };
     }
+  }
+
+  // Password Reset API
+  async requestPasswordReset(email: string): Promise<ApiResponse<string>> {
+    return this.request<string>('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  }
+
+  async resetPassword(request: ResetPasswordRequest): Promise<ApiResponse<string>> {
+    return this.request<string>('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    });
   }
 
   // Health Check
