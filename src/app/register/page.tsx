@@ -17,7 +17,12 @@ import Link from "next/link"
 const registerSchema = z.object({
   username: z.string().min(3, "Логин должен содержать минимум 3 символа"),
   email: z.string().email("Введите корректный email"),
-  password: z.string().min(6, "Пароль должен содержать минимум 6 символов"),
+  password: z.string()
+    .min(8, "Пароль должен содержать минимум 8 символов")
+    .regex(/[a-z]/, "Пароль должен содержать строчные буквы")
+    .regex(/[A-Z]/, "Пароль должен содержать заглавные буквы")
+    .regex(/\d/, "Пароль должен содержать цифры")
+    .regex(/[@$!%*?&]/, "Пароль должен содержать специальные символы (@$!%*?&)"),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
   phone: z.string().optional(),
@@ -153,6 +158,9 @@ export default function RegisterPage() {
                   placeholder="Введите пароль"
                   disabled={isLoading}
                 />
+                <div className="text-xs text-muted-foreground">
+                  Пароль должен содержать минимум 8 символов, включая заглавные и строчные буквы, цифры и специальные символы (@$!%*?&)
+                </div>
                 {errors.password && (
                   <p className="text-sm text-destructive">{errors.password.message}</p>
                 )}
