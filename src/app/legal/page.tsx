@@ -8,7 +8,7 @@ export default function LegalPage() {
       <div className="text-center space-y-4">
         <h1 className="text-3xl font-bold">Правовая информация</h1>
         <p className="text-muted-foreground">
-          Политика конфиденциальности и условия использования сервиса TROYKA.AI
+          Политика конфиденциальности и условия использования сервиса 24reshai
         </p>
       </div>
 
@@ -44,7 +44,7 @@ export default function LegalPage() {
             <h3 className="font-semibold">4. Права пользователей</h3>
             <p>
               Вы имеете право на доступ, исправление и удаление ваших персональных данных.
-              Для этого обратитесь к нам по адресу support@troyka-ai.ru
+              Для этого обратитесь к нам по адресу support@24reshai.ru
             </p>
 
             <h3 className="font-semibold">5. Cookies</h3>
@@ -65,7 +65,7 @@ export default function LegalPage() {
           <CardContent className="space-y-4 text-sm">
             <h3 className="font-semibold">1. Условия использования</h3>
             <p>
-              Используя сервис TROYKA.AI, вы соглашаетесь с данными условиями.
+              Используя сервис 24reshai, вы соглашаетесь с данными условиями.
               Сервис предназначен для создания изображений товаров с помощью ИИ.
             </p>
 
@@ -114,7 +114,7 @@ export default function LegalPage() {
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
           <p><strong>ООО "ТРОYKA ИИ"</strong></p>
-          <p>Email: support@troyka-ai.ru</p>
+          <p>Email: support@24reshai.ru</p>
           <p>Адрес: Россия, г. Москва</p>
           <p>Дата последнего обновления: {new Date().toLocaleDateString('ru-RU')}</p>
         </CardContent>

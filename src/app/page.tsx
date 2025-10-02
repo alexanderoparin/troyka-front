@@ -22,7 +22,7 @@ export default function HomePage() {
             Новое поколение ИИ для товаров
           </Badge>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-            <span className="gradient-text">TROYKA.AI</span>
+            <span className="gradient-text">24reshai</span>
             <br />
             Генерация изображений товаров
           </h1>
@@ -87,7 +87,7 @@ export default function HomePage() {
       {/* Features Section */}
       <section className="space-y-12">
         <div className="text-center space-y-4">
-          <h2 className="text-3xl font-bold">Почему выбирают TROYKA.AI</h2>
+          <h2 className="text-3xl font-bold">Почему выбирают 24reshai</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Мы используем передовые технологии ИИ для создания изображений товаров студийного качества
           </p>

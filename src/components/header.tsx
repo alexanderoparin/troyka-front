@@ -39,7 +39,7 @@ export function Header() {
           <Link href="/" className="flex items-center space-x-2">
             <div className="flex items-center space-x-2">
               <Zap className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold gradient-text">TROYKA</span>
+              <span className="text-2xl font-bold gradient-text">24reshai</span>
             </div>
           </Link>
 

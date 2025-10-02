@@ -117,7 +117,7 @@ export default function ForgotPasswordPage() {
             <div className="w-8 h-8 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg flex items-center justify-center">
               <Sparkles className="h-4 w-4 text-primary" />
             </div>
-            <span className="text-xl font-bold">TROYKA.AI</span>
+            <span className="text-xl font-bold">24reshai</span>
           </div>
           <h1 className="text-2xl font-bold">Восстановление пароля</h1>
           <p className="text-muted-foreground">

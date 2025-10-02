@@ -53,7 +53,7 @@ export default function RegisterPage() {
       if (result.success) {
         toast({
           title: "Регистрация успешна!",
-          description: "Добро пожаловать в TROYKA.AI",
+          description: "Добро пожаловать в 24reshai",
         })
         router.push("/studio")
       } else {
@@ -83,7 +83,7 @@ export default function RegisterPage() {
             <div className="w-8 h-8 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg flex items-center justify-center">
               <Sparkles className="h-4 w-4 text-primary" />
             </div>
-            <span className="text-xl font-bold">TROYKA.AI</span>
+            <span className="text-xl font-bold">24reshai</span>
           </div>
           <h1 className="text-2xl font-bold">Создание аккаунта</h1>
           <p className="text-muted-foreground">

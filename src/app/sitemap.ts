@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXTAUTH_URL || 'https://troyka-ai.ru'
+  const baseUrl = process.env.NEXTAUTH_URL || 'https://24reshai.ru'
 
   return [
     {
