@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { apiClient, PricingPlanResponse } from '@/lib/api-client'
 
 export function usePricingPlans() {
-  return useQuery({
+  return useQuery<PricingPlanResponse[], Error>({
     queryKey: ['pricing-plans'],
     queryFn: async (): Promise<PricingPlanResponse[]> => {
       const response = await apiClient.getPricingPlans()
@@ -17,7 +17,7 @@ export function usePricingPlans() {
 }
 
 export function useAllPricingPlans() {
-  return useQuery({
+  return useQuery<PricingPlanResponse[], Error>({
     queryKey: ['all-pricing-plans'],
     queryFn: async (): Promise<PricingPlanResponse[]> => {
       const response = await apiClient.getAllPricingPlans()
