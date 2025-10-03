@@ -8,10 +8,14 @@ import { PricingCard } from "@/components/pricing-card"
 import { usePricingPlans } from "@/hooks/use-pricing-plans"
 import { useAuth } from "@/contexts/auth-context"
 import { getPointsText } from "@/lib/grammar"
+import { PricingPlanResponse } from "@/lib/api-client"
 
 export default function PricingPage() {
   const { data: plans = [], isLoading, error } = usePricingPlans()
   const { isAuthenticated, points } = useAuth()
+  
+  // Явная типизация для TypeScript
+  const pricingPlans: PricingPlanResponse[] = plans
 
   return (
     <div className="space-y-12">
@@ -58,7 +62,7 @@ export default function PricingPage() {
         </div>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {plans.map((plan, index) => (
+          {pricingPlans.map((plan, index) => (
             <PricingCard
               key={plan.id}
               plan={plan}
