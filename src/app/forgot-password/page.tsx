@@ -43,22 +43,32 @@ export default function ForgotPasswordPage() {
       // Отладочная информация
       console.log('Password reset response:', response)
 
-      if (response.status === 200 && response.data && response.data.message) {
-        setIsEmailSent(true)
-        toast({
-          title: "Инструкции отправлены!",
-          description: "Проверьте вашу почту и следуйте инструкциям",
-        })
-      } else if (response.status === 404) {
-        toast({
-          title: "Пользователь не найден",
-          description: response.data?.message || "Пользователь с таким email не зарегистрирован",
-          variant: "destructive",
-        })
+      if (response.data && response.data.message) {
+        const message = response.data.message;
+        
+        if (message.includes("отправлены")) {
+          setIsEmailSent(true)
+          toast({
+            title: "Инструкции отправлены!",
+            description: "Проверьте вашу почту и следуйте инструкциям",
+          })
+        } else if (message.includes("не найден")) {
+          toast({
+            title: "Пользователь не найден",
+            description: message,
+            variant: "destructive",
+          })
+        } else {
+          toast({
+            title: "Ошибка",
+            description: message,
+            variant: "destructive",
+          })
+        }
       } else {
         toast({
           title: "Ошибка",
-          description: response.data?.message || response.error || "Не удалось отправить инструкции",
+          description: response.error || "Не удалось отправить инструкции",
           variant: "destructive",
         })
       }
