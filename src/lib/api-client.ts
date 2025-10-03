@@ -70,7 +70,11 @@ class ApiClient {
   private timeout: number;
 
   constructor() {
-    this.baseUrl = process.env.NEXT_PUBLIC_JAVA_API_URL || 'http://localhost:8080';
+    // На продакшене используем HTTPS через домен, на локальной разработке - HTTP
+    this.baseUrl = process.env.NEXT_PUBLIC_JAVA_API_URL || 
+      (typeof window !== 'undefined' && window.location.hostname === '24reshai.ru' 
+        ? 'https://24reshai.ru' 
+        : 'http://localhost:8080');
     this.timeout = parseInt(process.env.NEXT_PUBLIC_JAVA_API_TIMEOUT || '30000');
   }
 
