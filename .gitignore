@@ -116,6 +116,10 @@ dist
 tmp/
 temp/
 
+# Deploy artifacts
+*.tar.gz
+deploy/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
