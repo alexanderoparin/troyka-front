@@ -63,7 +63,7 @@ export default function RootLayout({
             <AuthProvider>
               <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 mobile-container">
                 <Header />
-                <main className="container mx-auto px-4 py-8 flex-1 mobile-scroll">
+                <main className="container mx-auto px-4 py-4 sm:py-8 flex-1 mobile-scroll">
                   {children}
                 </main>
               </div>

@@ -75,23 +75,18 @@
   @supports (-webkit-touch-callout: none) {
     html {
       height: 100%;
-      overflow: hidden;
-      position: fixed;
-      width: 100%;
+      -webkit-overflow-scrolling: touch;
     }
     
     body {
       height: 100%;
-      overflow: hidden;
-      position: fixed;
-      width: 100%;
       -webkit-overflow-scrolling: touch;
+      overflow-x: hidden;
     }
     
     main {
-      height: 100vh;
-      height: -webkit-fill-available;
-      overflow-y: auto;
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
       -webkit-overflow-scrolling: touch;
       position: relative;
     }
@@ -102,7 +97,6 @@
     body {
       -webkit-overflow-scrolling: touch;
       overflow-x: hidden;
-      position: relative;
     }
     
     main {
@@ -144,19 +138,21 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    position: relative;
+  }
+  
+  .mobile-scroll {
+    flex: 1;
+    position: relative;
+    overflow-x: hidden;
   }
 }
 
 /* Дополнительные исправления для iOS Safari */
 @supports (-webkit-touch-callout: none) {
   .mobile-scroll {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    overflow-x: hidden;
   }
   
   /* Специальные исправления для iPhone */
