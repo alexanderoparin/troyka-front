@@ -77,7 +77,7 @@ export default function ResetPasswordPage() {
         newPassword: data.newPassword,
       })
 
-      if (response.data) {
+      if (response.data && response.data.message) {
         setIsSuccess(true)
         toast({
           title: "Пароль изменен!",

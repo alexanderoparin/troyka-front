@@ -43,7 +43,7 @@ export default function ForgotPasswordPage() {
       // Отладочная информация
       console.log('Password reset response:', response)
 
-      if (response.data) {
+      if (response.data && response.data.message) {
         setIsEmailSent(true)
         toast({
           title: "Инструкции отправлены!",
