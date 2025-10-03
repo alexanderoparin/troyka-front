@@ -73,15 +73,24 @@
   
   /* Исправляем проблемы с viewport на iOS */
   @supports (-webkit-touch-callout: none) {
-    html, body {
+    html {
       height: 100%;
       overflow: hidden;
       position: fixed;
       width: 100%;
     }
     
+    body {
+      height: 100%;
+      overflow: hidden;
+      position: fixed;
+      width: 100%;
+      -webkit-overflow-scrolling: touch;
+    }
+    
     main {
       height: 100vh;
+      height: -webkit-fill-available;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       position: relative;
@@ -93,6 +102,7 @@
     body {
       -webkit-overflow-scrolling: touch;
       overflow-x: hidden;
+      position: relative;
     }
     
     main {
@@ -147,5 +157,30 @@
     bottom: 0;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Специальные исправления для iPhone */
+  @media screen and (max-width: 428px) {
+    html {
+      font-size: 16px;
+    }
+    
+    body {
+      font-size: 16px;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+    
+    /* Исправляем проблемы с масштабированием на iPhone */
+    input, textarea, select {
+      font-size: 16px !important;
+      -webkit-appearance: none;
+      border-radius: 0;
+    }
+    
+    /* Убираем zoom при фокусе на input */
+    input:focus, textarea:focus, select:focus {
+      font-size: 16px !important;
+    }
   }
 }

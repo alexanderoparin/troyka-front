@@ -15,7 +15,6 @@ export const metadata: Metadata = {
   keywords: 'ИИ, генерация изображений, товары, искусственный интеллект, фотосъемка товаров',
   authors: [{ name: '24reshai' }],
   robots: 'index, follow',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
   openGraph: {
     title: '24reshai - Генерация изображений товаров с ИИ',
     description: 'Создавайте профессиональные изображения товаров с помощью искусственного интеллекта',
@@ -48,7 +47,7 @@ export default function RootLayout({
   return (
     <html lang="ru" suppressHydrationWarning>
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, shrink-to-fit=no" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, shrink-to-fit=no" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
