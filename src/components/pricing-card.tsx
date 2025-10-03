@@ -8,10 +8,10 @@ import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { Check, Zap, Star } from "lucide-react"
 import { cn, formatCurrency } from "@/lib/utils"
-import { PricingPlan } from "@/lib/pricing"
+import { PricingPlanResponse } from "@/lib/api-client"
 
 interface PricingCardProps {
-  plan: PricingPlan
+  plan: PricingPlanResponse
   isPopular?: boolean
   className?: string
 }
@@ -23,6 +23,7 @@ export function PricingCard({ plan, isPopular = false, className }: PricingCardP
 
   const generationsCount = Math.floor(plan.credits / 3)
   const pricePerGeneration = plan.priceRub / generationsCount
+  const isPlanPopular = isPopular || plan.isPopular
 
   const handlePurchase = async () => {
     if (!isAuthenticated) {
@@ -55,8 +56,8 @@ export function PricingCard({ plan, isPopular = false, className }: PricingCardP
   }
 
   return (
-    <Card className={cn("relative", isPopular && "border-primary shadow-lg", className)}>
-      {isPopular && (
+    <Card className={cn("relative", isPlanPopular && "border-primary shadow-lg", className)}>
+      {isPlanPopular && (
         <Badge className="absolute -top-2 left-1/2 -translate-x-1/2">
           <Star className="w-3 h-3 mr-1" />
           Популярный
@@ -105,7 +106,7 @@ export function PricingCard({ plan, isPopular = false, className }: PricingCardP
           className="w-full"
           onClick={handlePurchase}
           disabled={isProcessing}
-          variant={isPopular ? "default" : "outline"}
+          variant={isPlanPopular ? "default" : "outline"}
         >
           {isProcessing ? (
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />

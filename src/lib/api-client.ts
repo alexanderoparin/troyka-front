@@ -65,6 +65,18 @@ export interface ResetPasswordRequest {
   newPassword: string;
 }
 
+export interface PricingPlanResponse {
+  id: string;
+  name: string;
+  description?: string;
+  credits: number;
+  priceRub: number; // цена в копейках
+  unitPriceRubComputed: number; // цена за поинт в копейках
+  isActive: boolean;
+  isPopular: boolean;
+  sortOrder: number;
+}
+
 class ApiClient {
   private baseUrl: string;
   private timeout: number;
@@ -556,6 +568,19 @@ class ApiClient {
     return this.request<{message: string}>('/auth/reset-password', {
       method: 'POST',
       body: JSON.stringify(request),
+    });
+  }
+
+  // Pricing methods
+  async getPricingPlans(): Promise<ApiResponse<PricingPlanResponse[]>> {
+    return this.request<PricingPlanResponse[]>('/pricing/plans', {
+      method: 'GET',
+    });
+  }
+
+  async getAllPricingPlans(): Promise<ApiResponse<PricingPlanResponse[]>> {
+    return this.request<PricingPlanResponse[]>('/pricing/plans/all', {
+      method: 'GET',
     });
   }
 

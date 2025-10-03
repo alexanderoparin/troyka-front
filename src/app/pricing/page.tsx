@@ -5,12 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Check, Zap, Star, Sparkles } from "lucide-react"
 import { PricingCard } from "@/components/pricing-card"
-import { getPricingPlans } from "@/lib/pricing"
+import { usePricingPlans } from "@/hooks/use-pricing-plans"
 import { useAuth } from "@/contexts/auth-context"
 import { getPointsText } from "@/lib/grammar"
 
 export default function PricingPage() {
-  const plans = getPricingPlans()
+  const { data: plans = [], isLoading, error } = usePricingPlans()
   const { isAuthenticated, points } = useAuth()
 
   return (
@@ -29,16 +29,45 @@ export default function PricingPage() {
       </div>
 
       {/* Pricing Cards */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {plans.map((plan, index) => (
-          <PricingCard
-            key={plan.id}
-            plan={plan}
-            isPopular={index === 1} // Профи план
-            className={index === 1 ? "border-primary shadow-lg scale-105" : ""}
-          />
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map((i) => (
+            <Card key={i} className="animate-pulse">
+              <CardHeader>
+                <div className="h-6 bg-muted rounded mb-2"></div>
+                <div className="h-8 bg-muted rounded mb-2"></div>
+                <div className="h-4 bg-muted rounded"></div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="h-4 bg-muted rounded"></div>
+                  <div className="h-4 bg-muted rounded"></div>
+                  <div className="h-4 bg-muted rounded"></div>
+                </div>
+                <div className="h-10 bg-muted rounded mt-4"></div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : error ? (
+        <div className="text-center py-12">
+          <p className="text-destructive mb-4">Ошибка загрузки тарифов</p>
+          <Button onClick={() => window.location.reload()}>
+            Попробовать снова
+          </Button>
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {plans.map((plan, index) => (
+            <PricingCard
+              key={plan.id}
+              plan={plan}
+              isPopular={plan.isPopular}
+              className={plan.isPopular ? "border-primary shadow-lg scale-105" : ""}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Features */}
       <div className="space-y-8">
