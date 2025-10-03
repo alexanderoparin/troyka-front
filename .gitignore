@@ -106,7 +106,7 @@ dist
 
 # Gatsby files
 .cache/
-public
+# public - нужна для favicon и статических файлов
 
 # Storybook build outputs
 .out
