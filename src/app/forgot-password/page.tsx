@@ -39,6 +39,9 @@ export default function ForgotPasswordPage() {
 
     try {
       const response = await apiClient.requestPasswordReset(data.email)
+      
+      // Отладочная информация
+      console.log('Password reset response:', response)
 
       if (response.data) {
         setIsEmailSent(true)
