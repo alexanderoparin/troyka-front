@@ -15,6 +15,7 @@ export const metadata: Metadata = {
   keywords: 'ИИ, генерация изображений, товары, искусственный интеллект, фотосъемка товаров',
   authors: [{ name: '24reshai' }],
   robots: 'index, follow',
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
   openGraph: {
     title: '24reshai - Генерация изображений товаров с ИИ',
     description: 'Создавайте профессиональные изображения товаров с помощью искусственного интеллекта',

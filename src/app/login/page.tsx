@@ -67,18 +67,18 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/20 p-4">
-      <div className="w-full max-w-md space-y-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/20 p-4 sm:p-6">
+      <div className="w-full max-w-md space-y-4 sm:space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg flex items-center justify-center">
-              <Sparkles className="h-4 w-4 text-primary" />
+          <div className="flex items-center justify-center gap-2 mb-3 sm:mb-4">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg flex items-center justify-center">
+              <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
             </div>
-            <span className="text-xl font-bold">24reshai</span>
+            <span className="text-lg sm:text-xl font-bold">24reshai</span>
           </div>
-          <h1 className="text-2xl font-bold">Вход в аккаунт</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-xl sm:text-2xl font-bold">Вход в аккаунт</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Войдите, чтобы начать создавать изображения
           </p>
         </div>
@@ -139,7 +139,7 @@ export default function LoginPage() {
 
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full py-3 sm:py-2"
                 disabled={isLoading}
               >
                 {isLoading ? (

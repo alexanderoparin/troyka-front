@@ -15,52 +15,52 @@ export default function HomePage() {
   return (
     <div className="space-y-20">
       {/* Hero Section */}
-      <section className="text-center space-y-8 py-20">
-        <div className="space-y-4">
-          <Badge variant="secondary" className="mb-4">
-            <Sparkles className="w-4 h-4 mr-2" />
+      <section className="text-center space-y-6 sm:space-y-8 py-12 sm:py-20 px-4">
+        <div className="space-y-3 sm:space-y-4">
+          <Badge variant="secondary" className="mb-2 sm:mb-4 text-xs sm:text-sm">
+            <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
             Новое поколение ИИ для товаров
           </Badge>
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight leading-tight">
             <span className="gradient-text">24reshai</span>
             <br />
-            Генерация изображений товаров
+            <span className="text-2xl sm:text-3xl md:text-5xl">Генерация изображений товаров</span>
           </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             Создавайте профессиональные изображения товаров с помощью искусственного интеллекта. 
             100% точность деталей, реалистичные фоны, студийное качество за секунды.
           </p>
         </div>
         
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center w-full max-w-md sm:max-w-none mx-auto">
           {isLoading ? (
-            <div className="w-32 h-12 animate-pulse bg-muted rounded-lg" />
+            <div className="w-full sm:w-32 h-12 animate-pulse bg-muted rounded-lg" />
           ) : isAuthenticated ? (
             <>
-              <Link href="/studio">
-                <Button size="lg" className="text-lg px-8 py-6">
-                  <Zap className="w-5 h-5 mr-2" />
+              <Link href="/studio" className="w-full sm:w-auto">
+                <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6">
+                  <Zap className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   Открыть студию
-                  <ArrowRight className="w-5 h-5 ml-2" />
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
                 </Button>
               </Link>
-              <Link href="/pricing">
-                <Button variant="outline" size="lg" className="text-lg px-8 py-6">
+              <Link href="/pricing" className="w-full sm:w-auto">
+                <Button variant="outline" size="lg" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6">
                   Посмотреть цены
                 </Button>
               </Link>
             </>
           ) : (
             <>
-              <Link href="/register">
-                <Button size="lg" className="text-lg px-8 py-6">
-                  <Sparkles className="w-5 h-5 mr-2" />
+              <Link href="/register" className="w-full sm:w-auto">
+                <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6">
+                  <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   Начать бесплатно
-                  <ArrowRight className="w-5 h-5 ml-2" />
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
                 </Button>
               </Link>
-              <Link href="/login">
-                <Button variant="outline" size="lg" className="text-lg px-8 py-6">
+              <Link href="/login" className="w-full sm:w-auto">
+                <Button variant="outline" size="lg" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6">
                   Войти в аккаунт
                 </Button>
               </Link>
@@ -85,25 +85,25 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="space-y-12">
-        <div className="text-center space-y-4">
-          <h2 className="text-3xl font-bold">Почему выбирают 24reshai</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+      <section className="space-y-8 sm:space-y-12 px-4">
+        <div className="text-center space-y-3 sm:space-y-4">
+          <h2 className="text-2xl sm:text-3xl font-bold">Почему выбирают 24reshai</h2>
+          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
             Мы используем передовые технологии ИИ для создания изображений товаров студийного качества
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          <Card className="glass-card">
-            <CardHeader>
-              <Sparkles className="w-12 h-12 text-primary mb-4" />
-              <CardTitle>100% Product Fidelity</CardTitle>
-              <CardDescription>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+          <Card className="glass-card h-full">
+            <CardHeader className="pb-4">
+              <Sparkles className="w-10 h-10 sm:w-12 sm:h-12 text-primary mb-3 sm:mb-4" />
+              <CardTitle className="text-lg sm:text-xl">100% Product Fidelity</CardTitle>
+              <CardDescription className="text-sm sm:text-base">
                 Каждая деталь товара передается с максимальной точностью
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 text-sm">
+            <CardContent className="pt-0">
+              <ul className="space-y-2 text-xs sm:text-sm">
                 <li>• Сохранение всех характеристик товара</li>
                 <li>• Точная передача цветов и текстур</li>
                 <li>• Реалистичное освещение</li>
@@ -111,16 +111,16 @@ export default function HomePage() {
             </CardContent>
           </Card>
 
-          <Card className="glass-card">
-            <CardHeader>
-              <Zap className="w-12 h-12 text-primary mb-4" />
-              <CardTitle>Мгновенная генерация</CardTitle>
-              <CardDescription>
+          <Card className="glass-card h-full">
+            <CardHeader className="pb-4">
+              <Zap className="w-10 h-10 sm:w-12 sm:h-12 text-primary mb-3 sm:mb-4" />
+              <CardTitle className="text-lg sm:text-xl">Мгновенная генерация</CardTitle>
+              <CardDescription className="text-sm sm:text-base">
                 От идеи до готового изображения за 5-10 секунд
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 text-sm">
+            <CardContent className="pt-0">
+              <ul className="space-y-2 text-xs sm:text-sm">
                 <li>• Быстрая обработка запросов</li>
                 <li>• Множество стилей и фонов</li>
                 <li>• Высокое разрешение 3:4</li>
@@ -128,16 +128,16 @@ export default function HomePage() {
             </CardContent>
           </Card>
 
-          <Card className="glass-card">
-            <CardHeader>
-              <Shield className="w-12 h-12 text-primary mb-4" />
-              <CardTitle>Безопасность данных</CardTitle>
-              <CardDescription>
+          <Card className="glass-card h-full sm:col-span-2 lg:col-span-1">
+            <CardHeader className="pb-4">
+              <Shield className="w-10 h-10 sm:w-12 sm:h-12 text-primary mb-3 sm:mb-4" />
+              <CardTitle className="text-lg sm:text-xl">Безопасность данных</CardTitle>
+              <CardDescription className="text-sm sm:text-base">
                 Ваши изображения защищены и доступны только вам
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 text-sm">
+            <CardContent className="pt-0">
+              <ul className="space-y-2 text-xs sm:text-sm">
                 <li>• Приватное хранилище</li>
                 <li>• Защищенная передача данных</li>
                 <li>• Соответствие GDPR</li>
