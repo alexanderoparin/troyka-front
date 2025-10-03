@@ -220,7 +220,7 @@ class ApiClient {
 
   // Image Generation API
   async generateImage(request: ImageRequest): Promise<ApiResponse<ImageResponse>> {
-    return this.request<ImageResponse>('/api/image/run/create', {
+    return this.request<ImageResponse>('/fal/image/run/create', {
       method: 'POST',
       body: JSON.stringify(request),
     });
@@ -508,7 +508,7 @@ class ApiClient {
 
   // Get user points/balance
   async getUserPoints(): Promise<ApiResponse<number>> {
-    const url = `${this.baseUrl}/api/user/points`;
+    const url = `${this.baseUrl}/fal/user/points`;
     const token = this.getToken();
     
     const headers: Record<string, string> = {};
