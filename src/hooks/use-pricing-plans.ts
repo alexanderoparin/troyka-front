@@ -12,7 +12,7 @@ export function usePricingPlans() {
       return response.data || []
     },
     staleTime: 5 * 60 * 1000, // 5 минут
-    cacheTime: 10 * 60 * 1000, // 10 минут
+    gcTime: 10 * 60 * 1000, // 10 минут (было cacheTime)
   }) as {
     data: PricingPlanResponse[] | undefined
     isLoading: boolean
@@ -21,7 +21,7 @@ export function usePricingPlans() {
 }
 
 export function useAllPricingPlans() {
-  return useQuery<PricingPlanResponse[], Error>({
+  return useQuery({
     queryKey: ['all-pricing-plans'],
     queryFn: async (): Promise<PricingPlanResponse[]> => {
       const response = await apiClient.getAllPricingPlans()
@@ -31,6 +31,10 @@ export function useAllPricingPlans() {
       return response.data || []
     },
     staleTime: 5 * 60 * 1000, // 5 минут
-    cacheTime: 10 * 60 * 1000, // 10 минут
-  })
+    gcTime: 10 * 60 * 1000, // 10 минут (было cacheTime)
+  }) as {
+    data: PricingPlanResponse[] | undefined
+    isLoading: boolean
+    error: Error | null
+  }
 }
