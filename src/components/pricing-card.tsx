@@ -56,72 +56,78 @@ export function PricingCard({ plan, isPopular = false, className }: PricingCardP
   }
 
   return (
-    <Card className={cn("relative", isPlanPopular && "border-primary shadow-lg", className)}>
+    <div className={cn(
+      "card-ios p-8 relative animate-ios-fade-in",
+      isPlanPopular && "card-ios-elevated",
+      className
+    )}>
       {isPlanPopular && (
-        <Badge className="absolute -top-2 left-1/2 -translate-x-1/2">
-          <Star className="w-3 h-3 mr-1" />
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-callout font-medium">
+          <Star className="w-3 h-3 mr-1 inline" />
           Популярный
-        </Badge>
+        </div>
       )}
       
-      <CardHeader className="text-center pb-4">
-        <CardTitle className="text-xl">{plan.name}</CardTitle>
+      <div className="text-center mb-8">
+        <h3 className="text-title-3 text-foreground mb-4">{plan.name}</h3>
         <div className="space-y-2">
-          <div className="text-3xl font-bold">
+          <div className="text-3xl font-bold text-foreground">
             {formatCurrency(plan.priceRub / 100)}
           </div>
-          <CardDescription className="text-sm">
+          <p className="text-callout text-muted-foreground">
             {plan.credits} поинтов • ~{generationsCount} генераций
-          </CardDescription>
+          </p>
         </div>
-      </CardHeader>
+      </div>
 
-      <CardContent className="space-y-4">
+      <div className="space-y-6">
         {/* Features */}
-        <div className="space-y-2 text-sm">
-          <div className="flex items-center gap-2">
-            <Check className="h-4 w-4 text-green-500" />
-            <span>{generationsCount} изображений</span>
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <Check className="h-5 w-5 text-blue-500" />
+            <span className="text-body text-foreground">{generationsCount} изображений</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Check className="h-4 w-4 text-green-500" />
-            <span>~{formatCurrency(pricePerGeneration / 100)} за генерацию</span>
+          <div className="flex items-center gap-3">
+            <Check className="h-5 w-5 text-blue-500" />
+            <span className="text-body text-foreground">~{formatCurrency(pricePerGeneration / 100)} за генерацию</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Check className="h-4 w-4 text-green-500" />
-            <span>Высокое разрешение</span>
+          <div className="flex items-center gap-3">
+            <Check className="h-5 w-5 text-blue-500" />
+            <span className="text-body text-foreground">Высокое разрешение</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Check className="h-4 w-4 text-green-500" />
-            <span>Коммерческое использование</span>
+          <div className="flex items-center gap-3">
+            <Check className="h-5 w-5 text-blue-500" />
+            <span className="text-body text-foreground">Коммерческое использование</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Check className="h-4 w-4 text-green-500" />
-            <span>Поинты не сгорают</span>
+          <div className="flex items-center gap-3">
+            <Check className="h-5 w-5 text-blue-500" />
+            <span className="text-body text-foreground">Поинты не сгорают</span>
           </div>
         </div>
 
         {/* Purchase Button */}
-        <Button
-          className="w-full"
+        <button
+          className={cn(
+            "w-full btn-ios transition-ios",
+            isPlanPopular ? "btn-ios-primary" : "btn-ios-ghost"
+          )}
           onClick={handlePurchase}
           disabled={isProcessing}
-          variant={isPlanPopular ? "default" : "outline"}
         >
           {isProcessing ? (
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
+            <div className="ios-spinner mr-3" />
           ) : (
-            <Zap className="w-4 h-4 mr-2" />
+            <Zap className="w-5 h-5 mr-3" />
           )}
           {isProcessing ? "Обработка..." : "Купить поинты"}
-        </Button>
+        </button>
 
         {/* Price per generation */}
-        <p className="text-xs text-muted-foreground text-center">
+        <p className="text-footnote text-muted-foreground text-center">
           Экономия до {Math.round(((30 - pricePerGeneration / 100) / 30) * 100)}% 
           по сравнению с разовыми покупками
         </p>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

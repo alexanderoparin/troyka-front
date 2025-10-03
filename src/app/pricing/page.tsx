@@ -17,13 +17,13 @@ export default function PricingPage() {
   return (
     <div className="space-y-12">
       {/* Header */}
-      <div className="text-center space-y-4">
-        <Badge variant="secondary" className="mb-4">
+      <div className="text-center space-y-6">
+        <Badge variant="secondary" className="mb-4 text-callout bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-700 px-4 py-2 rounded-full">
           <Zap className="w-4 h-4 mr-2" />
           Простые и честные цены
         </Badge>
-        <h1 className="text-4xl font-bold">Выберите ваш тариф</h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+        <h1 className="text-large-title sm:text-5xl font-bold text-foreground">Выберите ваш тариф</h1>
+        <p className="text-headline text-muted-foreground max-w-3xl mx-auto">
           Платите только за то, что используете. Без скрытых комиссий и подписок.
           {!isAuthenticated && " Получите +6 поинтов при регистрации!"}
         </p>
@@ -77,148 +77,130 @@ export default function PricingPage() {
         </div>
         
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader>
-              <Sparkles className="h-8 w-8 text-primary mb-2" />
-              <CardTitle className="text-lg">100% Product Fidelity</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  Точная передача всех деталей товара
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  Реалистичные цвета и текстуры
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  Профессиональное освещение
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
+          <div className="card-ios p-8 animate-ios-fade-in">
+            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center mb-6">
+              <Sparkles className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+            </div>
+            <h3 className="text-title-3 text-foreground mb-4">100% Product Fidelity</h3>
+            <ul className="space-y-3">
+              <li className="flex items-center gap-3">
+                <Check className="h-5 w-5 text-blue-500" />
+                <span className="text-body text-foreground">Точная передача всех деталей товара</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Check className="h-5 w-5 text-blue-500" />
+                <span className="text-body text-foreground">Реалистичные цвета и текстуры</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Check className="h-5 w-5 text-blue-500" />
+                <span className="text-body text-foreground">Профессиональное освещение</span>
+              </li>
+            </ul>
+          </div>
 
-          <Card>
-            <CardHeader>
-              <Zap className="h-8 w-8 text-primary mb-2" />
-              <CardTitle className="text-lg">Высокая скорость</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  Результат за 5-10 секунд
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  Высокое разрешение 3:4
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  Множество стилей фонов
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
+          <div className="card-ios p-8 animate-ios-fade-in" style={{ animationDelay: '0.1s' }}>
+            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-2xl flex items-center justify-center mb-6">
+              <Zap className="h-8 w-8 text-green-600 dark:text-green-400" />
+            </div>
+            <h3 className="text-title-3 text-foreground mb-4">Высокая скорость</h3>
+            <ul className="space-y-3">
+              <li className="flex items-center gap-3">
+                <Check className="h-5 w-5 text-green-500" />
+                <span className="text-body text-foreground">Результат за 5-10 секунд</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Check className="h-5 w-5 text-green-500" />
+                <span className="text-body text-foreground">Высокое разрешение 3:4</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Check className="h-5 w-5 text-green-500" />
+                <span className="text-body text-foreground">Множество стилей фонов</span>
+              </li>
+            </ul>
+          </div>
 
-          <Card>
-            <CardHeader>
-              <Star className="h-8 w-8 text-primary mb-2" />
-              <CardTitle className="text-lg">Премиум качество</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  Студийное качество
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  Готово для маркетплейсов
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  Коммерческое использование
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
+          <div className="card-ios p-8 animate-ios-fade-in" style={{ animationDelay: '0.2s' }}>
+            <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-2xl flex items-center justify-center mb-6">
+              <Star className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+            </div>
+            <h3 className="text-title-3 text-foreground mb-4">Премиум качество</h3>
+            <ul className="space-y-3">
+              <li className="flex items-center gap-3">
+                <Check className="h-5 w-5 text-purple-500" />
+                <span className="text-body text-foreground">Студийное качество</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Check className="h-5 w-5 text-purple-500" />
+                <span className="text-body text-foreground">Готово для маркетплейсов</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Check className="h-5 w-5 text-purple-500" />
+                <span className="text-body text-foreground">Коммерческое использование</span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 
       {/* FAQ */}
-      <div className="space-y-8">
+      <div className="space-y-12">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Часто задаваемые вопросы</h2>
+          <h2 className="text-title-1 text-foreground mb-4">Часто задаваемые вопросы</h2>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Как работает система поинтов?</CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm text-muted-foreground">
+          <div className="card-ios p-6 animate-ios-fade-in">
+            <h3 className="text-title-3 text-foreground mb-4">Как работает система поинтов?</h3>
+            <p className="text-body text-muted-foreground">
               1 генерация изображения = 3 поинта. Поинты не сгорают и остаются на вашем счету навсегда.
-            </CardContent>
-          </Card>
+            </p>
+          </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Можно ли вернуть деньги?</CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm text-muted-foreground">
+          <div className="card-ios p-6 animate-ios-fade-in" style={{ animationDelay: '0.1s' }}>
+            <h3 className="text-title-3 text-foreground mb-4">Можно ли вернуть деньги?</h3>
+            <p className="text-body text-muted-foreground">
               Да, мы возвращаем деньги в течение 14 дней, если вы не использовали приобретенные поинты.
-            </CardContent>
-          </Card>
+            </p>
+          </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Есть ли ограничения по использованию?</CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm text-muted-foreground">
+          <div className="card-ios p-6 animate-ios-fade-in" style={{ animationDelay: '0.2s' }}>
+            <h3 className="text-title-3 text-foreground mb-4">Есть ли ограничения по использованию?</h3>
+            <p className="text-body text-muted-foreground">
               Нет ограничений. Вы можете использовать созданные изображения в коммерческих целях.
-            </CardContent>
-          </Card>
+            </p>
+          </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Как получить +6 поинтов при регистрации?</CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm text-muted-foreground">
+          <div className="card-ios p-6 animate-ios-fade-in" style={{ animationDelay: '0.3s' }}>
+            <h3 className="text-title-3 text-foreground mb-4">Как получить +6 поинтов при регистрации?</h3>
+            <p className="text-body text-muted-foreground">
               Поинты автоматически начисляются на ваш счет сразу после создания аккаунта.
-            </CardContent>
-          </Card>
+            </p>
+          </div>
         </div>
       </div>
 
       {/* CTA */}
-      <div className="text-center py-12 bg-gradient-to-r from-primary/10 to-blue-500/10 rounded-3xl">
-        <h2 className="text-2xl font-bold mb-4">Готовы начать?</h2>
+      <div className="text-center py-16 card-ios-elevated">
+        <h2 className="text-title-1 text-foreground mb-6">Готовы начать?</h2>
         {isAuthenticated ? (
-          <div className="space-y-4">
-            <p className="text-muted-foreground mb-6">
+          <div className="space-y-6">
+            <p className="text-headline text-muted-foreground">
               У вас {getPointsText(points)}. Начните создавать изображения прямо сейчас!
             </p>
-            <Button size="lg" asChild>
-              <a href="/studio">
-                <Sparkles className="w-5 h-5 mr-2" />
-                Начать создавать
-              </a>
-            </Button>
+            <a href="/studio" className="btn-ios-primary px-8 py-3 text-headline inline-flex items-center">
+              <Sparkles className="w-5 h-5 mr-3" />
+              Начать создавать
+            </a>
           </div>
         ) : (
-          <div className="space-y-4">
-            <p className="text-muted-foreground mb-6">
+          <div className="space-y-6">
+            <p className="text-headline text-muted-foreground">
               Зарегистрируйтесь и получите +6 поинтов для бесплатного тестирования
             </p>
-            <Button size="lg" asChild>
-              <a href="/studio">
-                <Sparkles className="w-5 h-5 mr-2" />
-                Начать создавать
-              </a>
-            </Button>
+            <a href="/studio" className="btn-ios-primary px-8 py-3 text-headline inline-flex items-center">
+              <Sparkles className="w-5 h-5 mr-3" />
+              Начать создавать
+            </a>
           </div>
         )}
       </div>
