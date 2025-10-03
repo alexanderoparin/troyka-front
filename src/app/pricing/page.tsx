@@ -1,14 +1,13 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Check, Zap, Star, Sparkles } from "lucide-react"
 import { PricingCard } from "@/components/pricing-card"
 import { usePricingPlans } from "@/hooks/use-pricing-plans"
 import { useAuth } from "@/contexts/auth-context"
 import { getPointsText } from "@/lib/grammar"
-import { PricingPlanResponse } from "@/lib/api-client"
 
 export default function PricingPage() {
   const { data: plans = [], isLoading, error } = usePricingPlans()

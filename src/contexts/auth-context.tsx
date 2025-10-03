@@ -211,7 +211,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             ...prev,
             points: response.data || 0,
           }))
-          console.log('Поинты обновлены:', response.data)
+          // Поинты обновлены
         }
       } catch (error) {
         console.error('Ошибка обновления поинтов:', error)

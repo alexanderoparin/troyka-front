@@ -89,8 +89,8 @@ class ApiClient {
         : 'http://localhost:8080');
     this.timeout = parseInt(process.env.NEXT_PUBLIC_JAVA_API_TIMEOUT || '30000');
     
-    // Отладочная информация
-    if (typeof window !== 'undefined') {
+    // Отладочная информация (только в development)
+    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
       console.log('API Base URL:', this.baseUrl);
       console.log('Current hostname:', window.location.hostname);
     }
