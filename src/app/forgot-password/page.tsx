@@ -23,8 +23,28 @@ type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>
 export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isEmailSent, setIsEmailSent] = useState(false)
+  const [cooldownEndTime, setCooldownEndTime] = useState<Date | null>(null)
+  const [timeLeft, setTimeLeft] = useState(0)
   const router = useRouter()
   const { toast } = useToast()
+
+  // Отслеживаем оставшееся время кулдауна
+  useEffect(() => {
+    if (!cooldownEndTime) return
+
+    const interval = setInterval(() => {
+      const now = new Date()
+      const diff = Math.max(0, cooldownEndTime.getTime() - now.getTime())
+      setTimeLeft(Math.ceil(diff / 1000))
+
+      if (diff <= 0) {
+        setCooldownEndTime(null)
+        setTimeLeft(0)
+      }
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [cooldownEndTime])
 
   const {
     register,
@@ -48,6 +68,9 @@ export default function ForgotPasswordPage() {
         
         if (message.includes("отправлены")) {
           setIsEmailSent(true)
+          // Устанавливаем кулдаун на 5 минут
+          const cooldownEnd = new Date(Date.now() + 5 * 60 * 1000)
+          setCooldownEndTime(cooldownEnd)
           toast({
             title: "Инструкции отправлены!",
             description: "Проверьте вашу почту и следуйте инструкциям",
@@ -55,6 +78,12 @@ export default function ForgotPasswordPage() {
         } else if (message.includes("не найден")) {
           toast({
             title: "Пользователь не найден",
+            description: message,
+            variant: "destructive",
+          })
+        } else if (message.includes("частые запросы")) {
+          toast({
+            title: "Слишком частые запросы",
             description: message,
             variant: "destructive",
           })
@@ -109,8 +138,9 @@ export default function ForgotPasswordPage() {
                     variant="outline"
                     onClick={() => setIsEmailSent(false)}
                     className="w-full"
+                    disabled={timeLeft > 0}
                   >
-                    Отправить еще раз
+                    {timeLeft > 0 ? `Повторить через ${Math.floor(timeLeft / 60)}:${(timeLeft % 60).toString().padStart(2, '0')}` : 'Отправить еще раз'}
                   </Button>
                   <Button variant="ghost" asChild>
                     <Link href="/login">
@@ -171,13 +201,15 @@ export default function ForgotPasswordPage() {
               <Button
                 type="submit"
                 className="w-full"
-                disabled={isLoading}
+                disabled={isLoading || timeLeft > 0}
               >
                 {isLoading ? (
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     Отправляем...
                   </div>
+                ) : timeLeft > 0 ? (
+                  `Повторить через ${Math.floor(timeLeft / 60)}:${(timeLeft % 60).toString().padStart(2, '0')}`
                 ) : (
                   <>
                     <Mail className="w-4 h-4 mr-2" />
