@@ -63,6 +63,12 @@ export function Header() {
             >
               Цены
             </Link>
+            <Link 
+              href="/contacts" 
+              className="text-sm font-medium transition-colors hover:text-primary"
+            >
+              Контакты
+            </Link>
           </nav>
 
           {/* Right side */}
@@ -203,6 +209,13 @@ export function Header() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Цены
+              </Link>
+              <Link 
+                href="/contacts" 
+                className="text-sm font-medium transition-colors hover:text-primary"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Контакты
               </Link>
             </nav>
           </div>
