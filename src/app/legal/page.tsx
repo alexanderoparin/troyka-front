@@ -6,58 +6,15 @@ export default function LegalPage() {
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
       <div className="text-center space-y-4">
-        <h1 className="text-3xl font-bold">Правовая информация</h1>
-        <p className="text-muted-foreground">
-          Политика конфиденциальности и условия использования сервиса 24reshai
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Пользовательское соглашение</h1>
+        <p className="text-muted-foreground text-gray-600 dark:text-gray-300">
+          Условия использования сервиса 24reshai
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
-        <Card>
+      <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5" />
-              Политика конфиденциальности
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4 text-sm">
-            <h3 className="font-semibold">1. Сбор информации</h3>
-            <p>
-              Мы собираем только необходимую информацию для предоставления услуг:
-              email адрес, имя пользователя, данные о генерациях изображений.
-            </p>
-
-            <h3 className="font-semibold">2. Использование данных</h3>
-            <p>
-              Ваши данные используются исключительно для:
-              • Предоставления услуг генерации изображений
-              • Обработки платежей
-              • Связи с пользователями по вопросам сервиса
-            </p>
-
-            <h3 className="font-semibold">3. Защита данных</h3>
-            <p>
-              Мы применяем современные методы шифрования и защиты данных.
-              Ваши изображения хранятся в приватном режиме и доступны только вам.
-            </p>
-
-            <h3 className="font-semibold">4. Права пользователей</h3>
-            <p>
-              Вы имеете право на доступ, исправление и удаление ваших персональных данных.
-              Для этого обратитесь к нам по адресу support@24reshai.ru
-            </p>
-
-            <h3 className="font-semibold">5. Cookies</h3>
-            <p>
-              Мы используем технические cookies для обеспечения работы сайта и
-              аналитические cookies для улучшения пользовательского опыта.
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-gray-100">
               <FileText className="h-5 w-5" />
               Пользовательское соглашение
             </CardTitle>
@@ -71,10 +28,9 @@ export default function LegalPage() {
 
             <h3 className="font-semibold">2. Система поинтов</h3>
             <p>
-              • При регистрации вы получаете +6 поинтов бесплатно
-              • 1 генерация изображения = 3 поинта
+              • При регистрации вы получаете +6 поинтов бесплатно<br/>
+              • 1 генерация изображения = 3 поинта<br/>
               • Поинты не имеют срока действия
-              • Возврат неиспользованных поинтов возможен в течение 14 дней
             </p>
 
             <h3 className="font-semibold">3. Права на изображения</h3>
@@ -87,8 +43,10 @@ export default function LegalPage() {
             <h3 className="font-semibold">4. Ограничения</h3>
             <p>
               Запрещается создавать изображения:
-              • Нарушающие авторские права
-              • Содержащие неприемлемый контент
+            </p>
+            <p>
+              • Нарушающие авторские права<br/>
+              • Содержащие неприемлемый контент<br/>
               • Для незаконных целей
             </p>
 
@@ -101,22 +59,19 @@ export default function LegalPage() {
 
             <h3 className="font-semibold">6. Изменения условий</h3>
             <p>
-              Мы можем обновлять данные условия. О существенных изменениях
-              мы уведомляем пользователей по email за 30 дней.
+              Мы можем обновлять данные условия. Актуальная версия всегда доступна на сайте.
             </p>
           </CardContent>
         </Card>
-      </div>
 
-      <Card>
+      <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardHeader>
-          <CardTitle>Контактная информация</CardTitle>
+          <CardTitle className="text-gray-900 dark:text-gray-100">Контактная информация</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
-          <p><strong>ООО "ТРОYKA ИИ"</strong></p>
+          <p><strong>ИП Бурцев Даниил Викторович</strong></p>
+          <p>ИНН: 482619660921</p>
           <p>Email: support@24reshai.ru</p>
-          <p>Адрес: Россия, г. Москва</p>
-          <p>Дата последнего обновления: {new Date().toLocaleDateString('ru-RU')}</p>
         </CardContent>
       </Card>
     </div>
