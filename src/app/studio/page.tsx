@@ -57,9 +57,9 @@ export default function StudioPage() {
   const canGenerate = true // Пока что убираем проверку поинтов
 
   return (
-    <div className="space-y-8">
+    <div className="studio-page space-y-8">
       {/* Header */}
-      <div className="text-center space-y-4">
+      <div className="studio-header text-center space-y-4">
         <Badge variant="secondary" className="mb-4">
           <Sparkles className="w-4 h-4 mr-2" />
           Студия генерации
@@ -71,7 +71,7 @@ export default function StudioPage() {
         </p>
         
         {/* User Info */}
-        <div className="flex items-center justify-center gap-4 text-sm">
+        <div className="studio-user-info flex items-center justify-center gap-4 text-sm">
           <Badge variant="default" className="flex items-center gap-1">
             <Zap className="w-3 h-3" />
             {user?.username || 'Пользователь'}
@@ -82,12 +82,12 @@ export default function StudioPage() {
 
       <div className="max-w-4xl mx-auto">
         {/* Main Generation Interface */}
-        <div className="bg-gradient-to-br from-card/50 to-card/30 backdrop-blur-sm border border-border/50 rounded-2xl p-8 mb-8">
+        <div className="generation-form-container bg-gradient-to-br from-card/50 to-card/30 backdrop-blur-sm border border-border/50 rounded-2xl p-8 mb-8">
           <GenerationForm />
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-gradient-to-br from-muted/30 to-muted/10 backdrop-blur-sm border border-border/30 rounded-2xl p-6">
+        <div className="quick-actions bg-gradient-to-br from-muted/30 to-muted/10 backdrop-blur-sm border border-border/30 rounded-2xl p-6">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-8 h-8 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg flex items-center justify-center">
               <Sparkles className="h-4 w-4 text-primary" />

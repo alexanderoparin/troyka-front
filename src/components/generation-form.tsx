@@ -153,7 +153,7 @@ export function GenerationForm() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="generation-form space-y-6">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Prompt Input - Main Required Field */}
         <div className="space-y-3">
@@ -221,7 +221,7 @@ export function GenerationForm() {
         {uploadedImages.length === 0 && (
           <div className="space-y-3">
             <h4 className="text-sm font-medium text-muted-foreground">Стили для вдохновения:</h4>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="style-presets grid grid-cols-2 gap-2">
               {STYLE_PRESETS.map((preset) => (
                 <Button
                   key={preset.name}
@@ -245,7 +245,7 @@ export function GenerationForm() {
         )}
 
         {/* Generation Options */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="generation-options grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="numImages" className="text-sm font-medium">
               Количество изображений
@@ -286,7 +286,7 @@ export function GenerationForm() {
         </div>
 
         {/* Balance Info */}
-        <div className="flex items-center justify-between p-4 bg-muted/50 rounded-xl border">
+        <div className="balance-info flex items-center justify-between p-4 bg-muted/50 rounded-xl border">
           <div className="flex items-center gap-2">
             <CreditCard className="h-4 w-4 text-primary" />
             <span className="text-sm font-medium">Ваш баланс:</span>
@@ -302,7 +302,7 @@ export function GenerationForm() {
           type="submit"
           disabled={isGenerating || !canGenerate || !prompt?.trim()}
           className={cn(
-            "w-full h-14 text-base font-semibold rounded-xl",
+            "generate-button w-full h-14 text-base font-semibold rounded-xl",
             "bg-gradient-to-r from-primary to-primary/80",
             "hover:from-primary/90 hover:to-primary/70",
             "disabled:opacity-50 disabled:cursor-not-allowed",

@@ -844,3 +844,156 @@
     }
   }
 }
+
+/* Studio page mobile fixes */
+@media screen and (max-width: 768px) {
+  /* Main studio container */
+  .studio-page {
+    padding: 0.75rem !important;
+  }
+  
+  /* Header section */
+  .studio-header h1 {
+    font-size: 1.75rem !important;
+    line-height: 1.2 !important;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  .studio-header p {
+    font-size: 0.9rem !important;
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  /* User info section */
+  .studio-user-info {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    align-items: center !important;
+  }
+  
+  .studio-user-info .badge {
+    font-size: 0.75rem !important;
+    padding: 0.25rem 0.5rem !important;
+  }
+  
+  /* Generation form container */
+  .generation-form-container {
+    padding: 1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  /* Form labels */
+  .generation-form label {
+    font-size: 0.875rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  /* Textarea */
+  .generation-form textarea {
+    min-height: 100px !important;
+    font-size: 14px !important;
+    padding: 0.75rem !important;
+  }
+  
+  /* Style presets grid */
+  .style-presets {
+    grid-template-columns: 1fr !important;
+    gap: 0.5rem !important;
+  }
+  
+  .style-presets button {
+    padding: 0.75rem !important;
+    font-size: 0.8rem !important;
+  }
+  
+  /* Generation options */
+  .generation-options {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+  
+  /* Balance info */
+  .balance-info {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    text-align: center !important;
+  }
+  
+  /* Generate button */
+  .generate-button {
+    height: 3rem !important;
+    font-size: 0.9rem !important;
+  }
+  
+  /* Quick actions */
+  .quick-actions {
+    padding: 1rem !important;
+  }
+  
+  .quick-actions h3 {
+    font-size: 1rem !important;
+  }
+  
+  .quick-actions p {
+    font-size: 0.8rem !important;
+  }
+  
+  .quick-actions .grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+  
+  .quick-actions button {
+    padding: 1rem !important;
+    text-align: left !important;
+  }
+}
+
+/* iPhone specific fixes */
+@media screen and (max-width: 428px) {
+  /* Studio page */
+  .studio-page {
+    padding: 0.5rem !important;
+  }
+  
+  .studio-header h1 {
+    font-size: 1.5rem !important;
+  }
+  
+  .studio-header p {
+    font-size: 0.8rem !important;
+    padding: 0 0.5rem !important;
+  }
+  
+  /* Generation form */
+  .generation-form-container {
+    padding: 0.75rem !important;
+  }
+  
+  .generation-form textarea {
+    min-height: 80px !important;
+    font-size: 13px !important;
+  }
+  
+  /* Badges */
+  .generation-form .badge {
+    font-size: 0.7rem !important;
+    padding: 0.2rem 0.4rem !important;
+  }
+  
+  /* Buttons */
+  .generate-button {
+    height: 2.5rem !important;
+    font-size: 0.85rem !important;
+  }
+  
+  /* Quick actions */
+  .quick-actions {
+    padding: 0.75rem !important;
+  }
+  
+  .quick-actions button {
+    padding: 0.75rem !important;
+  }
+}
