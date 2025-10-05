@@ -128,4 +128,7 @@ deploy/
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
+*.sw?deploy.sh
+deploy.sh
+deploy-old.sh
+deploy.sh
