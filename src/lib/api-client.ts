@@ -77,6 +77,20 @@ export interface PricingPlanResponse {
   sortOrder: number;
 }
 
+export interface ContactRequest {
+  name: string;
+  email: string;
+  phone?: string;
+  subject: string;
+  message: string;
+}
+
+export interface ContactResponse {
+  message: string;
+  status: string;
+  messageId?: string;
+}
+
 class ApiClient {
   private baseUrl: string;
   private timeout: number;
@@ -581,6 +595,14 @@ class ApiClient {
   async getAllPricingPlans(): Promise<ApiResponse<PricingPlanResponse[]>> {
     return this.request<PricingPlanResponse[]>('/pricing/plans/all', {
       method: 'GET',
+    });
+  }
+
+  // Contact Form API
+  async sendContactMessage(request: ContactRequest): Promise<ApiResponse<ContactResponse>> {
+    return this.request<ContactResponse>('/contact/send', {
+      method: 'POST',
+      body: JSON.stringify(request),
     });
   }
 

@@ -1,11 +1,76 @@
+"use client"
+
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Mail, MessageCircle, MapPin, Clock, Phone } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
+import { apiClient, ContactRequest } from '@/lib/api-client';
+import { Mail, MessageCircle, MapPin, Clock, Phone, Send, CheckCircle } from 'lucide-react';
+
+const contactSchema = z.object({
+  name: z.string().min(2, 'Имя должно содержать минимум 2 символа').max(100, 'Имя не должно превышать 100 символов'),
+  email: z.string().email('Введите корректный email'),
+  phone: z.string().optional(),
+  subject: z.string().min(5, 'Тема должна содержать минимум 5 символов').max(200, 'Тема не должна превышать 200 символов'),
+  message: z.string().min(10, 'Сообщение должно содержать минимум 10 символов').max(2000, 'Сообщение не должно превышать 2000 символов'),
+});
+
+type ContactFormData = z.infer<typeof contactSchema>;
 
 export default function ContactsPage() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const { toast } = useToast();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<ContactFormData>({
+    resolver: zodResolver(contactSchema),
+  });
+
+  const onSubmit = async (data: ContactFormData) => {
+    setIsSubmitting(true);
+
+    try {
+      const request: ContactRequest = {
+        name: data.name,
+        email: data.email,
+        phone: data.phone || undefined,
+        subject: data.subject,
+        message: data.message,
+      };
+
+      const response = await apiClient.sendContactMessage(request);
+
+      if (response.data) {
+        setIsSubmitted(true);
+        reset();
+        toast({
+          title: "Сообщение отправлено!",
+          description: response.data.message,
+        });
+      } else {
+        throw new Error(response.error || "Ошибка отправки сообщения");
+      }
+    } catch (error: any) {
+      toast({
+        title: "Ошибка отправки",
+        description: error.message || "Не удалось отправить сообщение",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -91,67 +156,109 @@ export default function ContactsPage() {
                 <CardTitle className="text-gray-900 dark:text-gray-100">Написать нам</CardTitle>
               </CardHeader>
               <CardContent>
-                <form className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {isSubmitted ? (
+                  <div className="text-center py-8">
+                    <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                      Сообщение отправлено!
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4">
+                      Спасибо за обращение! Мы ответим в течение 24 часов.
+                    </p>
+                    <Button 
+                      onClick={() => setIsSubmitted(false)}
+                      variant="outline"
+                    >
+                      Отправить еще одно сообщение
+                    </Button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="name">Имя *</Label>
+                        <Input 
+                          id="name" 
+                          placeholder="Ваше имя"
+                          className={`mt-1 ${errors.name ? 'border-red-500' : ''}`}
+                          {...register('name')}
+                        />
+                        {errors.name && (
+                          <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+                        )}
+                      </div>
+                      <div>
+                        <Label htmlFor="email">Email *</Label>
+                        <Input 
+                          id="email" 
+                          type="email" 
+                          placeholder="your@email.com"
+                          className={`mt-1 ${errors.email ? 'border-red-500' : ''}`}
+                          {...register('email')}
+                        />
+                        {errors.email && (
+                          <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+                        )}
+                      </div>
+                    </div>
+                    
                     <div>
-                      <Label htmlFor="name">Имя *</Label>
+                      <Label htmlFor="phone">Телефон</Label>
                       <Input 
-                        id="name" 
-                        placeholder="Ваше имя"
+                        id="phone" 
+                        type="tel" 
+                        placeholder="+7 (XXX) XXX-XX-XX"
                         className="mt-1"
-                        required
+                        {...register('phone')}
                       />
                     </div>
+                    
                     <div>
-                      <Label htmlFor="email">Email *</Label>
+                      <Label htmlFor="subject">Тема *</Label>
                       <Input 
-                        id="email" 
-                        type="email" 
-                        placeholder="your@email.com"
-                        className="mt-1"
-                        required
+                        id="subject" 
+                        placeholder="Тема сообщения"
+                        className={`mt-1 ${errors.subject ? 'border-red-500' : ''}`}
+                        {...register('subject')}
                       />
+                      {errors.subject && (
+                        <p className="text-red-500 text-sm mt-1">{errors.subject.message}</p>
+                      )}
                     </div>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="phone">Телефон</Label>
-                    <Input 
-                      id="phone" 
-                      type="tel" 
-                      placeholder="+7 (XXX) XXX-XX-XX"
-                      className="mt-1"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="subject">Тема *</Label>
-                    <Input 
-                      id="subject" 
-                      placeholder="Тема сообщения"
-                      className="mt-1"
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="message">Сообщение *</Label>
-                    <Textarea 
-                      id="message" 
-                      placeholder="Ваше сообщение..."
-                      rows={5}
-                      className="mt-1"
-                      required
-                    />
-                  </div>
-                  
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-blue-600 hover:bg-blue-700"
-                  >
-                    Отправить сообщение
-                  </Button>
-                </form>
+                    
+                    <div>
+                      <Label htmlFor="message">Сообщение *</Label>
+                      <Textarea 
+                        id="message" 
+                        placeholder="Ваше сообщение..."
+                        rows={5}
+                        className={`mt-1 ${errors.message ? 'border-red-500' : ''}`}
+                        {...register('message')}
+                      />
+                      {errors.message && (
+                        <p className="text-red-500 text-sm mt-1">{errors.message.message}</p>
+                      )}
+                    </div>
+                    
+                    <Button 
+                      type="submit" 
+                      className="w-full bg-blue-600 hover:bg-blue-700"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                          Отправка...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4 mr-2" />
+                          Отправить сообщение
+                        </>
+                      )}
+                    </Button>
+                  </form>
+                )}
               </CardContent>
             </Card>
           </div>
