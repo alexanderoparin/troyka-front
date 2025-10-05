@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
+import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { apiClient, ImageRequest, ImageResponse } from "@/lib/api-client"
 import { FileUpload } from "@/components/file-upload"
@@ -29,22 +30,22 @@ type GenerationFormData = z.infer<typeof generationSchema>
 const STYLE_PRESETS = [
   {
     name: "Студийная съёмка",
-    prompt: "professional product photography, clean white background, studio lighting, high quality, commercial style",
+    prompt: "профессиональная фотография товара, чистый белый фон, студийное освещение, высокое качество, коммерческий стиль",
     icon: "📸"
   },
   {
     name: "Минимализм", 
-    prompt: "minimalist product shot, soft shadows, neutral background, clean aesthetic, modern style",
+    prompt: "минималистичный снимок товара, мягкие тени, нейтральный фон, чистый эстетичный стиль, современный дизайн",
     icon: "🎨"
   },
   {
     name: "Премиум",
-    prompt: "luxury product photography, elegant presentation, dramatic lighting, premium quality, sophisticated",
+    prompt: "роскошная фотография товара, элегантная подача, драматичное освещение, премиум качество, изысканный стиль",
     icon: "✨"
   },
   {
     name: "Lifestyle",
-    prompt: "lifestyle product photography, natural setting, warm lighting, casual atmosphere, authentic",
+    prompt: "жизненная фотография товара, естественная обстановка, теплое освещение, повседневная атмосфера, аутентичный стиль",
     icon: "🌟"
   },
 ]
@@ -153,19 +154,17 @@ export function GenerationForm() {
 
   return (
     <div className="space-y-6">
-      {/* Image Upload Area */}
-      <FileUpload
-        onFileUploaded={handleFileUploaded}
-        onFileRemoved={handleFileRemoved}
-        uploadedFiles={uploadedImages}
-        maxFiles={1}
-                  accept="image/*"
-        className="w-full"
-      />
-
-      {/* Prompt Input */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {/* Prompt Input - Main Required Field */}
         <div className="space-y-3">
+          <div className="flex items-center gap-2 mb-2">
+            <Label htmlFor="prompt" className="text-base font-semibold">
+              Описание товара
+            </Label>
+            <Badge variant="destructive" className="text-xs">
+              Обязательно
+            </Badge>
+          </div>
           <div className="relative">
             <Textarea
               {...register("prompt")}
@@ -191,6 +190,31 @@ export function GenerationForm() {
               {errors.prompt.message}
             </p>
           )}
+        </div>
+
+        {/* Optional Image Upload Area */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 mb-2">
+            <Label className="text-base font-semibold">
+              Загрузить изображение
+            </Label>
+            <Badge variant="secondary" className="text-xs">
+              По желанию
+            </Badge>
+          </div>
+          <div className="p-4 border-2 border-dashed border-muted-foreground/25 rounded-xl bg-muted/20">
+            <FileUpload
+              onFileUploaded={handleFileUploaded}
+              onFileRemoved={handleFileRemoved}
+              uploadedFiles={uploadedImages}
+              maxFiles={1}
+              accept="image/*"
+              className="w-full"
+            />
+            <p className="text-xs text-muted-foreground mt-2 text-center">
+              Загрузите изображение, если хотите его изменить, или оставьте пустым для создания нового
+            </p>
+          </div>
         </div>
 
         {/* Style Presets */}
