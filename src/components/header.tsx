@@ -72,7 +72,7 @@ export function Header() {
           </nav>
 
           {/* Right side */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             {/* User info (if authenticated) */}
             {isAuthenticated && (
               <div className="hidden sm:flex items-center space-x-2">
@@ -159,11 +159,11 @@ export function Header() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <div className="flex items-center gap-2">
-                <Button asChild>
+              <div className="flex items-center gap-1 sm:gap-2">
+                <Button asChild size="sm" className="text-xs sm:text-sm px-2 sm:px-4">
                   <Link href="/login">Войти</Link>
                 </Button>
-                <Button variant="outline" asChild>
+                <Button variant="outline" asChild size="sm" className="text-xs sm:text-sm px-2 sm:px-4">
                   <Link href="/register">Регистрация</Link>
                 </Button>
               </div>
