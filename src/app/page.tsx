@@ -12,37 +12,37 @@ export default function HomePage() {
   return (
     <div className="space-y-20">
       {/* Hero Section */}
-      <section className="text-center space-y-8 sm:space-y-12 py-16 sm:py-24 px-4">
-        <div className="space-y-6 sm:space-y-8">
+      <section className="text-center space-y-6 sm:space-y-8 md:space-y-12 py-12 sm:py-16 md:py-24 px-4">
+        <div className="space-y-4 sm:space-y-6 md:space-y-8">
           <Badge variant="secondary" className="mb-4 text-callout bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-700 px-4 py-2 rounded-full">
             <Sparkles className="w-4 h-4 mr-2" />
             Новое поколение ИИ для товаров
           </Badge>
-          <h1 className="text-display sm:text-6xl md:text-7xl font-bold tracking-tight">
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight">
             <span className="bg-gradient-to-r from-blue-600 via-blue-500 to-blue-700 bg-clip-text text-transparent">24reshai</span>
             <br />
-            <span className="text-large-title sm:text-4xl md:text-5xl text-foreground">Генерация изображений товаров</span>
+            <span className="text-2xl sm:text-4xl md:text-5xl text-foreground">Генерация изображений товаров</span>
           </h1>
-          <p className="text-headline sm:text-xl md:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-xl md:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
             Создавайте профессиональные изображения товаров с помощью искусственного интеллекта. 
             100% точность деталей, реалистичные фоны, студийное качество за секунды.
           </p>
         </div>
         
-        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center w-full max-w-lg sm:max-w-none mx-auto">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-6 justify-center items-center w-full max-w-lg sm:max-w-none mx-auto px-2 sm:px-0">
           {isLoading ? (
             <div className="w-full sm:w-44 h-11 animate-pulse bg-muted rounded-xl" />
           ) : isAuthenticated ? (
             <>
               <Link href="/studio" className="w-full sm:w-auto">
-                <button className="btn-ios-primary w-full sm:w-auto px-8 py-3 text-headline">
+                <button className="btn-ios-primary w-full sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-headline">
                   <Zap className="w-5 h-5 mr-3" />
                   Открыть студию
                   <ArrowRight className="w-5 h-5 ml-3" />
                 </button>
               </Link>
               <Link href="/pricing" className="w-full sm:w-auto">
-                <button className="btn-ios-ghost w-full sm:w-auto px-8 py-3 text-headline">
+                <button className="btn-ios-ghost w-full sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-headline">
                   Посмотреть цены
                 </button>
               </Link>
@@ -50,14 +50,14 @@ export default function HomePage() {
           ) : (
             <>
               <Link href="/register" className="w-full sm:w-auto">
-                <button className="btn-ios-primary w-full sm:w-auto px-8 py-3 text-headline">
+                <button className="btn-ios-primary w-full sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-headline">
                   <Sparkles className="w-5 h-5 mr-3" />
                   Начать бесплатно
                   <ArrowRight className="w-5 h-5 ml-3" />
                 </button>
               </Link>
               <Link href="/login" className="w-full sm:w-auto">
-                <button className="btn-ios-ghost w-full sm:w-auto px-8 py-3 text-headline">
+                <button className="btn-ios-ghost w-full sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-headline">
                   Войти в аккаунт
                 </button>
               </Link>
@@ -65,7 +65,7 @@ export default function HomePage() {
           )}
         </div>
 
-        <div className="flex flex-wrap justify-center gap-8 text-sm text-muted-foreground">
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-8 text-xs sm:text-sm text-muted-foreground px-2">
           <div className="flex items-center gap-2">
             <Star className="w-4 h-4 text-yellow-500" />
             <span>+6 поинтов при регистрации</span>
@@ -222,12 +222,12 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="text-center space-y-12 py-20 card-ios-elevated">
-        <div className="space-y-6">
-          <h2 className="text-title-1 text-foreground">Готовы начать?</h2>
+      <section className="text-center space-y-8 sm:space-y-12 py-16 sm:py-20 card-ios-elevated px-4">
+        <div className="space-y-4 sm:space-y-6">
+          <h2 className="text-2xl sm:text-title-1 text-foreground">Готовы начать?</h2>
           {isAuthenticated ? (
             <div className="space-y-4">
-              <p className="text-headline text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-base sm:text-headline text-muted-foreground max-w-2xl mx-auto">
                 Добро пожаловать, {user?.username}! Начните создавать профессиональные изображения товаров прямо сейчас
               </p>
               <div className="flex items-center justify-center">
@@ -238,32 +238,32 @@ export default function HomePage() {
               </div>
             </div>
           ) : (
-            <p className="text-headline text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base sm:text-headline text-muted-foreground max-w-2xl mx-auto">
               Зарегистрируйтесь сейчас и получите +6 поинтов для бесплатного тестирования
             </p>
           )}
         </div>
         
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center max-w-lg sm:max-w-none mx-auto px-2 sm:px-0">
           {isLoading ? (
             <div className="w-44 h-11 animate-pulse bg-muted rounded-xl" />
           ) : isAuthenticated ? (
-            <Link href="/studio">
-              <button className="btn-ios-primary px-8 py-3 text-headline">
+            <Link href="/studio" className="w-full sm:w-auto">
+              <button className="btn-ios-primary w-full sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-headline">
                 <Sparkles className="w-5 h-5 mr-3" />
                 Начать создавать
               </button>
             </Link>
           ) : (
             <>
-              <Link href="/register">
-                <button className="btn-ios-primary px-8 py-3 text-headline">
+              <Link href="/register" className="w-full sm:w-auto">
+                <button className="btn-ios-primary w-full sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-headline">
                   <Sparkles className="w-5 h-5 mr-3" />
                   Зарегистрироваться
                 </button>
               </Link>
-              <Link href="/login">
-                <button className="btn-ios-ghost px-8 py-3 text-headline">
+              <Link href="/login" className="w-full sm:w-auto">
+                <button className="btn-ios-ghost w-full sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-headline">
                   Уже есть аккаунт?
                 </button>
               </Link>
