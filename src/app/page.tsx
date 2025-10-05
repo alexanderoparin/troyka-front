@@ -12,7 +12,7 @@ export default function HomePage() {
   return (
     <div className="space-y-20">
       {/* Hero Section */}
-      <section className="text-center space-y-6 sm:space-y-8 md:space-y-12 py-12 sm:py-16 md:py-24 px-4">
+      <section className="hero-section text-center space-y-6 sm:space-y-8 md:space-y-12 py-12 sm:py-16 md:py-24 px-4">
         <div className="space-y-4 sm:space-y-6 md:space-y-8">
           <Badge variant="secondary" className="mb-4 text-callout bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-700 px-4 py-2 rounded-full">
             <Sparkles className="w-4 h-4 mr-2" />
