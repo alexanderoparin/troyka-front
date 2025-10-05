@@ -129,3 +129,5 @@ deploy/
 *.njsproj
 *.sln
 *.sw?deploy.sh
+deploy.sh
+deploy-old.sh
