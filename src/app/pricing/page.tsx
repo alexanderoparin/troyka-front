@@ -57,16 +57,16 @@ export default function PricingPage() {
           </Button>
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {plans.map((plan, index) => (
-            <PricingCard
-              key={plan.id}
-              plan={plan}
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {plans.map((plan, index) => (
+          <PricingCard
+            key={plan.id}
+            plan={plan}
               isPopular={plan.isPopular}
               className={plan.isPopular ? "border-primary shadow-lg scale-105" : ""}
-            />
-          ))}
-        </div>
+          />
+        ))}
+      </div>
       )}
 
       {/* Features */}
@@ -85,16 +85,16 @@ export default function PricingPage() {
               <li className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-blue-500" />
                 <span className="text-body text-foreground">Точная передача всех деталей товара</span>
-              </li>
+                </li>
               <li className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-blue-500" />
                 <span className="text-body text-foreground">Реалистичные цвета и текстуры</span>
-              </li>
+                </li>
               <li className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-blue-500" />
                 <span className="text-body text-foreground">Профессиональное освещение</span>
-              </li>
-            </ul>
+                </li>
+              </ul>
           </div>
 
           <div className="card-ios p-8 animate-ios-fade-in" style={{ animationDelay: '0.1s' }}>
@@ -106,16 +106,16 @@ export default function PricingPage() {
               <li className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-green-500" />
                 <span className="text-body text-foreground">Результат за 5-10 секунд</span>
-              </li>
+                </li>
               <li className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-green-500" />
                 <span className="text-body text-foreground">Высокое разрешение 3:4</span>
-              </li>
+                </li>
               <li className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-green-500" />
                 <span className="text-body text-foreground">Множество стилей фонов</span>
-              </li>
-            </ul>
+                </li>
+              </ul>
           </div>
 
           <div className="card-ios p-8 animate-ios-fade-in" style={{ animationDelay: '0.2s' }}>
@@ -127,16 +127,16 @@ export default function PricingPage() {
               <li className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-purple-500" />
                 <span className="text-body text-foreground">Студийное качество</span>
-              </li>
+                </li>
               <li className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-purple-500" />
                 <span className="text-body text-foreground">Готово для маркетплейсов</span>
-              </li>
+                </li>
               <li className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-purple-500" />
                 <span className="text-body text-foreground">Коммерческое использование</span>
-              </li>
-            </ul>
+                </li>
+              </ul>
           </div>
         </div>
       </div>
@@ -188,8 +188,8 @@ export default function PricingPage() {
             </p>
             <a href="/studio" className="btn-ios-primary px-8 py-3 text-headline inline-flex items-center">
               <Sparkles className="w-5 h-5 mr-3" />
-              Начать создавать
-            </a>
+                Начать создавать
+              </a>
           </div>
         ) : (
           <div className="space-y-6">
@@ -198,8 +198,8 @@ export default function PricingPage() {
             </p>
             <a href="/studio" className="btn-ios-primary px-8 py-3 text-headline inline-flex items-center">
               <Sparkles className="w-5 h-5 mr-3" />
-              Начать создавать
-            </a>
+                Начать создавать
+              </a>
           </div>
         )}
       </div>

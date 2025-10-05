@@ -199,7 +199,7 @@ class ApiClient {
 
   // Auth API
   async login(credentials: LoginRequest): Promise<ApiResponse<AuthResponse>> {
-    const response = await this.request<AuthResponse>('/auth/login', {
+    const response = await this.request<AuthResponse>('/api/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials),
     });
@@ -212,7 +212,7 @@ class ApiClient {
   }
 
   async register(userData: RegisterRequest): Promise<ApiResponse<AuthResponse>> {
-    const response = await this.request<AuthResponse>('/auth/register', {
+    const response = await this.request<AuthResponse>('/api/auth/register', {
       method: 'POST',
       body: JSON.stringify(userData),
     });
@@ -234,7 +234,7 @@ class ApiClient {
 
   // Image Generation API
   async generateImage(request: ImageRequest): Promise<ApiResponse<ImageResponse>> {
-    return this.request<ImageResponse>('/fal/image/run/create', {
+    return this.request<ImageResponse>('/api/fal/image/run/create', {
       method: 'POST',
       body: JSON.stringify(request),
     });
@@ -245,7 +245,7 @@ class ApiClient {
     const formData = new FormData();
     formData.append('file', file);
 
-    const url = `${this.baseUrl}/files/upload`;
+    const url = `${this.baseUrl}/api/files/upload`;
     const token = this.getToken();
     
     // Устанавливаем только Authorization, Content-Type браузер установит автоматически
@@ -302,7 +302,7 @@ class ApiClient {
     const formData = new FormData();
     formData.append('file', file);
 
-    const url = `${this.baseUrl}/users/avatar/upload`;
+    const url = `${this.baseUrl}/api/users/avatar/upload`;
     const token = this.getToken();
     
     if (!token) {
@@ -367,7 +367,7 @@ class ApiClient {
 
   // Get user avatar
   async getUserAvatar(): Promise<ApiResponse<string>> {
-    const url = `${this.baseUrl}/users/avatar`;
+    const url = `${this.baseUrl}/api/users/avatar`;
     const token = this.getToken();
     
     if (!token) {
@@ -434,7 +434,7 @@ class ApiClient {
 
   // Delete user avatar
   async deleteUserAvatar(): Promise<ApiResponse<void>> {
-    const url = `${this.baseUrl}/users/avatar`;
+    const url = `${this.baseUrl}/api/users/avatar`;
     const token = this.getToken();
     
     if (!token) {
@@ -503,26 +503,26 @@ class ApiClient {
     if (filename.startsWith('https://')) {
       return filename;
     }
-    // Если filename начинается с /files/, добавляем baseUrl
+    // Если filename начинается с /files/, заменяем на /api/files/
     if (filename.startsWith('/files/')) {
-      return `${this.baseUrl}${filename}`;
+      return `${this.baseUrl}/api${filename}`;
     }
     // Иначе добавляем /files/ к filename
-    return `${this.baseUrl}/files/${filename}`;
+    return `${this.baseUrl}/api/files/${filename}`;
   }
 
   // User API
   async getUserInfo(): Promise<ApiResponse<UserInfo>> {
-    return this.request<UserInfo>('/users/me');
+    return this.request<UserInfo>('/api/users/me');
   }
 
   async getImageHistory(): Promise<ApiResponse<ImageGenerationHistory[]>> {
-    return this.request<ImageGenerationHistory[]>('/users/me/image-history');
+    return this.request<ImageGenerationHistory[]>('/api/users/me/image-history');
   }
 
   // Get user points/balance
   async getUserPoints(): Promise<ApiResponse<number>> {
-    const url = `${this.baseUrl}/fal/user/points`;
+    const url = `${this.baseUrl}/api/fal/user/points`;
     const token = this.getToken();
     
     const headers: Record<string, string> = {};
@@ -572,14 +572,14 @@ class ApiClient {
 
   // Password Reset API
   async requestPasswordReset(email: string): Promise<ApiResponse<{message: string}>> {
-    return this.request<{message: string}>('/auth/forgot-password', {
+    return this.request<{message: string}>('/api/auth/forgot-password', {
       method: 'POST',
       body: JSON.stringify({ email }),
     });
   }
 
   async resetPassword(request: ResetPasswordRequest): Promise<ApiResponse<{message: string}>> {
-    return this.request<{message: string}>('/auth/reset-password', {
+    return this.request<{message: string}>('/api/auth/reset-password', {
       method: 'POST',
       body: JSON.stringify(request),
     });
@@ -587,20 +587,20 @@ class ApiClient {
 
   // Pricing methods
   async getPricingPlans(): Promise<ApiResponse<PricingPlanResponse[]>> {
-    return this.request<PricingPlanResponse[]>('/pricing/plans', {
+    return this.request<PricingPlanResponse[]>('/api/pricing/plans', {
       method: 'GET',
     });
   }
 
   async getAllPricingPlans(): Promise<ApiResponse<PricingPlanResponse[]>> {
-    return this.request<PricingPlanResponse[]>('/pricing/plans/all', {
+    return this.request<PricingPlanResponse[]>('/api/pricing/plans/all', {
       method: 'GET',
     });
   }
 
   // Contact Form API
   async sendContactMessage(request: ContactRequest): Promise<ApiResponse<ContactResponse>> {
-    return this.request<ContactResponse>('/contact/send', {
+    return this.request<ContactResponse>('/api/contact/send', {
       method: 'POST',
       body: JSON.stringify(request),
     });
@@ -608,7 +608,7 @@ class ApiClient {
 
   // Health Check
   async healthCheck(): Promise<ApiResponse<any>> {
-    return this.request('/health');
+    return this.request('/api/health');
   }
 }
 

@@ -79,7 +79,7 @@ export function AvatarUpload({
           const formData = new FormData()
           formData.append('file', file)
           
-          const saveResponse = await fetch(`${apiClient.getBaseUrl()}/users/avatar/upload`, {
+          const saveResponse = await fetch(`${apiClient.getBaseUrl()}/api/users/avatar/upload`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${apiClient.getAuthToken()}`,
