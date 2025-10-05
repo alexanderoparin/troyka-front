@@ -704,34 +704,49 @@
     
     /* Специальные исправления для хедера на iPhone */
     header {
-      padding-left: 4px !important;
-      padding-right: 4px !important;
+      padding-left: 2px !important;
+      padding-right: 2px !important;
     }
     
     header .container {
-      padding-left: 4px !important;
-      padding-right: 4px !important;
+      padding-left: 2px !important;
+      padding-right: 2px !important;
+      max-width: 100% !important;
     }
     
     /* Исправляем кнопки в хедере */
     header .flex.items-center.space-x-2 {
-      gap: 2px !important;
+      gap: 1px !important;
     }
     
     header button {
-      padding: 4px 6px !important;
-      font-size: 11px !important;
+      padding: 2px 4px !important;
+      font-size: 10px !important;
       min-width: auto !important;
       white-space: nowrap !important;
+      height: 28px !important;
     }
     
     /* Принудительно исправляем кнопки авторизации */
     header a[href="/login"],
     header a[href="/register"] {
-      padding: 4px 6px !important;
-      font-size: 11px !important;
+      padding: 2px 4px !important;
+      font-size: 10px !important;
       min-width: auto !important;
       white-space: nowrap !important;
+      height: 28px !important;
+      display: inline-block !important;
+    }
+    
+    /* Исправляем логотип */
+    header .flex.items-center.space-x-2:first-child {
+      flex-shrink: 1 !important;
+    }
+    
+    /* Принудительно сжимаем правую часть хедера */
+    header .flex.items-center.space-x-2:last-child {
+      flex-shrink: 1 !important;
+      min-width: 0 !important;
     }
     
     /* Исправляем главную страницу */
@@ -773,14 +788,26 @@
   /* Дополнительные исправления для очень маленьких экранов */
   @media screen and (max-width: 375px) {
     header button {
-      padding: 3px 4px !important;
-      font-size: 10px !important;
+      padding: 1px 2px !important;
+      font-size: 9px !important;
+      height: 24px !important;
     }
     
     header a[href="/login"],
     header a[href="/register"] {
-      padding: 3px 4px !important;
-      font-size: 10px !important;
+      padding: 1px 2px !important;
+      font-size: 9px !important;
+      height: 24px !important;
+    }
+    
+    /* Сжимаем логотип еще больше */
+    header .flex.items-center.space-x-1:first-child span {
+      font-size: 14px !important;
+    }
+    
+    header .flex.items-center.space-x-1:first-child svg {
+      width: 16px !important;
+      height: 16px !important;
     }
     
     .hero-section h1 {
@@ -789,6 +816,31 @@
     
     .hero-section .text-2xl {
       font-size: 1.25rem !important;
+    }
+  }
+  
+  /* Экстремальные исправления для самых маленьких экранов */
+  @media screen and (max-width: 320px) {
+    header button {
+      padding: 1px !important;
+      font-size: 8px !important;
+      height: 22px !important;
+    }
+    
+    header a[href="/login"],
+    header a[href="/register"] {
+      padding: 1px !important;
+      font-size: 8px !important;
+      height: 22px !important;
+    }
+    
+    header .flex.items-center.space-x-1:first-child span {
+      font-size: 12px !important;
+    }
+    
+    header .flex.items-center.space-x-1:first-child svg {
+      width: 14px !important;
+      height: 14px !important;
     }
   }
 }
