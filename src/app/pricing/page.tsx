@@ -177,6 +177,14 @@ export default function PricingPage() {
               Поинты автоматически начисляются на ваш счет сразу после создания аккаунта.
             </p>
           </div>
+
+          <div className="card-ios p-6 animate-ios-fade-in" style={{ animationDelay: '0.4s' }}>
+            <h3 className="text-title-3 text-foreground mb-4">Можно ли вернуть деньги?</h3>
+            <p className="text-body text-muted-foreground">
+              Да, возврат денежных средств возможен. Подробные условия возврата 
+              указаны в <a href="/legal" className="text-primary hover:underline">пользовательском соглашении</a>.
+            </p>
+          </div>
         </div>
       </div>
 
