@@ -158,9 +158,9 @@ export default function PricingPage() {
           </div>
 
           <div className="card-ios p-6 animate-ios-fade-in" style={{ animationDelay: '0.1s' }}>
-            <h3 className="text-title-3 text-foreground mb-4">Можно ли вернуть деньги?</h3>
+            <h3 className="text-title-3 text-foreground mb-4">Безопасны ли платежи?</h3>
             <p className="text-body text-muted-foreground">
-              Да, мы возвращаем деньги в течение 14 дней, если вы не использовали приобретенные поинты.
+              Да, все платежи проходят через защищенный шлюз Робокассы с SSL-шифрованием. Мы не храним данные ваших карт.
             </p>
           </div>
 
