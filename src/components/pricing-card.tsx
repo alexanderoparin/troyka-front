@@ -41,6 +41,7 @@ export function PricingCard({ plan, isPopular = false, className }: PricingCardP
       const response = await apiClient.createPayment({
         amount: plan.priceRub / 100, // Конвертируем из копеек в рубли
         description: `Пополнение баланса - ${plan.name} (${plan.credits} поинтов)`,
+        credits: plan.credits, // Передаем количество поинтов
       })
 
       if (response.data) {

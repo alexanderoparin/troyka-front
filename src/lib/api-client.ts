@@ -96,6 +96,7 @@ export interface PaymentRequest {
   amount: number;
   description: string;
   orderId?: string;
+  credits?: number;
 }
 
 export interface PaymentResponse {
