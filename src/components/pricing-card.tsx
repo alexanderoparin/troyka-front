@@ -134,8 +134,8 @@ export function PricingCard({ plan, isPopular = false, className }: PricingCardP
 
         {/* Price per generation */}
         <p className="text-footnote text-muted-foreground text-center">
-          Экономия до {Math.round(((30 - pricePerGeneration / 100) / 30) * 100)}% 
-          по сравнению с разовыми покупками
+          {formatCurrency(pricePerGeneration / 100)} за генерацию • 
+          Поинты не сгорают и остаются навсегда
         </p>
       </div>
     </div>
