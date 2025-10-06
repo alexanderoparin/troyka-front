@@ -132,11 +132,12 @@ export function PricingCard({ plan, isPopular = false, className }: PricingCardP
           {isProcessing ? "Обработка..." : "Купить поинты"}
         </button>
 
-        {/* Price per generation */}
-        <p className="text-footnote text-muted-foreground text-center">
-          {formatCurrency(pricePerGeneration / 100)} за генерацию • 
-          Поинты не сгорают и остаются навсегда
-        </p>
+        {/* Description from DB */}
+        {plan.description && (
+          <p className="text-footnote text-muted-foreground text-center">
+            {plan.description}
+          </p>
+        )}
       </div>
     </div>
   )
