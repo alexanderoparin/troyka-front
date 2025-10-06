@@ -106,6 +106,17 @@ export interface PaymentResponse {
   status: string;
 }
 
+export interface PaymentHistory {
+  id: number;
+  orderId: string;
+  amount: number;
+  description: string;
+  status: string;
+  creditsAmount: number;
+  paidAt: string | null;
+  createdAt: string;
+}
+
 class ApiClient {
   private baseUrl: string;
   private timeout: number;
@@ -631,6 +642,13 @@ class ApiClient {
     const response = await this.request<PaymentResponse>('/api/payment/create', {
       method: 'POST',
       body: JSON.stringify(request),
+    });
+    return response;
+  }
+
+  public async getPaymentHistory(): Promise<ApiResponse<PaymentHistory[]>> {
+    const response = await this.request<PaymentHistory[]>('/api/payment/history', {
+      method: 'GET',
     });
     return response;
   }

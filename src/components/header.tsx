@@ -55,7 +55,7 @@ export function Header() {
               href="/history" 
               className="text-sm font-medium transition-colors hover:text-primary"
             >
-              История
+              История генераций
             </Link>
             <Link 
               href="/pricing" 
@@ -142,7 +142,13 @@ export function Header() {
                   <DropdownMenuItem asChild>
                     <Link href="/history">
                       <History className="mr-2 h-4 w-4" />
-                      История
+                      История генераций
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/payment-history">
+                      <CreditCard className="mr-2 h-4 w-4" />
+                      История платежей
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
@@ -201,7 +207,14 @@ export function Header() {
                 className="text-sm font-medium transition-colors hover:text-primary"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                История
+                История генераций
+              </Link>
+              <Link 
+                href="/payment-history" 
+                className="text-sm font-medium transition-colors hover:text-primary"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                История платежей
               </Link>
               <Link 
                 href="/pricing" 

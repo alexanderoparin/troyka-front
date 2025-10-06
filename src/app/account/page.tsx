@@ -17,7 +17,8 @@ import {
   Shield,
   History,
   Image as ImageIcon,
-  ExternalLink
+  ExternalLink,
+  CreditCard
 } from "lucide-react"
 import { ImageEditButton } from "@/components/image-edit-button"
 import { AvatarUpload } from "@/components/avatar-upload"
@@ -266,6 +267,13 @@ export default function AccountPage() {
                 <Link href="/history">
                   <History className="w-4 h-4 mr-2" />
                   История генерации
+                </Link>
+              </Button>
+              
+              <Button variant="outline" className="w-full justify-start" asChild>
+                <Link href="/payment-history">
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  История платежей
                 </Link>
               </Button>
               
