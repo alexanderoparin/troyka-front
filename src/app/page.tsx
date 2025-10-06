@@ -181,6 +181,11 @@ export default function HomePage() {
               <div className="text-3xl font-bold text-foreground">990 ₽</div>
               <div className="text-callout text-muted-foreground">100 поинтов • ~33 генерации</div>
             </div>
+            <Link href="/pricing">
+              <button className="btn-ios-ghost w-full px-4 py-2 text-sm">
+                Купить
+              </button>
+            </Link>
           </div>
           
           <div className="card-ios-elevated p-6 text-center relative animate-ios-fade-in" style={{ animationDelay: '0.1s' }}>
@@ -192,6 +197,11 @@ export default function HomePage() {
               <div className="text-3xl font-bold text-foreground">2990 ₽</div>
               <div className="text-callout text-muted-foreground">300 поинтов • ~100 генераций</div>
             </div>
+            <Link href="/pricing">
+              <button className="btn-ios-primary w-full px-4 py-2 text-sm">
+                Купить
+              </button>
+            </Link>
           </div>
 
           <div className="card-ios p-6 text-center animate-ios-fade-in" style={{ animationDelay: '0.2s' }}>
@@ -200,6 +210,11 @@ export default function HomePage() {
               <div className="text-3xl font-bold text-foreground">5490 ₽</div>
               <div className="text-callout text-muted-foreground">600 поинтов • ~200 генераций</div>
             </div>
+            <Link href="/pricing">
+              <button className="btn-ios-ghost w-full px-4 py-2 text-sm">
+                Купить
+              </button>
+            </Link>
           </div>
 
           <div className="card-ios p-6 text-center animate-ios-fade-in" style={{ animationDelay: '0.3s' }}>
@@ -208,6 +223,11 @@ export default function HomePage() {
               <div className="text-3xl font-bold text-foreground">8990 ₽</div>
               <div className="text-callout text-muted-foreground">1000 поинтов • ~333 генерации</div>
             </div>
+            <Link href="/pricing">
+              <button className="btn-ios-ghost w-full px-4 py-2 text-sm">
+                Купить
+              </button>
+            </Link>
           </div>
         </div>
 
