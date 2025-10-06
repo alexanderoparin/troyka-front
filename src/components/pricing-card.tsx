@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { Check, Zap, Star } from "lucide-react"
 import { cn, formatCurrency } from "@/lib/utils"
-import { PricingPlanResponse } from "@/lib/api-client"
+import { PricingPlanResponse, apiClient } from "@/lib/api-client"
 
 interface PricingCardProps {
   plan: PricingPlanResponse
@@ -38,13 +38,23 @@ export function PricingCard({ plan, isPopular = false, className }: PricingCardP
     setIsProcessing(true)
 
     try {
-      // TODO: Реализовать покупку поинтов через Java бэкенд
-      toast({
-        title: "Функция в разработке",
-        description: "Покупка поинтов будет доступна в ближайшее время",
-        variant: "destructive",
+      const response = await apiClient.createPayment({
+        amount: plan.priceRub / 100, // Конвертируем из копеек в рубли
+        description: `Пополнение баланса - ${plan.name} (${plan.credits} поинтов)`,
       })
+
+      if (response.data) {
+        // Перенаправляем на страницу оплаты Робокассы
+        window.location.href = response.data.paymentUrl
+      } else {
+        toast({
+          title: "Ошибка создания платежа",
+          description: response.error || "Не удалось создать заказ. Попробуйте еще раз.",
+          variant: "destructive",
+        })
+      }
     } catch (error) {
+      console.error('Payment error:', error)
       toast({
         title: "Ошибка покупки",
         description: "Не удалось создать заказ. Попробуйте еще раз.",

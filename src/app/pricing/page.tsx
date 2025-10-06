@@ -8,6 +8,8 @@ import { PricingCard } from "@/components/pricing-card"
 import { usePricingPlans } from "@/hooks/use-pricing-plans"
 import { useAuth } from "@/contexts/auth-context"
 import { getPointsText } from "@/lib/grammar"
+import { apiClient } from '@/lib/api-client';
+import { useToast } from '@/components/ui/use-toast';
 
 export default function PricingPage() {
   const { data: plans = [], isLoading, error } = usePricingPlans()

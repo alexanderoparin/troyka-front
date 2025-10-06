@@ -91,6 +91,20 @@ export interface ContactResponse {
   messageId?: string;
 }
 
+// Добавляем интерфейсы для платежей
+export interface PaymentRequest {
+  amount: number;
+  description: string;
+  orderId?: string;
+}
+
+export interface PaymentResponse {
+  paymentUrl: string;
+  orderId: string;
+  amount: number;
+  status: string;
+}
+
 class ApiClient {
   private baseUrl: string;
   private timeout: number;
@@ -609,6 +623,15 @@ class ApiClient {
   // Health Check
   async healthCheck(): Promise<ApiResponse<any>> {
     return this.request('/api/health');
+  }
+
+  // Payment methods
+  public async createPayment(request: PaymentRequest): Promise<ApiResponse<PaymentResponse>> {
+    const response = await this.request<PaymentResponse>('/api/payment/create', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    });
+    return response;
   }
 }
 
