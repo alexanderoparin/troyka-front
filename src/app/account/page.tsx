@@ -1,7 +1,6 @@
 "use client"
 
 import { useAuth } from "@/contexts/auth-context"
-import { useImageHistory } from "@/hooks/use-image-history"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -17,19 +16,14 @@ import {
   Shield,
   History,
   Image as ImageIcon,
-  ExternalLink,
   CreditCard
 } from "lucide-react"
-import { ImageEditButton } from "@/components/image-edit-button"
 import { AvatarUpload } from "@/components/avatar-upload"
 import { formatDate } from "@/lib/utils"
-import { apiClient } from "@/lib/api-client"
 import Link from "next/link"
-import Image from "next/image"
 
 export default function AccountPage() {
   const { user, isAuthenticated, isLoading, logout, avatar } = useAuth()
-  const { history: imageHistory, isLoading: historyLoading, error: historyError } = useImageHistory()
   const router = useRouter()
 
   if (isLoading) {
@@ -81,7 +75,7 @@ export default function AccountPage() {
         </p>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-8">
+      <div className="grid lg:grid-cols-2 gap-8">
         {/* Left Column - Profile Info */}
         <div className="space-y-6">
           <Card>
@@ -176,15 +170,24 @@ export default function AccountPage() {
                 <span className="text-muted-foreground">Тип аккаунта:</span>
                 <span className="font-medium">{getRoleDisplayName(user.role)}</span>
               </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Дата регистрации:</span>
+                <span className="font-medium">
+                  {formatDate(new Date(user.createdAt))}
+                </span>
+              </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Middle Column - Quick Actions */}
+        {/* Right Column - Quick Actions */}
         <div className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Быстрые действия</CardTitle>
+              <CardDescription>
+                Основные функции и навигация
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               <Button variant="outline" className="w-full justify-start" asChild>
@@ -230,96 +233,26 @@ export default function AccountPage() {
               </Button>
             </CardContent>
           </Card>
-        </div>
 
-        {/* Right Column - Image Generation History */}
-        <div className="space-y-6">
+          {/* Additional Info Card */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <History className="h-5 w-5" />
-                История генерации
+                <Calendar className="h-5 w-5" />
+                Статистика
               </CardTitle>
-              <CardDescription>
-                Ваши последние созданные изображения
-              </CardDescription>
             </CardHeader>
-            <CardContent>
-              {historyLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                </div>
-              ) : historyError ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p>Ошибка загрузки истории: {historyError}</p>
-                </div>
-              ) : imageHistory && imageHistory.length > 0 ? (
-                <div className="space-y-4">
-                  {imageHistory.slice(0, 4).map((item, index) => (
-                    <div key={index} className="flex items-center gap-3 p-3 border rounded-lg hover:bg-muted/50 transition-colors">
-                      <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-muted">
-                        <Image
-                          src={apiClient.getFileUrl(item.imageUrl)}
-                          alt={item.prompt}
-                          fill
-                          className="object-cover"
-                          sizes="48px"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate" title={item.prompt}>
-                          {item.prompt}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {formatDate(new Date(item.createdAt))}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          asChild
-                          className="h-7 w-7 p-0"
-                        >
-                          <a
-                            href={apiClient.getFileUrl(item.imageUrl)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <ExternalLink className="h-3 w-3" />
-                          </a>
-                        </Button>
-                        <ImageEditButton
-                          imageUrl={item.imageUrl}
-                          originalPrompt={item.prompt}
-                          onImageEdited={() => {
-                            // Обновляем историю после редактирования
-                            window.location.reload();
-                          }}
-                          className="h-7 w-7"
-                        />
-                      </div>
-                    </div>
-                  ))}
-                  {imageHistory.length > 4 && (
-                    <div className="text-center pt-2">
-                      <Button variant="outline" asChild size="sm">
-                        <Link href="/history">
-                          <History className="w-4 h-4 mr-2" />
-                          Показать всю историю
-                        </Link>
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="text-center py-8 text-muted-foreground">
-                  <ImageIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p>История генерации пуста</p>
-                  <p className="text-sm">Создайте первое изображение в студии</p>
-                </div>
-              )}
+            <CardContent className="space-y-3">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Статус аккаунта:</span>
+                <span className="font-medium">Активен</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Дата регистрации:</span>
+                <span className="font-medium">
+                  {formatDate(new Date(user.createdAt))}
+                </span>
+              </div>
             </CardContent>
           </Card>
         </div>
