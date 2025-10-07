@@ -12,17 +12,12 @@ export default function PaymentSuccessPage() {
   const [paymentId, setPaymentId] = useState<string | null>(null);
 
   useEffect(() => {
-    // Отладочная информация - выводим все параметры URL
-    console.log('All URL parameters:', Array.from(searchParams.entries()));
-    
-    // Пробуем разные возможные имена параметров для ID платежа
+    // Получаем ID платежа из URL параметров
     const invId = searchParams.get('InvId') || 
                   searchParams.get('payment_id') || 
                   searchParams.get('transaction_id') || 
                   searchParams.get('order_id') ||
                   searchParams.get('id');
-    
-    console.log('Found payment ID:', invId);
     
     if (invId) {
       setPaymentId(invId);
@@ -48,20 +43,6 @@ export default function PaymentSuccessPage() {
               <p className="font-mono text-sm">{paymentId}</p>
             </div>
           )}
-          
-          {/* Временная отладочная информация */}
-          <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
-            <p className="text-sm text-yellow-800 font-medium mb-2">Отладочная информация:</p>
-            <p className="text-xs text-yellow-700">
-              URL параметры: {Array.from(searchParams.entries()).length > 0 
-                ? Array.from(searchParams.entries()).map(([key, value]) => `${key}=${value}`).join(', ')
-                : 'Нет параметров'
-              }
-            </p>
-            <p className="text-xs text-yellow-700 mt-1">
-              Найденный ID: {paymentId || 'Не найден'}
-            </p>
-          </div>
           <div className="space-y-2">
             <Button asChild className="w-full">
               <Link href="/studio">
