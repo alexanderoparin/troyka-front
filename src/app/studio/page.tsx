@@ -1,25 +1,16 @@
 "use client"
 
-import { useState } from "react"
 import { useAuth } from "@/contexts/auth-context"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Slider } from "@/components/ui/slider"
 import { Badge } from "@/components/ui/badge"
-import { useToast } from "@/components/ui/use-toast"
 import { GenerationForm } from "@/components/generation-form"
-import { Sparkles, Zap, AlertCircle, Upload } from "lucide-react"
+import { Sparkles, AlertCircle, User } from "lucide-react"
 import Link from "next/link"
 
 export default function StudioPage() {
   const { user, isAuthenticated, isLoading } = useAuth()
   const router = useRouter()
-  const { toast } = useToast()
 
   if (isLoading) {
     return (
@@ -54,7 +45,6 @@ export default function StudioPage() {
     )
   }
 
-  const canGenerate = true // Пока что убираем проверку поинтов
 
   return (
     <div className="studio-page space-y-8">
