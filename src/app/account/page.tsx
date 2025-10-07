@@ -13,7 +13,8 @@ import {
   History,
   Image as ImageIcon,
   CreditCard,
-  Plus
+  Plus,
+  AlertCircle
 } from "lucide-react"
 import { AvatarUpload } from "@/components/avatar-upload"
 import { formatDate } from "@/lib/utils"
