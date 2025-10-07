@@ -95,20 +95,18 @@ export interface ContactResponse {
 export interface PaymentRequest {
   amount: number;
   description: string;
-  orderId?: string;
   credits?: number;
 }
 
 export interface PaymentResponse {
   paymentUrl: string;
-  orderId: string;
+  paymentId: string;
   amount: number;
   status: string;
 }
 
 export interface PaymentHistory {
   id: number;
-  orderId: string;
   amount: number;
   description: string;
   status: string;
@@ -652,6 +650,7 @@ class ApiClient {
     });
     return response;
   }
+
 }
 
 // Экспортируем singleton instance

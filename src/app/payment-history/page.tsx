@@ -57,6 +57,7 @@ export default function PaymentHistoryPage() {
     }
   }
 
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -142,7 +143,7 @@ export default function PaymentHistoryPage() {
                       <div>
                         <h3 className="font-medium">{payment.description}</h3>
                         <p className="text-sm text-muted-foreground">
-                          Заказ #{payment.orderId}
+                          Платеж #{payment.id}
                         </p>
                       </div>
                     </div>

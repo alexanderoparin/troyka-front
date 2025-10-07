@@ -9,12 +9,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 
 export default function PaymentFailPage() {
   const searchParams = useSearchParams();
-  const [orderId, setOrderId] = useState<string | null>(null);
+  const [paymentId, setPaymentId] = useState<string | null>(null);
 
   useEffect(() => {
     const invId = searchParams.get('InvId');
     if (invId) {
-      setOrderId(invId);
+      setPaymentId(invId);
     }
   }, [searchParams]);
 
@@ -31,10 +31,10 @@ export default function PaymentFailPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {orderId && (
+          {paymentId && (
             <div className="bg-gray-50 p-3 rounded-lg">
-              <p className="text-sm text-gray-600">Номер заказа:</p>
-              <p className="font-mono text-sm">{orderId}</p>
+              <p className="text-sm text-gray-600">ID платежа:</p>
+              <p className="font-mono text-sm">{paymentId}</p>
             </div>
           )}
           <div className="space-y-2">
