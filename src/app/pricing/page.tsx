@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Check, Zap, Star, Sparkles } from "lucide-react"
+import { Check, Zap, Star, Sparkles, Target } from "lucide-react"
 import { PricingCard } from "@/components/pricing-card"
 import { usePricingPlans } from "@/hooks/use-pricing-plans"
 import { useAuth } from "@/contexts/auth-context"
@@ -20,7 +20,7 @@ export default function PricingPage() {
       {/* Header */}
       <div className="text-center space-y-6">
         <Badge variant="secondary" className="mb-4 text-callout bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-700 px-4 py-2 rounded-full">
-          <Zap className="w-4 h-4 mr-2" />
+          <Sparkles className="w-4 h-4 mr-2" />
           Простые и честные цены
         </Badge>
         <h1 className="text-large-title sm:text-5xl font-bold text-foreground">Выберите ваш тариф</h1>
@@ -80,9 +80,9 @@ export default function PricingPage() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="card-ios p-8 animate-ios-fade-in">
             <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center mb-6">
-              <Sparkles className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+              <Target className="h-8 w-8 text-blue-600 dark:text-blue-400" />
             </div>
-            <h3 className="text-title-3 text-foreground mb-4">100% Product Fidelity</h3>
+            <h3 className="text-title-3 text-foreground mb-4">100% Точность товара</h3>
             <ul className="space-y-3">
               <li className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-blue-500" />

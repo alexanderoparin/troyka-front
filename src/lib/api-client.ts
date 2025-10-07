@@ -48,6 +48,7 @@ export interface UserInfo {
   role: string;
   points?: number;
   avatar?: string;
+  createdAt?: string;
 }
 
 export interface ImageGenerationHistory {

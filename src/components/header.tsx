@@ -22,6 +22,8 @@ import {
   Zap, 
   History, 
   CreditCard,
+  Plus,
+  Sparkles,
   Menu,
   X
 } from "lucide-react"
@@ -38,7 +40,7 @@ export function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
             <div className="flex items-center space-x-1 sm:space-x-2">
-              <Zap className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+              <Sparkles className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               <span className="text-lg sm:text-2xl font-bold gradient-text">24reshai</span>
             </div>
           </Link>
@@ -77,7 +79,7 @@ export function Header() {
             {isAuthenticated && (
               <div className="hidden sm:flex items-center space-x-2">
                 <Badge variant="secondary" className="flex items-center space-x-1">
-                  <Zap className="h-3 w-3" />
+                  <User className="h-3 w-3" />
                   <span>{user?.username || 'Пользователь'}</span>
                 </Badge>
                 <Badge variant="outline" className="flex items-center space-x-1 bg-primary/10 text-primary border-primary/20">
@@ -123,7 +125,7 @@ export function Header() {
                   {/* User info for mobile */}
                   <div className="sm:hidden">
                     <DropdownMenuItem disabled>
-                      <Zap className="mr-2 h-4 w-4" />
+                      <User className="mr-2 h-4 w-4" />
                       {user?.username || 'Пользователь'}
                     </DropdownMenuItem>
                     <DropdownMenuItem disabled>
@@ -153,7 +155,7 @@ export function Header() {
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link href="/pricing">
-                      <CreditCard className="mr-2 h-4 w-4" />
+                      <Plus className="mr-2 h-4 w-4" />
                       Пополнить баланс
                     </Link>
                   </DropdownMenuItem>

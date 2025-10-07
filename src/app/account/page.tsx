@@ -12,11 +12,11 @@ import {
   Phone,
   LogOut,
   AlertCircle,
-  Calendar,
   Shield,
   History,
   Image as ImageIcon,
-  CreditCard
+  CreditCard,
+  Plus
 } from "lucide-react"
 import { AvatarUpload } from "@/components/avatar-upload"
 import { formatDate } from "@/lib/utils"
@@ -75,10 +75,10 @@ export default function AccountPage() {
         </p>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-8">
+      <div className="grid lg:grid-cols-3 gap-8 items-stretch">
         {/* Left Column - Profile Info */}
-        <div className="space-y-6">
-          <Card>
+        <div className="lg:col-span-2 space-y-6">
+          <Card className="h-full">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="h-5 w-5" />
@@ -98,16 +98,6 @@ export default function AccountPage() {
                       ? `${user.firstName} ${user.lastName}` 
                       : user.username}
                   </p>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Mail className="h-3 w-3" />
-                    {user.email}
-                  </div>
-                  {user.phone && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Phone className="h-3 w-3" />
-                      {user.phone}
-                    </div>
-                  )}
                 </div>
               </div>
               
@@ -124,57 +114,34 @@ export default function AccountPage() {
                     {getRoleDisplayName(user.role)}
                   </Badge>
                 </div>
-              </div>
-
-              {(user.firstName || user.lastName || user.phone) && (
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  {user.firstName && (
-                    <div>
-                      <p className="text-muted-foreground">Имя</p>
-                      <p className="font-medium">{user.firstName}</p>
-                    </div>
-                  )}
-                  {user.lastName && (
-                    <div>
-                      <p className="text-muted-foreground">Фамилия</p>
-                      <p className="font-medium">{user.lastName}</p>
-                    </div>
-                  )}
-                  {user.phone && (
-                    <div className="col-span-2">
-                      <p className="text-muted-foreground">Телефон</p>
-                      <p className="font-medium">{user.phone}</p>
-                    </div>
-                  )}
+                <div>
+                  <p className="text-muted-foreground">Email</p>
+                  <p className="font-medium">{user.email}</p>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Account Info */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                Информация об аккаунте
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Статус:</span>
-                <Badge variant="default" className="bg-green-100 text-green-800">
-                  Активен
-                </Badge>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Тип аккаунта:</span>
-                <span className="font-medium">{getRoleDisplayName(user.role)}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Дата регистрации:</span>
-                <span className="font-medium">
-                  {formatDate(new Date(user.createdAt))}
-                </span>
+                <div>
+                  <p className="text-muted-foreground">Статус</p>
+                  <Badge variant="default" className="bg-green-100 text-green-800">
+                    Активен
+                  </Badge>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Имя</p>
+                  <p className="font-medium">{user.firstName || '—'}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Фамилия</p>
+                  <p className="font-medium">{user.lastName || '—'}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Телефон</p>
+                  <p className="font-medium">{user.phone || '—'}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Дата регистрации</p>
+                  <p className="font-medium">
+                    {formatDate(user.createdAt)}
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -182,7 +149,7 @@ export default function AccountPage() {
 
         {/* Right Column - Quick Actions */}
         <div className="space-y-6">
-          <Card>
+          <Card className="h-full">
             <CardHeader>
               <CardTitle>Быстрые действия</CardTitle>
               <CardDescription>
@@ -213,8 +180,8 @@ export default function AccountPage() {
               
               <Button variant="outline" className="w-full justify-start" asChild>
                 <Link href="/pricing">
-                  <CreditCard className="w-4 h-4 mr-2" />
-                  Купить поинты
+                  <Plus className="w-4 h-4 mr-2" />
+                  Пополнить баланс
                 </Link>
               </Button>
               
@@ -234,27 +201,6 @@ export default function AccountPage() {
             </CardContent>
           </Card>
 
-          {/* Additional Info Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Статистика
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Статус аккаунта:</span>
-                <span className="font-medium">Активен</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Дата регистрации:</span>
-                <span className="font-medium">
-                  {formatDate(new Date(user.createdAt))}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>

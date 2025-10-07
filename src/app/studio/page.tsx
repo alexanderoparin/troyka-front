@@ -41,7 +41,7 @@ export default function StudioPage() {
         </div>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button size="lg" onClick={() => router.push("/login")}>
-            <Zap className="w-5 h-5 mr-2" />
+            <User className="w-5 h-5 mr-2" />
             Войти в аккаунт
           </Button>
           <Button variant="outline" size="lg" asChild>
@@ -73,7 +73,7 @@ export default function StudioPage() {
         {/* User Info */}
         <div className="studio-user-info flex items-center justify-center gap-4 text-sm">
           <Badge variant="default" className="flex items-center gap-1">
-            <Zap className="w-3 h-3" />
+            <User className="w-3 h-3" />
             {user?.username || 'Пользователь'}
           </Badge>
           <span className="text-muted-foreground">Готов к генерации</span>
@@ -112,7 +112,7 @@ export default function StudioPage() {
             <Link href="/account">
               <Button variant="outline" className="w-full h-auto p-4 flex flex-col items-start gap-2">
                 <div className="flex items-center gap-2">
-                  <Zap className="h-4 w-4" />
+                  <User className="h-4 w-4" />
                   <span className="font-medium">Мой аккаунт</span>
                 </div>
                 <p className="text-sm text-muted-foreground text-left">

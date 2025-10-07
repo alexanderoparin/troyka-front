@@ -1,7 +1,7 @@
 "use client"
 
 import { Badge } from '@/components/ui/badge'
-import { Sparkles, Zap, Shield, ArrowRight, Star, Users, Clock } from 'lucide-react'
+import { Sparkles, Zap, Shield, ArrowRight, Star, Users, Clock, Target } from 'lucide-react'
 import Link from 'next/link'
 import { useAuth } from '@/contexts/auth-context'
 import { getPointsText } from '@/lib/grammar'
@@ -36,7 +36,7 @@ export default function HomePage() {
             <>
               <Link href="/studio" className="w-full sm:w-auto">
                 <button className="btn-ios-primary w-full sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-headline">
-                  <Zap className="w-5 h-5 mr-3" />
+                  <Sparkles className="w-5 h-5 mr-3" />
                   Открыть студию
                   <ArrowRight className="w-5 h-5 ml-3" />
                 </button>
@@ -93,9 +93,9 @@ export default function HomePage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           <div className="card-ios p-8 animate-ios-fade-in">
             <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center mb-6">
-              <Sparkles className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+              <Target className="w-8 h-8 text-blue-600 dark:text-blue-400" />
             </div>
-            <h3 className="text-title-3 text-foreground mb-3">100% Product Fidelity</h3>
+            <h3 className="text-title-3 text-foreground mb-3">100% Точность товара</h3>
             <p className="text-body text-muted-foreground mb-6">
               Каждая деталь товара передается с максимальной точностью
             </p>
@@ -252,7 +252,7 @@ export default function HomePage() {
               </p>
               <div className="flex items-center justify-center">
                 <div className="bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-full text-callout font-medium border border-blue-200 dark:border-blue-700">
-                  <Zap className="w-4 h-4 mr-2 inline" />
+                  <Sparkles className="w-4 h-4 mr-2 inline" />
                   {getPointsText(points)} доступно
                 </div>
               </div>

@@ -12,14 +12,26 @@ export function formatCurrency(amount: number, currency = "RUB"): string {
   }).format(amount)
 }
 
-export function formatDate(date: Date): string {
+export function formatDate(date: Date | string | undefined | null): string {
+  // Проверяем, что дата существует
+  if (!date) {
+    return 'Дата не указана'
+  }
+  
+  const dateObj = typeof date === 'string' ? new Date(date) : date
+  
+  // Проверяем, что дата валидна
+  if (isNaN(dateObj.getTime())) {
+    return 'Неверная дата'
+  }
+  
   return new Intl.DateTimeFormat("ru-RU", {
     year: "numeric",
     month: "long",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-  }).format(date)
+  }).format(dateObj)
 }
 
 export function generateId(): string {
