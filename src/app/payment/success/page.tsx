@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 export default function PaymentSuccessPage() {
   const searchParams = useSearchParams();
   const [paymentId, setPaymentId] = useState<string | null>(null);
+  const [paymentAmount, setPaymentAmount] = useState<string | null>(null);
 
   useEffect(() => {
     // Получаем ID платежа из URL параметров
@@ -19,8 +20,17 @@ export default function PaymentSuccessPage() {
                   searchParams.get('order_id') ||
                   searchParams.get('id');
     
+    // Получаем сумму платежа из URL параметров
+    const amount = searchParams.get('OutSum') || 
+                  searchParams.get('amount') || 
+                  searchParams.get('sum');
+    
     if (invId) {
       setPaymentId(invId);
+    }
+    
+    if (amount) {
+      setPaymentAmount(amount);
     }
   }, [searchParams]);
 
@@ -37,10 +47,20 @@ export default function PaymentSuccessPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {paymentId && (
-            <div className="bg-gray-50 p-3 rounded-lg">
-              <p className="text-sm text-gray-600">ID платежа:</p>
-              <p className="font-mono text-sm">{paymentId}</p>
+          {(paymentId || paymentAmount) && (
+            <div className="bg-gray-50 p-3 rounded-lg space-y-2">
+              {paymentId && (
+                <div>
+                  <p className="text-sm text-gray-600">ID платежа:</p>
+                  <p className="font-mono text-sm">{paymentId}</p>
+                </div>
+              )}
+              {paymentAmount && (
+                <div>
+                  <p className="text-sm text-gray-600">Сумма платежа:</p>
+                  <p className="font-mono text-sm font-semibold">{paymentAmount} ₽</p>
+                </div>
+              )}
             </div>
           )}
           <div className="space-y-2">
