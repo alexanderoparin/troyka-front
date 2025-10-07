@@ -126,7 +126,7 @@ class ApiClient {
     this.baseUrl = process.env.NEXT_PUBLIC_JAVA_API_URL || 
       (typeof window !== 'undefined' && (window.location.hostname === '24reshai.ru' || window.location.hostname.includes('24reshai'))
         ? 'https://24reshai.ru' 
-        : 'http://localhost:8080');
+        : 'https://24reshai.ru');
     this.timeout = parseInt(process.env.NEXT_PUBLIC_JAVA_API_TIMEOUT || '30000');
     
     // Отладочная информация (только в development)
