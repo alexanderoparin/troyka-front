@@ -13,7 +13,7 @@ export default function PaymentSuccessPage() {
 
   useEffect(() => {
     // Отладочная информация - выводим все параметры URL
-    console.log('All URL parameters:', Object.fromEntries(searchParams.entries()));
+    console.log('All URL parameters:', Array.from(searchParams.entries()));
     
     // Пробуем разные возможные имена параметров для ID платежа
     const invId = searchParams.get('InvId') || 
@@ -53,8 +53,8 @@ export default function PaymentSuccessPage() {
           <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
             <p className="text-sm text-yellow-800 font-medium mb-2">Отладочная информация:</p>
             <p className="text-xs text-yellow-700">
-              URL параметры: {Object.keys(Object.fromEntries(searchParams.entries())).length > 0 
-                ? Object.entries(searchParams.entries()).map(([key, value]) => `${key}=${value}`).join(', ')
+              URL параметры: {Array.from(searchParams.entries()).length > 0 
+                ? Array.from(searchParams.entries()).map(([key, value]) => `${key}=${value}`).join(', ')
                 : 'Нет параметров'
               }
             </p>
