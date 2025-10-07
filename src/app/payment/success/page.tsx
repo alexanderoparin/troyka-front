@@ -48,17 +48,17 @@ export default function PaymentSuccessPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {(paymentId || paymentAmount) && (
-            <div className="bg-gray-50 p-3 rounded-lg space-y-2">
+            <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg space-y-2">
               {paymentId && (
                 <div>
-                  <p className="text-sm text-gray-600">ID платежа:</p>
-                  <p className="font-mono text-sm">{paymentId}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">ID платежа:</p>
+                  <p className="font-mono text-sm text-gray-900 dark:text-gray-100">{paymentId}</p>
                 </div>
               )}
               {paymentAmount && (
                 <div>
-                  <p className="text-sm text-gray-600">Сумма платежа:</p>
-                  <p className="font-mono text-sm font-semibold">{paymentAmount} ₽</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Сумма платежа:</p>
+                  <p className="font-mono text-sm font-semibold text-gray-900 dark:text-gray-100">{paymentAmount} ₽</p>
                 </div>
               )}
             </div>
