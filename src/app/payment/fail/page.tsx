@@ -10,31 +10,70 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 export default function PaymentFailPage() {
   const searchParams = useSearchParams();
   const [paymentId, setPaymentId] = useState<string | null>(null);
+  const [paymentAmount, setPaymentAmount] = useState<string | null>(null);
+  const [isTest, setIsTest] = useState<boolean>(false);
 
   useEffect(() => {
-    const invId = searchParams.get('InvId');
+    // Получаем параметры от Робокассы
+    const invId = searchParams.get('InvId') || 
+                  searchParams.get('payment_id') || 
+                  searchParams.get('transaction_id') || 
+                  searchParams.get('order_id') ||
+                  searchParams.get('id');
+    
+    const amount = searchParams.get('OutSum') || 
+                  searchParams.get('amount') || 
+                  searchParams.get('sum');
+    
+    const test = searchParams.get('IsTest');
+    
     if (invId) {
       setPaymentId(invId);
+    }
+    
+    if (amount) {
+      setPaymentAmount(amount);
+    }
+    
+    if (test === '1') {
+      setIsTest(true);
     }
   }, [searchParams]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-rose-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-red-50 to-rose-100 dark:from-red-900/20 dark:to-rose-900/20 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
-            <XCircle className="w-8 h-8 text-red-600" />
+          <div className="mx-auto w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-4">
+            <XCircle className="w-8 h-8 text-red-600 dark:text-red-400" />
           </div>
-          <CardTitle className="text-2xl text-red-800">Оплата не прошла</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-2xl text-red-800 dark:text-red-200">
+            {isTest ? 'Тестовая оплата не прошла' : 'Оплата не прошла'}
+          </CardTitle>
+          <CardDescription className="text-red-700 dark:text-red-300">
             Произошла ошибка при обработке платежа
+            {isTest && (
+              <span className="block text-sm text-yellow-600 dark:text-yellow-400 mt-1">
+                (Тестовый режим)
+              </span>
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {paymentId && (
-            <div className="bg-gray-50 p-3 rounded-lg">
-              <p className="text-sm text-gray-600">ID платежа:</p>
-              <p className="font-mono text-sm">{paymentId}</p>
+          {(paymentId || paymentAmount) && (
+            <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg space-y-2">
+              {paymentId && (
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">ID платежа:</p>
+                  <p className="font-mono text-sm text-gray-900 dark:text-gray-100">{paymentId}</p>
+                </div>
+              )}
+              {paymentAmount && (
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Сумма платежа:</p>
+                  <p className="font-mono text-sm font-semibold text-gray-900 dark:text-gray-100">{paymentAmount} ₽</p>
+                </div>
+              )}
             </div>
           )}
           <div className="space-y-2">
