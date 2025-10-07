@@ -173,8 +173,12 @@ export default function PricingPage() {
 
           <div className="card-ios p-6 animate-ios-fade-in" style={{ animationDelay: '0.3s' }}>
             <h3 className="text-title-3 text-foreground mb-4">Как получить +6 поинтов при регистрации?</h3>
-            <p className="text-body text-muted-foreground">
+            <p className="text-body text-muted-foreground mb-3">
               Поинты автоматически начисляются на ваш счет сразу после создания аккаунта.
+            </p>
+            <p className="text-body text-muted-foreground">
+              <strong>Важно:</strong> Для использования всех функций сервиса необходимо подтвердить email адрес. 
+              Письмо с подтверждением придет на указанную при регистрации почту.
             </p>
           </div>
 
