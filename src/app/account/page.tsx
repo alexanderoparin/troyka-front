@@ -14,7 +14,9 @@ import {
   Image as ImageIcon,
   CreditCard,
   Plus,
-  AlertCircle
+  AlertCircle,
+  CheckCircle,
+  AlertTriangle
 } from "lucide-react"
 import { AvatarUpload } from "@/components/avatar-upload"
 import { formatDate } from "@/lib/utils"
@@ -119,11 +121,24 @@ export default function AccountPage() {
                 </div>
                 <div>
                   <p className="text-muted-foreground">Email</p>
-                  <p className="font-medium">{user.email}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium">{user.email}</p>
+                    {isEmailVerified() ? (
+                      <Badge variant="default" className="bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400 flex items-center gap-1">
+                        <CheckCircle className="w-3 h-3" />
+                        Подтвержден
+                      </Badge>
+                    ) : (
+                      <Badge variant="destructive" className="bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400 flex items-center gap-1">
+                        <AlertTriangle className="w-3 h-3" />
+                        Не подтвержден
+                      </Badge>
+                    )}
+                  </div>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Статус</p>
-                  <Badge variant="default" className="bg-green-100 text-green-800">
+                  <p className="text-muted-foreground">Статус аккаунта</p>
+                  <Badge variant="secondary">
                     Активен
                   </Badge>
                 </div>
