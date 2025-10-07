@@ -6,13 +6,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
+import { EmailVerificationBanner } from "@/components/email-verification-banner"
 import { 
   User, 
-  Mail, 
-  Phone,
   LogOut,
-  AlertCircle,
-  Shield,
   History,
   Image as ImageIcon,
   CreditCard,
@@ -23,7 +20,7 @@ import { formatDate } from "@/lib/utils"
 import Link from "next/link"
 
 export default function AccountPage() {
-  const { user, isAuthenticated, isLoading, logout, avatar } = useAuth()
+  const { user, isAuthenticated, isLoading, logout, avatar, isEmailVerified } = useAuth()
   const router = useRouter()
 
   if (isLoading) {
@@ -67,6 +64,11 @@ export default function AccountPage() {
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
+      {/* Email Verification Banner */}
+      {isAuthenticated && user && !isEmailVerified() && (
+        <EmailVerificationBanner email={user.email} />
+      )}
+
       {/* Header */}
       <div className="space-y-4">
         <h1 className="text-3xl font-bold">Мой аккаунт</h1>

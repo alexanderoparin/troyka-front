@@ -49,6 +49,7 @@ export interface UserInfo {
   points?: number;
   avatar?: string;
   createdAt?: string;
+  emailVerified?: boolean;
 }
 
 export interface ImageGenerationHistory {
@@ -251,6 +252,18 @@ class ApiClient {
 
   logout(): void {
     this.removeToken();
+  }
+
+  async verifyEmail(token: string): Promise<ApiResponse<{ message: string }>> {
+    return this.request<{ message: string }>(`/api/auth/verify-email?token=${token}`, {
+      method: 'GET',
+    });
+  }
+
+  async resendVerificationEmail(): Promise<ApiResponse<{ message: string }>> {
+    return this.request<{ message: string }>('/api/auth/resend-verification', {
+      method: 'POST',
+    });
   }
 
   isAuthenticated(): boolean {

@@ -17,6 +17,7 @@ interface AuthContextType extends AuthState {
   logout: () => void
   refreshPoints: () => Promise<void>
   refreshUserInfo: () => Promise<void>
+  isEmailVerified: () => boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -239,6 +240,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [state.isAuthenticated])
 
+  const isEmailVerified = useCallback(() => {
+    return state.user?.emailVerified === true
+  }, [state.user?.emailVerified])
+
   return (
     <AuthContext.Provider value={{
       ...state,
@@ -247,6 +252,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       logout,
       refreshPoints,
       refreshUserInfo,
+      isEmailVerified,
     }}>
       {children}
     </AuthContext.Provider>

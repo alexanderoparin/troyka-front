@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { GenerationForm } from "@/components/generation-form"
+import { EmailVerificationBanner } from "@/components/email-verification-banner"
 import { Sparkles, AlertCircle, User } from "lucide-react"
 import Link from "next/link"
 
 export default function StudioPage() {
-  const { user, isAuthenticated, isLoading } = useAuth()
+  const { user, isAuthenticated, isLoading, isEmailVerified } = useAuth()
   const router = useRouter()
 
   if (isLoading) {
@@ -48,6 +49,11 @@ export default function StudioPage() {
 
   return (
     <div className="studio-page space-y-8">
+      {/* Email Verification Banner */}
+      {isAuthenticated && user && !isEmailVerified() && (
+        <EmailVerificationBanner email={user.email} />
+      )}
+
       {/* Header */}
       <div className="studio-header text-center space-y-4">
         <Badge variant="secondary" className="mb-4">

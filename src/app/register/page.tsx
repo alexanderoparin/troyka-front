@@ -54,9 +54,9 @@ export default function RegisterPage() {
       if (result.success) {
         toast({
           title: "Регистрация успешна!",
-          description: "Добро пожаловать в 24reshai",
+          description: "Проверьте почту для подтверждения email",
         })
-        router.push("/studio")
+        router.push("/verify-email?email=" + encodeURIComponent(data.email))
       } else {
         toast({
           title: "Ошибка регистрации",
