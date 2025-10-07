@@ -81,8 +81,8 @@ export default function AccountPage() {
         </p>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-8">
-        {/* Profile Info */}
+      <div className="grid lg:grid-cols-3 gap-8">
+        {/* Left Column - Profile Info */}
         <div className="space-y-6">
           <Card>
             <CardHeader>
@@ -157,100 +157,31 @@ export default function AccountPage() {
             </CardContent>
           </Card>
 
-          {/* Image Generation History */}
+          {/* Account Info */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <History className="h-5 w-5" />
-                История генерации изображений
+                <Shield className="h-5 w-5" />
+                Информация об аккаунте
               </CardTitle>
-              <CardDescription>
-                Ваши последние созданные изображения
-              </CardDescription>
             </CardHeader>
-            <CardContent>
-              {historyLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                </div>
-              ) : historyError ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p>Ошибка загрузки истории: {historyError}</p>
-                </div>
-              ) : imageHistory && imageHistory.length > 0 ? (
-                <div className="space-y-4">
-                  {imageHistory.slice(0, 6).map((item, index) => (
-                    <div key={index} className="flex items-center gap-4 p-3 border rounded-lg hover:bg-muted/50 transition-colors">
-                      <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-muted">
-                        <Image
-                          src={apiClient.getFileUrl(item.imageUrl)}
-                          alt={item.prompt}
-                          fill
-                          className="object-cover"
-                          sizes="64px"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate" title={item.prompt}>
-                          {item.prompt}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {formatDate(new Date(item.createdAt))}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          asChild
-                          className="h-8 w-8 p-0"
-                        >
-                          <a
-                            href={apiClient.getFileUrl(item.imageUrl)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                          </a>
-                        </Button>
-                        <ImageEditButton
-                          imageUrl={item.imageUrl}
-                          originalPrompt={item.prompt}
-                          onImageEdited={() => {
-                            // Обновляем историю после редактирования
-                            window.location.reload();
-                          }}
-                          className="h-8 w-8"
-                        />
-                      </div>
-                    </div>
-                  ))}
-                  {imageHistory.length > 6 && (
-                    <div className="text-center pt-2">
-                      <Button variant="outline" asChild>
-                        <Link href="/history">
-                          <History className="w-4 h-4 mr-2" />
-                          Показать всю историю
-                        </Link>
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="text-center py-8 text-muted-foreground">
-                  <ImageIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p>История генерации пуста</p>
-                  <p className="text-sm">Создайте первое изображение в студии</p>
-                </div>
-              )}
+            <CardContent className="space-y-3">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Статус:</span>
+                <Badge variant="default" className="bg-green-100 text-green-800">
+                  Активен
+                </Badge>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Тип аккаунта:</span>
+                <span className="font-medium">{getRoleDisplayName(user.role)}</span>
+              </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Sidebar */}
+        {/* Middle Column - Quick Actions */}
         <div className="space-y-6">
-          {/* Quick Actions */}
           <Card>
             <CardHeader>
               <CardTitle>Быстрые действия</CardTitle>
@@ -277,6 +208,13 @@ export default function AccountPage() {
                 </Link>
               </Button>
               
+              <Button variant="outline" className="w-full justify-start" asChild>
+                <Link href="/pricing">
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  Купить поинты
+                </Link>
+              </Button>
+              
               <Separator />
               
               <Button 
@@ -292,26 +230,96 @@ export default function AccountPage() {
               </Button>
             </CardContent>
           </Card>
+        </div>
 
-          {/* Account Info */}
+        {/* Right Column - Image Generation History */}
+        <div className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                Информация об аккаунте
+                <History className="h-5 w-5" />
+                История генерации
               </CardTitle>
+              <CardDescription>
+                Ваши последние созданные изображения
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Статус:</span>
-                <Badge variant="default" className="bg-green-100 text-green-800">
-                  Активен
-                </Badge>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Тип аккаунта:</span>
-                <span className="font-medium">{getRoleDisplayName(user.role)}</span>
-              </div>
+            <CardContent>
+              {historyLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+              ) : historyError ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p>Ошибка загрузки истории: {historyError}</p>
+                </div>
+              ) : imageHistory && imageHistory.length > 0 ? (
+                <div className="space-y-4">
+                  {imageHistory.slice(0, 4).map((item, index) => (
+                    <div key={index} className="flex items-center gap-3 p-3 border rounded-lg hover:bg-muted/50 transition-colors">
+                      <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-muted">
+                        <Image
+                          src={apiClient.getFileUrl(item.imageUrl)}
+                          alt={item.prompt}
+                          fill
+                          className="object-cover"
+                          sizes="48px"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate" title={item.prompt}>
+                          {item.prompt}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatDate(new Date(item.createdAt))}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          asChild
+                          className="h-7 w-7 p-0"
+                        >
+                          <a
+                            href={apiClient.getFileUrl(item.imageUrl)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        </Button>
+                        <ImageEditButton
+                          imageUrl={item.imageUrl}
+                          originalPrompt={item.prompt}
+                          onImageEdited={() => {
+                            // Обновляем историю после редактирования
+                            window.location.reload();
+                          }}
+                          className="h-7 w-7"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                  {imageHistory.length > 4 && (
+                    <div className="text-center pt-2">
+                      <Button variant="outline" asChild size="sm">
+                        <Link href="/history">
+                          <History className="w-4 h-4 mr-2" />
+                          Показать всю историю
+                        </Link>
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <ImageIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p>История генерации пуста</p>
+                  <p className="text-sm">Создайте первое изображение в студии</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
