@@ -121,26 +121,21 @@ export default function AccountPage() {
                 </div>
                 <div>
                   <p className="text-muted-foreground">Email</p>
-                  <div className="flex items-center gap-2">
-                    <p className="font-medium">{user.email}</p>
-                    {isEmailVerified() ? (
-                      <Badge variant="default" className="bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400 flex items-center gap-1">
-                        <CheckCircle className="w-3 h-3" />
-                        Подтвержден
-                      </Badge>
-                    ) : (
-                      <Badge variant="destructive" className="bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400 flex items-center gap-1">
-                        <AlertTriangle className="w-3 h-3" />
-                        Не подтвержден
-                      </Badge>
-                    )}
-                  </div>
+                  <p className="font-medium">{user.email}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Статус аккаунта</p>
-                  <Badge variant="secondary">
-                    Активен
-                  </Badge>
+                  <p className="text-muted-foreground">Статус email</p>
+                  {isEmailVerified() ? (
+                    <Badge variant="default" className="bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400 flex items-center gap-1 w-fit">
+                      <CheckCircle className="w-3 h-3" />
+                      Подтвержден
+                    </Badge>
+                  ) : (
+                    <Badge variant="destructive" className="bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400 flex items-center gap-1 w-fit">
+                      <AlertTriangle className="w-3 h-3" />
+                      Не подтвержден
+                    </Badge>
+                  )}
                 </div>
                 <div>
                   <p className="text-muted-foreground">Имя</p>
