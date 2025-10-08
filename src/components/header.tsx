@@ -164,11 +164,11 @@ export function Header() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
-                <Button asChild size="sm" className="text-xs sm:text-sm px-2 sm:px-4 md:px-6 py-1.5 sm:py-2 h-8 sm:h-9 whitespace-nowrap">
+              <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
+                <Button asChild size="sm" className="text-sm px-4 sm:px-6 md:px-8 py-2 h-9 whitespace-nowrap">
                   <Link href="/login">Войти</Link>
                 </Button>
-                <Button variant="outline" asChild size="sm" className="text-xs sm:text-sm px-2 sm:px-4 md:px-6 py-1.5 sm:py-2 h-8 sm:h-9 whitespace-nowrap">
+                <Button variant="outline" asChild size="sm" className="text-sm px-4 sm:px-6 md:px-8 py-2 h-9 whitespace-nowrap">
                   <Link href="/register">Регистрация</Link>
                 </Button>
               </div>
