@@ -1,7 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import { apiClient, AuthResponse, LoginRequest, RegisterRequest, UserInfo } from '@/lib/api-client'
+import { apiClient, LoginRequest, RegisterRequest, UserInfo } from '@/lib/api-client'
 
 interface AuthState {
   user: UserInfo | null

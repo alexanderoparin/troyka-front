@@ -12,14 +12,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { AvatarUpload } from "@/components/avatar-upload"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { 
   User, 
-  Settings, 
   LogOut, 
-  Zap, 
   History, 
   CreditCard,
   Plus,

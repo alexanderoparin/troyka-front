@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
-import { apiClient, ImageRequest, ImageResponse } from "@/lib/api-client"
+import { apiClient, ImageRequest } from "@/lib/api-client"
 import { FileUpload } from "@/components/file-upload"
 import { ImageEditButton } from "@/components/image-edit-button"
 import { useAuth } from "@/contexts/auth-context"

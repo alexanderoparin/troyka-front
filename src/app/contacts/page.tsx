@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { apiClient, ContactRequest } from '@/lib/api-client';
-import { Mail, MessageCircle, MapPin, Clock, Phone, Send, CheckCircle } from 'lucide-react';
+import { Mail, MessageCircle, MapPin, Clock, Send, CheckCircle } from 'lucide-react';
 
 const contactSchema = z.object({
   name: z.string().min(2, 'Имя должно содержать минимум 2 символа').max(100, 'Имя не должно превышать 100 символов'),

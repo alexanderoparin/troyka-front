@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+// import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -25,7 +25,7 @@ export default function ForgotPasswordPage() {
   const [isEmailSent, setIsEmailSent] = useState(false)
   const [cooldownEndTime, setCooldownEndTime] = useState<Date | null>(null)
   const [timeLeft, setTimeLeft] = useState(0)
-  const router = useRouter()
+  // const router = useRouter()
   const { toast } = useToast()
 
   // Отслеживаем оставшееся время кулдауна
@@ -61,7 +61,7 @@ export default function ForgotPasswordPage() {
       const response = await apiClient.requestPasswordReset(data.email)
       
       // Отладочная информация
-      console.log('Password reset response:', response)
+      // console.log('Password reset response:', response)
 
       if (response.data && response.data.message) {
         const message = response.data.message;

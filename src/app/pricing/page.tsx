@@ -1,15 +1,13 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Check, Zap, Star, Sparkles, Target } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Check, Star, Sparkles, Target, Zap } from "lucide-react"
 import { PricingCard } from "@/components/pricing-card"
 import { usePricingPlans } from "@/hooks/use-pricing-plans"
 import { useAuth } from "@/contexts/auth-context"
 import { getPointsText } from "@/lib/grammar"
-import { apiClient } from '@/lib/api-client';
-import { useToast } from '@/components/ui/use-toast';
 
 export default function PricingPage() {
   const { data: plans = [], isLoading, error } = usePricingPlans()
@@ -60,7 +58,7 @@ export default function PricingPage() {
         </div>
       ) : (
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {plans.map((plan, index) => (
+        {plans.map((plan) => (
           <PricingCard
             key={plan.id}
             plan={plan}

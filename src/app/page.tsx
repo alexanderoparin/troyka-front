@@ -1,7 +1,7 @@
 "use client"
 
 import { Badge } from '@/components/ui/badge'
-import { Sparkles, Zap, Shield, ArrowRight, Star, Users, Clock, Target } from 'lucide-react'
+import { Sparkles, Shield, ArrowRight, Star, Users, Clock, Target, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { useAuth } from '@/contexts/auth-context'
 import { getPointsText } from '@/lib/grammar'
@@ -170,80 +170,200 @@ export default function HomePage() {
         <div className="text-center space-y-6">
           <h2 className="text-title-1 text-foreground">Примеры работ</h2>
           <p className="text-headline text-muted-foreground max-w-2xl mx-auto">
-            Посмотрите, какие профессиональные изображения товаров создает наш ИИ
+            Всего один промпт — и ваше изображение превращается в профессиональную фотографию товара
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Example 1 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Example 1 - Black Jacket */}
           <div className="card-ios p-6 animate-ios-fade-in group">
-            <div className="aspect-[3/4] bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/30 rounded-xl mb-4 flex items-center justify-center">
-              <div className="text-center space-y-2">
-                <Sparkles className="w-12 h-12 text-blue-500 mx-auto" />
-                <p className="text-sm text-muted-foreground">Пример изображения</p>
+            <div className="aspect-[3/4] rounded-xl mb-4 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center border border-gray-200 dark:border-gray-700 overflow-hidden relative cursor-pointer">
+              <div className="w-full h-full relative">
+                {/* До - всегда видно */}
+                <img 
+                  src="https://24reshai.ru/files/examples/jacket-before.jpg" 
+                  alt="До обработки" 
+                  className="w-full h-full object-cover transition-opacity duration-500 group-hover:opacity-0"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                    if (nextElement) {
+                      nextElement.style.display = 'flex';
+                    }
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center hidden">
+                  <div className="text-center space-y-2">
+                    <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto">
+                      <span className="text-xl">👔</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Загрузите изображение</p>
+                  </div>
+                </div>
+                
+                {/* После - появляется при наведении */}
+                <img 
+                  src="https://24reshai.ru/files/examples/jacket-after.jpg" 
+                  alt="После обработки" 
+                  className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                    if (nextElement) {
+                      nextElement.style.display = 'flex';
+                    }
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center hidden">
+                  <div className="text-center space-y-2">
+                    <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto">
+                      <span className="text-xl">✨</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Загрузите изображение</p>
+                  </div>
+                </div>
+              </div>
+              {/* Hover overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute bottom-4 left-4 right-4 text-white opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium bg-black/70 px-3 py-1.5 rounded-full backdrop-blur-sm">До</span>
+                  <span className="text-sm font-medium bg-green-600/90 px-3 py-1.5 rounded-full backdrop-blur-sm">После</span>
+                </div>
+              </div>
+              <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-y-2 group-hover:translate-y-0">
+                <div className="bg-white/90 dark:bg-black/90 px-2 py-1 rounded-full text-xs font-medium text-gray-800 dark:text-gray-200">
+                  Наведите для сравнения
+                </div>
               </div>
             </div>
-            <h3 className="text-title-3 text-foreground mb-2">Электроника</h3>
-            <p className="text-body text-muted-foreground mb-4">
-              Смартфон на белом фоне с профессиональным освещением
-            </p>
-            <div className="flex items-center gap-2 text-callout text-muted-foreground">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span>Студийное качество</span>
-            </div>
           </div>
-
-          {/* Example 2 */}
+          
+          {/* Example 2 - Winter Wear */}
           <div className="card-ios p-6 animate-ios-fade-in group" style={{ animationDelay: '0.1s' }}>
-            <div className="aspect-[3/4] bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/30 dark:to-green-900/30 rounded-xl mb-4 flex items-center justify-center">
-              <div className="text-center space-y-2">
-                <Sparkles className="w-12 h-12 text-green-500 mx-auto" />
-                <p className="text-sm text-muted-foreground">Пример изображения</p>
+            <div className="aspect-[3/4] rounded-xl mb-4 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center border border-gray-200 dark:border-gray-700 overflow-hidden relative cursor-pointer">
+              <div className="w-full h-full relative">
+                {/* До - всегда видно */}
+                <img 
+                  src="https://24reshai.ru/files/examples/winter-before.jpg" 
+                  alt="До обработки" 
+                  className="w-full h-full object-cover transition-opacity duration-500 group-hover:opacity-0"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                    if (nextElement) {
+                      nextElement.style.display = 'flex';
+                    }
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center hidden">
+                  <div className="text-center space-y-2">
+                    <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto">
+                      <span className="text-xl">🧥</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Загрузите изображение</p>
+                  </div>
+                </div>
+                
+                {/* После - появляется при наведении */}
+                <img 
+                  src="https://24reshai.ru/files/examples/winter-after.jpg" 
+                  alt="После обработки" 
+                  className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                    if (nextElement) {
+                      nextElement.style.display = 'flex';
+                    }
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center hidden">
+                  <div className="text-center space-y-2">
+                    <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto">
+                      <span className="text-xl">❄️</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Загрузите изображение</p>
+                  </div>
+                </div>
               </div>
+              {/* Hover overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute bottom-4 left-4 right-4 text-white opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium bg-black/70 px-3 py-1.5 rounded-full backdrop-blur-sm">До</span>
+                  <span className="text-sm font-medium bg-blue-600/90 px-3 py-1.5 rounded-full backdrop-blur-sm">После</span>
+                </div>
+              </div>
+              <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-y-2 group-hover:translate-y-0">
+                <div className="bg-white/90 dark:bg-black/90 px-2 py-1 rounded-full text-xs font-medium text-gray-800 dark:text-gray-200">
+                  Наведите для сравнения
+                </div>
             </div>
-            <h3 className="text-title-3 text-foreground mb-2">Одежда</h3>
-            <p className="text-body text-muted-foreground mb-4">
-              Футболка на манекене с естественным освещением
-            </p>
-            <div className="flex items-center gap-2 text-callout text-muted-foreground">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span>Реалистичные текстуры</span>
             </div>
           </div>
 
-          {/* Example 3 */}
+          {/* Example 3 - Dress */}
           <div className="card-ios p-6 animate-ios-fade-in group" style={{ animationDelay: '0.2s' }}>
-            <div className="aspect-[3/4] bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/30 dark:to-purple-900/30 rounded-xl mb-4 flex items-center justify-center">
-              <div className="text-center space-y-2">
-                <Sparkles className="w-12 h-12 text-purple-500 mx-auto" />
-                <p className="text-sm text-muted-foreground">Пример изображения</p>
+            <div className="aspect-[3/4] rounded-xl mb-4 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center border border-gray-200 dark:border-gray-700 overflow-hidden relative cursor-pointer">
+              <div className="w-full h-full relative">
+                {/* До - всегда видно */}
+                <img 
+                  src="https://24reshai.ru/files/examples/dress-before.jpg" 
+                  alt="До обработки" 
+                  className="w-full h-full object-cover transition-opacity duration-500 group-hover:opacity-0"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                    if (nextElement) {
+                      nextElement.style.display = 'flex';
+                    }
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center hidden">
+                  <div className="text-center space-y-2">
+                    <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto">
+                      <span className="text-xl">👗</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Загрузите изображение</p>
+                  </div>
+                </div>
+                
+                {/* После - появляется при наведении */}
+                <img 
+                  src="https://24reshai.ru/files/examples/dress-after.jpg" 
+                  alt="После обработки" 
+                  className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                    if (nextElement) {
+                      nextElement.style.display = 'flex';
+                    }
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center hidden">
+                  <div className="text-center space-y-2">
+                    <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto">
+                      <span className="text-xl">✨</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Загрузите изображение</p>
+                  </div>
+                </div>
               </div>
-            </div>
-            <h3 className="text-title-3 text-foreground mb-2">Косметика</h3>
-            <p className="text-body text-muted-foreground mb-4">
-              Помада на элегантном фоне с мягким освещением
-            </p>
-            <div className="flex items-center gap-2 text-callout text-muted-foreground">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span>Точная передача цветов</span>
-            </div>
-          </div>
-
-          {/* Example 4 */}
-          <div className="card-ios p-6 animate-ios-fade-in group" style={{ animationDelay: '0.3s' }}>
-            <div className="aspect-[3/4] bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950/30 dark:to-orange-900/30 rounded-xl mb-4 flex items-center justify-center">
-              <div className="text-center space-y-2">
-                <Sparkles className="w-12 h-12 text-orange-500 mx-auto" />
-                <p className="text-sm text-muted-foreground">Пример изображения</p>
+              {/* Hover overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute bottom-4 left-4 right-4 text-white opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium bg-black/70 px-3 py-1.5 rounded-full backdrop-blur-sm">До</span>
+                  <span className="text-sm font-medium bg-indigo-600/90 px-3 py-1.5 rounded-full backdrop-blur-sm">После</span>
+                </div>
               </div>
-            </div>
-            <h3 className="text-title-3 text-foreground mb-2">Аксессуары</h3>
-            <p className="text-body text-muted-foreground mb-4">
-              Часы на деревянном фоне с теплым освещением
-            </p>
-            <div className="flex items-center gap-2 text-callout text-muted-foreground">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span>Детализация материалов</span>
+              <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-y-2 group-hover:translate-y-0">
+                <div className="bg-white/90 dark:bg-black/90 px-2 py-1 rounded-full text-xs font-medium text-gray-800 dark:text-gray-200">
+                  Наведите для сравнения
+                </div>
+              </div>
             </div>
           </div>
         </div>

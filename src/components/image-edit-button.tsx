@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { apiClient, ImageRequest, ImageResponse } from "@/lib/api-client";
+import { apiClient, ImageRequest } from "@/lib/api-client";
 import { useAuth } from "@/contexts/auth-context";
 import { Edit3, Wand2, Loader2, CreditCard } from "lucide-react";
 import Image from "next/image";

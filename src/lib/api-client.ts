@@ -128,8 +128,8 @@ class ApiClient {
     
     // Отладочная информация (только в development)
     if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-      console.log('API Base URL:', this.baseUrl);
-      console.log('Current hostname:', window.location.hostname);
+      // console.log('API Base URL:', this.baseUrl);
+      // console.log('Current hostname:', window.location.hostname);
     }
   }
 

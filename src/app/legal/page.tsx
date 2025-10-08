@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { Shield, FileText } from "lucide-react"
+import { FileText } from "lucide-react"
 
 export default function LegalPage() {
   return (

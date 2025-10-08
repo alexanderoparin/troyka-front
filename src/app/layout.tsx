@@ -11,6 +11,7 @@ import Footer from '@/components/footer'
 const inter = Inter({ subsets: ['latin', 'cyrillic'] })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://24reshai.ru'),
   title: '24reshai - Генерация изображений товаров с ИИ',
   description: 'Создавайте профессиональные изображения товаров с помощью искусственного интеллекта. Получите +6 поинтов при регистрации! Подтвердите email для доступа ко всем функциям.',
   keywords: 'ИИ, генерация изображений, товары, искусственный интеллект, фотосъемка товаров',
@@ -67,7 +68,7 @@ export default function RootLayout({
             <AuthProvider>
               <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700 mobile-container flex flex-col">
                 <Header />
-                <main className="container mx-auto px-4 py-4 sm:py-8 flex-1 mobile-scroll">
+                <main className="container mx-auto px-4 py-4 sm:py-8 flex-1">
                   {children}
                 </main>
                 <Footer />
