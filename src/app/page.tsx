@@ -165,79 +165,107 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Pricing Preview */}
+      {/* Examples Section */}
       <section className="space-y-16">
         <div className="text-center space-y-6">
-          <h2 className="text-title-1 text-foreground">Простые и честные цены</h2>
+          <h2 className="text-title-1 text-foreground">Примеры работ</h2>
           <p className="text-headline text-muted-foreground max-w-2xl mx-auto">
-            Платите только за то, что используете. Без скрытых комиссий.
+            Посмотрите, какие профессиональные изображения товаров создает наш ИИ
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="card-ios p-6 text-center animate-ios-fade-in">
-            <h3 className="text-title-3 text-foreground mb-4">Стартер</h3>
-            <div className="space-y-2 mb-6">
-              <div className="text-3xl font-bold text-foreground">990 ₽</div>
-              <div className="text-callout text-muted-foreground">100 поинтов • ~33 генерации</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* Example 1 */}
+          <div className="card-ios p-6 animate-ios-fade-in group">
+            <div className="aspect-[3/4] bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/30 rounded-xl mb-4 flex items-center justify-center">
+              <div className="text-center space-y-2">
+                <Sparkles className="w-12 h-12 text-blue-500 mx-auto" />
+                <p className="text-sm text-muted-foreground">Пример изображения</p>
+              </div>
             </div>
-            <Link href="/pricing">
-              <button className="btn-ios-ghost w-full px-4 py-2 text-sm">
-                Купить
-              </button>
-            </Link>
-          </div>
-          
-          <div className="card-ios-elevated p-6 text-center relative animate-ios-fade-in" style={{ animationDelay: '0.1s' }}>
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-callout font-medium">
-              Популярный
+            <h3 className="text-title-3 text-foreground mb-2">Электроника</h3>
+            <p className="text-body text-muted-foreground mb-4">
+              Смартфон на белом фоне с профессиональным освещением
+            </p>
+            <div className="flex items-center gap-2 text-callout text-muted-foreground">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span>Студийное качество</span>
             </div>
-            <h3 className="text-title-3 text-foreground mb-4">Профи</h3>
-            <div className="space-y-2 mb-6">
-              <div className="text-3xl font-bold text-foreground">2990 ₽</div>
-              <div className="text-callout text-muted-foreground">300 поинтов • ~100 генераций</div>
-            </div>
-            <Link href="/pricing">
-              <button className="btn-ios-primary w-full px-4 py-2 text-sm">
-                Купить
-              </button>
-            </Link>
           </div>
 
-          <div className="card-ios p-6 text-center animate-ios-fade-in" style={{ animationDelay: '0.2s' }}>
-            <h3 className="text-title-3 text-foreground mb-4">Бизнес</h3>
-            <div className="space-y-2 mb-6">
-              <div className="text-3xl font-bold text-foreground">5490 ₽</div>
-              <div className="text-callout text-muted-foreground">600 поинтов • ~200 генераций</div>
+          {/* Example 2 */}
+          <div className="card-ios p-6 animate-ios-fade-in group" style={{ animationDelay: '0.1s' }}>
+            <div className="aspect-[3/4] bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/30 dark:to-green-900/30 rounded-xl mb-4 flex items-center justify-center">
+              <div className="text-center space-y-2">
+                <Sparkles className="w-12 h-12 text-green-500 mx-auto" />
+                <p className="text-sm text-muted-foreground">Пример изображения</p>
+              </div>
             </div>
-            <Link href="/pricing">
-              <button className="btn-ios-ghost w-full px-4 py-2 text-sm">
-                Купить
-              </button>
-            </Link>
+            <h3 className="text-title-3 text-foreground mb-2">Одежда</h3>
+            <p className="text-body text-muted-foreground mb-4">
+              Футболка на манекене с естественным освещением
+            </p>
+            <div className="flex items-center gap-2 text-callout text-muted-foreground">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span>Реалистичные текстуры</span>
+            </div>
           </div>
 
-          <div className="card-ios p-6 text-center animate-ios-fade-in" style={{ animationDelay: '0.3s' }}>
-            <h3 className="text-title-3 text-foreground mb-4">Премиум</h3>
-            <div className="space-y-2 mb-6">
-              <div className="text-3xl font-bold text-foreground">8990 ₽</div>
-              <div className="text-callout text-muted-foreground">1000 поинтов • ~333 генерации</div>
+          {/* Example 3 */}
+          <div className="card-ios p-6 animate-ios-fade-in group" style={{ animationDelay: '0.2s' }}>
+            <div className="aspect-[3/4] bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/30 dark:to-purple-900/30 rounded-xl mb-4 flex items-center justify-center">
+              <div className="text-center space-y-2">
+                <Sparkles className="w-12 h-12 text-purple-500 mx-auto" />
+                <p className="text-sm text-muted-foreground">Пример изображения</p>
+              </div>
             </div>
-            <Link href="/pricing">
-              <button className="btn-ios-ghost w-full px-4 py-2 text-sm">
-                Купить
-              </button>
-            </Link>
+            <h3 className="text-title-3 text-foreground mb-2">Косметика</h3>
+            <p className="text-body text-muted-foreground mb-4">
+              Помада на элегантном фоне с мягким освещением
+            </p>
+            <div className="flex items-center gap-2 text-callout text-muted-foreground">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span>Точная передача цветов</span>
+            </div>
+          </div>
+
+          {/* Example 4 */}
+          <div className="card-ios p-6 animate-ios-fade-in group" style={{ animationDelay: '0.3s' }}>
+            <div className="aspect-[3/4] bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950/30 dark:to-orange-900/30 rounded-xl mb-4 flex items-center justify-center">
+              <div className="text-center space-y-2">
+                <Sparkles className="w-12 h-12 text-orange-500 mx-auto" />
+                <p className="text-sm text-muted-foreground">Пример изображения</p>
+              </div>
+            </div>
+            <h3 className="text-title-3 text-foreground mb-2">Аксессуары</h3>
+            <p className="text-body text-muted-foreground mb-4">
+              Часы на деревянном фоне с теплым освещением
+            </p>
+            <div className="flex items-center gap-2 text-callout text-muted-foreground">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span>Детализация материалов</span>
+            </div>
           </div>
         </div>
 
-        <div className="text-center">
-          <Link href="/pricing">
-            <button className="btn-ios-ghost px-8 py-3 text-headline">
-              Подробнее о тарифах
-              <ArrowRight className="w-5 h-5 ml-3" />
-            </button>
-          </Link>
+        <div className="text-center space-y-6">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link href="/pricing">
+              <button className="btn-ios-primary px-8 py-3 text-headline">
+                <Sparkles className="w-5 h-5 mr-3" />
+                Посмотреть тарифы
+                <ArrowRight className="w-5 h-5 ml-3" />
+              </button>
+            </Link>
+            <Link href="/studio">
+              <button className="btn-ios-ghost px-8 py-3 text-headline">
+                Попробовать бесплатно
+              </button>
+            </Link>
+          </div>
+          <p className="text-callout text-muted-foreground">
+            Начните с +6 поинтов при регистрации
+          </p>
         </div>
       </section>
 
