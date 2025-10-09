@@ -546,6 +546,11 @@ class ApiClient {
     return `${this.baseUrl}/api/files/${filename}`;
   }
 
+  // Get example file URL
+  getExampleFileUrl(filename: string): string {
+    return `https://24reshai.ru/files/examples/${filename}`;
+  }
+
   // User API
   async getUserInfo(): Promise<ApiResponse<UserInfo>> {
     return this.request<UserInfo>('/api/users/me');
