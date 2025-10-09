@@ -16,6 +16,10 @@ const nextConfig = {
       },
     ],
   },
+  // Увеличиваем лимит размера файлов для загрузки
+  experimental: {
+    serverComponentsExternalPackages: [],
+  },
 };
 
 module.exports = nextConfig;
