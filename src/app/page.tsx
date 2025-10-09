@@ -1,83 +1,380 @@
 "use client"
 
 import { Badge } from '@/components/ui/badge'
-import { Sparkles, Shield, ArrowRight, Star, Users, Clock, Target, Zap } from 'lucide-react'
+import { Sparkles, Shield, ArrowRight, Star, Users, Clock, Target, Zap, X } from 'lucide-react'
 import Link from 'next/link'
 import { useAuth } from '@/contexts/auth-context'
 import { getPointsText } from '@/lib/grammar'
+import { useState } from 'react'
 
 export default function HomePage() {
   const { isAuthenticated, isLoading, points, user } = useAuth()
+  const [selectedImage, setSelectedImage] = useState<{ src: string; alt: string; label: string } | null>(null)
 
   return (
     <div className="space-y-20">
-      {/* Hero Section */}
-      <section className="hero-section text-center space-y-6 sm:space-y-8 md:space-y-12 py-12 sm:py-16 md:py-24 px-4">
-        <div className="space-y-4 sm:space-y-6 md:space-y-8">
-          <Badge variant="secondary" className="mb-4 text-callout bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-700 px-4 py-2 rounded-full">
-            <Sparkles className="w-4 h-4 mr-2" />
-            Новое поколение ИИ для товаров
-          </Badge>
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight">
-            <span className="bg-gradient-to-r from-blue-600 via-blue-500 to-blue-700 bg-clip-text text-transparent">24reshai</span>
-            <br />
-            <span className="text-2xl sm:text-4xl md:text-5xl text-foreground">Генерация изображений товаров</span>
-          </h1>
-          <p className="text-base sm:text-xl md:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-            Создавайте профессиональные изображения товаров с помощью искусственного интеллекта. 
-            100% точность деталей, реалистичные фоны, студийное качество за секунды.
+      {/* Hero Section - Compact Layout */}
+      <section className="hero-section py-8 sm:py-12 px-4">
+        <div className="max-w-none mx-auto w-full px-4">
+          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6 lg:gap-8">
+            {/* Left Side - Content */}
+            <div className="flex flex-col items-center text-center space-y-4 sm:space-y-5">
+              <Badge variant="secondary" className="text-sm bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-700 px-3 py-1.5 rounded-full w-fit">
+                <Sparkles className="w-3 h-3 mr-2" />
+                Революция в создании изображений
+              </Badge>
+              
+              <div className="space-y-2 sm:space-y-3 max-w-2xl">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
+                  <span className="gradient-text">24reshai</span>
+                </h1>
+                <h2 className="text-lg sm:text-xl md:text-2xl text-foreground font-semibold">
+                  ИИ-платформа для реализации ваших идей
+                </h2>
+                <p className="text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed">
+                  От товаров до портретов, от интерьеров до еды — превращайте любые идеи в профессиональные изображения. 
+                  Мощный ИИ создает студийное качество, реалистичные сцены и идеальные детали за секунды.
+                </p>
+              </div>
+            </div>
+
+            {/* Right Side - Actions */}
+            <div className="flex flex-col items-center space-y-4 sm:space-y-5 lg:items-end">
+              <div className="space-y-2 sm:space-y-3 w-full max-w-sm">
+                {isLoading ? (
+                  <div className="space-y-2">
+                    <div className="w-full h-10 animate-pulse bg-muted rounded-xl" />
+                    <div className="w-full h-10 animate-pulse bg-muted rounded-xl" />
+                  </div>
+                ) : isAuthenticated ? (
+                  <div className="space-y-2">
+                    <Link href="/studio" className="block">
+                      <button className="btn-ios-primary w-full px-4 py-2.5 text-sm flex items-center justify-center">
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        Открыть студию
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </button>
+                    </Link>
+                    <Link href="/pricing" className="block">
+                      <button className="btn-ios-ghost w-full px-4 py-2.5 text-sm flex items-center justify-center">
+                        Посмотреть цены
+                      </button>
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Link href="/register" className="block">
+                      <button className="btn-ios-primary w-full px-4 py-2.5 text-sm flex items-center justify-center">
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        Начать бесплатно
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </button>
+                    </Link>
+                    <Link href="/login" className="block">
+                      <button className="btn-ios-ghost w-full px-4 py-2.5 text-sm flex items-center justify-center">
+                        Войти в аккаунт
+                      </button>
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-1.5 text-sm sm:text-base text-muted-foreground text-center">
+                <div className="flex items-center justify-center gap-2">
+                  <Star className="w-3 h-3 text-yellow-500" />
+                  <span>Получите 6 поинтов за регистрацию</span>
+                </div>
+                <div className="flex items-center justify-center gap-2">
+                  <Users className="w-3 h-3 text-green-500" />
+                  <span>3 поинта = 1 генерация</span>
+                </div>
+                <div className="flex items-center justify-center gap-2">
+                  <Clock className="w-3 h-3 text-blue-500" />
+                  <span>Результат за 5-10 секунд</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Examples Section - Horizontal Scroll */}
+      <section className="space-y-8">
+        <div className="text-center space-y-2 px-4">
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Примеры работ</h2>
+          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
+            От промпта до результата — один клик
           </p>
         </div>
-        
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-6 justify-center items-center w-full max-w-lg sm:max-w-none mx-auto px-2 sm:px-0">
-          {isLoading ? (
-            <div className="w-full sm:w-44 h-11 animate-pulse bg-muted rounded-xl" />
-          ) : isAuthenticated ? (
-            <>
-              <Link href="/studio" className="w-full sm:w-auto">
-                <button className="btn-ios-primary w-full sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-headline">
-                  <Sparkles className="w-5 h-5 mr-3" />
-                  Открыть студию
-                  <ArrowRight className="w-5 h-5 ml-3" />
-                </button>
-              </Link>
-              <Link href="/pricing" className="w-full sm:w-auto">
-                <button className="btn-ios-ghost w-full sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-headline">
-                  Посмотреть цены
-                </button>
-              </Link>
-            </>
-          ) : (
-            <>
-              <Link href="/register" className="w-full sm:w-auto">
-                <button className="btn-ios-primary w-full sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-headline">
-                  <Sparkles className="w-5 h-5 mr-3" />
-                  Начать бесплатно
-                  <ArrowRight className="w-5 h-5 ml-3" />
-                </button>
-              </Link>
-              <Link href="/login" className="w-full sm:w-auto">
-                <button className="btn-ios-ghost w-full sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-headline">
-                  Войти в аккаунт
-                </button>
-              </Link>
-            </>
-          )}
+
+        {/* Horizontal Scroll Container */}
+        <div className="relative overflow-hidden">
+          <div className="scroll-horizontal flex space-x-8 py-4 pl-4">
+            {/* Duplicate the set for seamless loop */}
+            {[...Array(2)].map((_, setIndex) => (
+              <div key={setIndex} className="flex space-x-8 flex-shrink-0">
+                {/* Example 1: Jacket - Before/After Pair */}
+                <div className="flex space-x-4">
+                  {/* Before */}
+                  <div className="group relative">
+                    <div 
+                      className="w-64 h-80 rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-xl transition-shadow duration-300"
+                      onClick={() => setSelectedImage({
+                        src: "https://24reshai.ru/files/examples/jacket-before.jpg",
+                        alt: "До обработки",
+                        label: "До"
+                      })}
+                    >
+                      <img 
+                        src="https://24reshai.ru/files/examples/jacket-before.jpg" 
+                        alt="До обработки" 
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                          if (nextElement) {
+                            nextElement.style.display = 'flex';
+                          }
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center hidden">
+                        <div className="text-center space-y-2">
+                          <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto">
+                            <span className="text-xl">👔</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground">Загрузите изображение</p>
+                        </div>
+                      </div>
+                      <div className="absolute top-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-medium">
+                        До
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* After */}
+                  <div className="group relative">
+                    <div 
+                      className="w-64 h-80 rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-xl transition-shadow duration-300"
+                      onClick={() => setSelectedImage({
+                        src: "https://24reshai.ru/files/examples/jacket-after.jpg",
+                        alt: "После обработки",
+                        label: "После"
+                      })}
+                    >
+                      <img 
+                        src="https://24reshai.ru/files/examples/jacket-after.jpg" 
+                        alt="После обработки" 
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                          if (nextElement) {
+                            nextElement.style.display = 'flex';
+                          }
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center hidden">
+                        <div className="text-center space-y-2">
+                          <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto">
+                            <span className="text-xl">✨</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground">Загрузите изображение</p>
+                        </div>
+                      </div>
+                      <div className="absolute top-2 left-2 bg-primary/90 text-white px-2 py-1 rounded text-xs font-medium">
+                        После
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Visual Separator */}
+                <div className="flex items-center justify-center">
+                  <div className="w-px h-16 bg-gradient-to-b from-transparent via-primary/30 to-transparent"></div>
+                </div>
+
+                {/* Example 2: Winter - Before/After Pair */}
+                <div className="flex space-x-4">
+                  {/* Before */}
+                  <div className="group relative">
+                    <div 
+                      className="w-64 h-80 rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-xl transition-shadow duration-300"
+                      onClick={() => setSelectedImage({
+                        src: "https://24reshai.ru/files/examples/winter-before.jpg",
+                        alt: "До обработки",
+                        label: "До"
+                      })}
+                    >
+                      <img 
+                        src="https://24reshai.ru/files/examples/winter-before.jpg" 
+                        alt="До обработки" 
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                          if (nextElement) {
+                            nextElement.style.display = 'flex';
+                          }
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center hidden">
+                        <div className="text-center space-y-2">
+                          <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto">
+                            <span className="text-xl">🧥</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground">Загрузите изображение</p>
+                        </div>
+                      </div>
+                      <div className="absolute top-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-medium">
+                        До
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* After */}
+                  <div className="group relative">
+                    <div 
+                      className="w-64 h-80 rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-xl transition-shadow duration-300"
+                      onClick={() => setSelectedImage({
+                        src: "https://24reshai.ru/files/examples/winter-after.jpg",
+                        alt: "После обработки",
+                        label: "После"
+                      })}
+                    >
+                      <img 
+                        src="https://24reshai.ru/files/examples/winter-after.jpg" 
+                        alt="После обработки" 
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                          if (nextElement) {
+                            nextElement.style.display = 'flex';
+                          }
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center hidden">
+                        <div className="text-center space-y-2">
+                          <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto">
+                            <span className="text-xl">❄️</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground">Загрузите изображение</p>
+                        </div>
+                      </div>
+                      <div className="absolute top-2 left-2 bg-primary/90 text-white px-2 py-1 rounded text-xs font-medium">
+                        После
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Visual Separator */}
+                <div className="flex items-center justify-center">
+                  <div className="w-px h-16 bg-gradient-to-b from-transparent via-primary/30 to-transparent"></div>
+                </div>
+
+                {/* Example 3: Dress - Before/After Pair */}
+                <div className="flex space-x-4">
+                  {/* Before */}
+                  <div className="group relative">
+                    <div 
+                      className="w-64 h-80 rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-xl transition-shadow duration-300"
+                      onClick={() => setSelectedImage({
+                        src: "https://24reshai.ru/files/examples/dress-before.jpg",
+                        alt: "До обработки",
+                        label: "До"
+                      })}
+                    >
+                      <img 
+                        src="https://24reshai.ru/files/examples/dress-before.jpg" 
+                        alt="До обработки" 
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                          if (nextElement) {
+                            nextElement.style.display = 'flex';
+                          }
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center hidden">
+                        <div className="text-center space-y-2">
+                          <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto">
+                            <span className="text-xl">👗</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground">Загрузите изображение</p>
+                        </div>
+                      </div>
+                      <div className="absolute top-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-medium">
+                        До
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* After */}
+                  <div className="group relative">
+                    <div 
+                      className="w-64 h-80 rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-xl transition-shadow duration-300"
+                      onClick={() => setSelectedImage({
+                        src: "https://24reshai.ru/files/examples/dress-after.jpg",
+                        alt: "После обработки",
+                        label: "После"
+                      })}
+                    >
+                      <img 
+                        src="https://24reshai.ru/files/examples/dress-after.jpg" 
+                        alt="После обработки" 
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                          if (nextElement) {
+                            nextElement.style.display = 'flex';
+                          }
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center hidden">
+                        <div className="text-center space-y-2">
+                          <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto">
+                            <span className="text-xl">✨</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground">Загрузите изображение</p>
+                        </div>
+                      </div>
+                      <div className="absolute top-2 left-2 bg-primary/90 text-white px-2 py-1 rounded text-xs font-medium">
+                        После
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Final Separator */}
+                <div className="flex items-center justify-center">
+                  <div className="w-px h-16 bg-gradient-to-b from-transparent via-primary/30 to-transparent"></div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-8 text-xs sm:text-sm text-muted-foreground px-2">
-          <div className="flex items-center gap-2">
-            <Star className="w-4 h-4 text-yellow-500" />
-            <span>+6 поинтов при регистрации</span>
+        <div className="text-center space-y-6">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link href="/pricing">
+              <button className="btn-ios-primary px-8 py-3 text-headline">
+                <Sparkles className="w-5 h-5 mr-3" />
+                Посмотреть тарифы
+                <ArrowRight className="w-5 h-5 ml-3" />
+              </button>
+            </Link>
+            <Link href="/studio">
+              <button className="btn-ios-ghost px-8 py-3 text-headline">
+                Попробовать бесплатно
+              </button>
+            </Link>
           </div>
-          <div className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-green-500" />
-            <span>3 поинта = 1 генерация</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-blue-500" />
-            <span>Результат за 5-10 секунд</span>
-          </div>
+          <p className="text-callout text-muted-foreground">
+            Начните с +6 поинтов при регистрации
+          </p>
         </div>
       </section>
 
@@ -165,280 +462,41 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Examples Section */}
-      <section className="space-y-16">
-        <div className="text-center space-y-6">
-          <h2 className="text-title-1 text-foreground">Примеры работ</h2>
-          <p className="text-headline text-muted-foreground max-w-2xl mx-auto">
-            Всего один промпт — и ваше изображение превращается в профессиональную фотографию товара
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Example 1 - Black Jacket */}
-          <div className="card-ios p-6 animate-ios-fade-in group">
-            <div className="aspect-[3/4] rounded-xl mb-4 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center border border-gray-200 dark:border-gray-700 overflow-hidden relative cursor-pointer">
-              <div className="w-full h-full relative">
-                {/* До - всегда видно */}
-                <img 
-                  src="https://24reshai.ru/files/examples/jacket-before.jpg" 
-                  alt="До обработки" 
-                  className="w-full h-full object-cover transition-opacity duration-500 group-hover:opacity-0"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
-                    if (nextElement) {
-                      nextElement.style.display = 'flex';
-                    }
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center hidden">
-                  <div className="text-center space-y-2">
-                    <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto">
-                      <span className="text-xl">👔</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">Загрузите изображение</p>
-                  </div>
-                </div>
-                
-                {/* После - появляется при наведении */}
-                <img 
-                  src="https://24reshai.ru/files/examples/jacket-after.jpg" 
-                  alt="После обработки" 
-                  className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
-                    if (nextElement) {
-                      nextElement.style.display = 'flex';
-                    }
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center hidden">
-                  <div className="text-center space-y-2">
-                    <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto">
-                      <span className="text-xl">✨</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">Загрузите изображение</p>
-                  </div>
-                </div>
-              </div>
-              {/* Hover overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="absolute bottom-4 left-4 right-4 text-white opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium bg-black/70 px-3 py-1.5 rounded-full backdrop-blur-sm">До</span>
-                  <span className="text-sm font-medium bg-green-600/90 px-3 py-1.5 rounded-full backdrop-blur-sm">После</span>
-                </div>
-              </div>
-              <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-y-2 group-hover:translate-y-0">
-                <div className="bg-white/90 dark:bg-black/90 px-2 py-1 rounded-full text-xs font-medium text-gray-800 dark:text-gray-200">
-                  Наведите для сравнения
-                </div>
-              </div>
+      {/* Image Modal */}
+      {selectedImage && (
+        <div 
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div 
+            className="relative max-w-4xl max-h-[90vh] bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedImage(null)}
+              className="absolute top-4 right-4 z-10 w-10 h-10 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-colors duration-200"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            
+            {/* Image Label */}
+            <div className="absolute top-4 left-4 z-10">
+              <span className="bg-primary/90 text-white px-3 py-1.5 rounded-full text-sm font-medium">
+                {selectedImage.label}
+              </span>
             </div>
-          </div>
-          
-          {/* Example 2 - Winter Wear */}
-          <div className="card-ios p-6 animate-ios-fade-in group" style={{ animationDelay: '0.1s' }}>
-            <div className="aspect-[3/4] rounded-xl mb-4 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center border border-gray-200 dark:border-gray-700 overflow-hidden relative cursor-pointer">
-              <div className="w-full h-full relative">
-                {/* До - всегда видно */}
-                <img 
-                  src="https://24reshai.ru/files/examples/winter-before.jpg" 
-                  alt="До обработки" 
-                  className="w-full h-full object-cover transition-opacity duration-500 group-hover:opacity-0"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
-                    if (nextElement) {
-                      nextElement.style.display = 'flex';
-                    }
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center hidden">
-                  <div className="text-center space-y-2">
-                    <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto">
-                      <span className="text-xl">🧥</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">Загрузите изображение</p>
-                  </div>
-                </div>
-                
-                {/* После - появляется при наведении */}
-                <img 
-                  src="https://24reshai.ru/files/examples/winter-after.jpg" 
-                  alt="После обработки" 
-                  className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
-                    if (nextElement) {
-                      nextElement.style.display = 'flex';
-                    }
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center hidden">
-                  <div className="text-center space-y-2">
-                    <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto">
-                      <span className="text-xl">❄️</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">Загрузите изображение</p>
-                  </div>
-                </div>
-              </div>
-              {/* Hover overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="absolute bottom-4 left-4 right-4 text-white opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium bg-black/70 px-3 py-1.5 rounded-full backdrop-blur-sm">До</span>
-                  <span className="text-sm font-medium bg-blue-600/90 px-3 py-1.5 rounded-full backdrop-blur-sm">После</span>
-                </div>
-              </div>
-              <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-y-2 group-hover:translate-y-0">
-                <div className="bg-white/90 dark:bg-black/90 px-2 py-1 rounded-full text-xs font-medium text-gray-800 dark:text-gray-200">
-                  Наведите для сравнения
-                </div>
-            </div>
-            </div>
-          </div>
-
-          {/* Example 3 - Dress */}
-          <div className="card-ios p-6 animate-ios-fade-in group" style={{ animationDelay: '0.2s' }}>
-            <div className="aspect-[3/4] rounded-xl mb-4 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center border border-gray-200 dark:border-gray-700 overflow-hidden relative cursor-pointer">
-              <div className="w-full h-full relative">
-                {/* До - всегда видно */}
-                <img 
-                  src="https://24reshai.ru/files/examples/dress-before.jpg" 
-                  alt="До обработки" 
-                  className="w-full h-full object-cover transition-opacity duration-500 group-hover:opacity-0"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
-                    if (nextElement) {
-                      nextElement.style.display = 'flex';
-                    }
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center hidden">
-                  <div className="text-center space-y-2">
-                    <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto">
-                      <span className="text-xl">👗</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">Загрузите изображение</p>
-                  </div>
-                </div>
-                
-                {/* После - появляется при наведении */}
-                <img 
-                  src="https://24reshai.ru/files/examples/dress-after.jpg" 
-                  alt="После обработки" 
-                  className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
-                    if (nextElement) {
-                      nextElement.style.display = 'flex';
-                    }
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 flex items-center justify-center hidden">
-                  <div className="text-center space-y-2">
-                    <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto">
-                      <span className="text-xl">✨</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">Загрузите изображение</p>
-                  </div>
-                </div>
-              </div>
-              {/* Hover overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="absolute bottom-4 left-4 right-4 text-white opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium bg-black/70 px-3 py-1.5 rounded-full backdrop-blur-sm">До</span>
-                  <span className="text-sm font-medium bg-indigo-600/90 px-3 py-1.5 rounded-full backdrop-blur-sm">После</span>
-                </div>
-              </div>
-              <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-y-2 group-hover:translate-y-0">
-                <div className="bg-white/90 dark:bg-black/90 px-2 py-1 rounded-full text-xs font-medium text-gray-800 dark:text-gray-200">
-                  Наведите для сравнения
-                </div>
-              </div>
-            </div>
+            
+            {/* Image */}
+            <img
+              src={selectedImage.src}
+              alt={selectedImage.alt}
+              className="w-full h-auto max-h-[90vh] object-contain"
+            />
           </div>
         </div>
+      )}
 
-        <div className="text-center space-y-6">
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/pricing">
-              <button className="btn-ios-primary px-8 py-3 text-headline">
-                <Sparkles className="w-5 h-5 mr-3" />
-                Посмотреть тарифы
-                <ArrowRight className="w-5 h-5 ml-3" />
-              </button>
-            </Link>
-            <Link href="/studio">
-              <button className="btn-ios-ghost px-8 py-3 text-headline">
-                Попробовать бесплатно
-              </button>
-            </Link>
-          </div>
-          <p className="text-callout text-muted-foreground">
-            Начните с +6 поинтов при регистрации
-          </p>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="text-center space-y-8 sm:space-y-12 py-16 sm:py-20 card-ios-elevated px-4">
-        <div className="space-y-4 sm:space-y-6">
-          <h2 className="text-2xl sm:text-title-1 text-foreground">Готовы начать?</h2>
-          {isAuthenticated ? (
-            <div className="space-y-4">
-              <p className="text-base sm:text-headline text-muted-foreground max-w-2xl mx-auto">
-                Добро пожаловать, {user?.username}! Начните создавать профессиональные изображения товаров прямо сейчас
-              </p>
-              <div className="flex items-center justify-center">
-                <div className="bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-full text-callout font-medium border border-blue-200 dark:border-blue-700">
-                  <Sparkles className="w-4 h-4 mr-2 inline" />
-                  {getPointsText(points)} доступно
-                </div>
-              </div>
-            </div>
-          ) : (
-            <p className="text-base sm:text-headline text-muted-foreground max-w-2xl mx-auto">
-              Зарегистрируйтесь сейчас и получите +6 поинтов для бесплатного тестирования
-            </p>
-          )}
-        </div>
-        
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center max-w-lg sm:max-w-none mx-auto px-2 sm:px-0">
-          {isLoading ? (
-            <div className="w-44 h-11 animate-pulse bg-muted rounded-xl" />
-          ) : isAuthenticated ? (
-            <Link href="/studio" className="w-full sm:w-auto">
-              <button className="btn-ios-primary w-full sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-headline">
-                <Sparkles className="w-5 h-5 mr-3" />
-                Начать создавать
-              </button>
-            </Link>
-          ) : (
-            <>
-              <Link href="/register" className="w-full sm:w-auto">
-                <button className="btn-ios-primary w-full sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-headline">
-                  <Sparkles className="w-5 h-5 mr-3" />
-                  Зарегистрироваться
-                </button>
-              </Link>
-              <Link href="/login" className="w-full sm:w-auto">
-                <button className="btn-ios-ghost w-full sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-headline">
-                  Уже есть аккаунт?
-                </button>
-              </Link>
-            </>
-          )}
-        </div>
-      </section>
     </div>
   )
 }

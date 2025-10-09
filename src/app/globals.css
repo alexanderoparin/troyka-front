@@ -633,6 +633,23 @@
   }
 }
 
+@keyframes scroll-horizontal {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.scroll-horizontal {
+  animation: scroll-horizontal 30s linear infinite;
+}
+
+.scroll-horizontal:hover {
+  animation-play-state: paused;
+}
+
 /* iOS Loading Spinner */
 .ios-spinner {
   width: 20px;
