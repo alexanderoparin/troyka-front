@@ -156,16 +156,17 @@ export function GenerationForm() {
     <div className="generation-form space-y-6">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Prompt Input - Main Required Field */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 mb-2">
-            <Label htmlFor="prompt" className="text-base font-semibold">
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-1 h-6 bg-gradient-to-b from-primary to-primary/50 rounded-full"></div>
+            <Label htmlFor="prompt" className="text-lg font-bold">
               Описание товара
             </Label>
-            <Badge variant="destructive" className="text-xs">
+            <Badge variant="destructive" className="text-xs px-2 py-1">
               Обязательно
             </Badge>
           </div>
-          <div className="relative">
+          <div className="relative group">
             <Textarea
               {...register("prompt")}
               placeholder={uploadedImages.length > 0
@@ -173,55 +174,63 @@ export function GenerationForm() {
                 : "Опишите ваш товар: красивый смартфон на белом фоне, студийное освещение, высокое качество..."
               }
               className={cn(
-                "min-h-[120px] text-base resize-none border-2 rounded-xl px-4 py-3",
-                "focus:ring-2 focus:ring-primary/20 focus:border-primary",
+                "min-h-[140px] text-base resize-none border-2 rounded-2xl px-6 py-4",
+                "focus:ring-4 focus:ring-primary/20 focus:border-primary",
                 "placeholder:text-muted-foreground/60",
+                "bg-gradient-to-br from-background to-muted/20",
+                "transition-all duration-300 group-hover:border-primary/30",
                 errors.prompt && "border-destructive focus:border-destructive"
               )}
             />
-            <div className="absolute bottom-3 right-3 text-xs text-muted-foreground">
+            <div className="absolute bottom-4 right-4 text-xs text-muted-foreground bg-background/80 backdrop-blur-sm px-2 py-1 rounded-lg">
               {prompt?.length || 0} символов
             </div>
           </div>
           
           {errors.prompt && (
-            <p className="text-sm text-destructive flex items-center gap-1">
-              <span className="w-1 h-1 bg-destructive rounded-full"></span>
-              {errors.prompt.message}
-            </p>
+            <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-xl">
+              <div className="w-2 h-2 bg-destructive rounded-full"></div>
+              <p className="text-sm text-destructive font-medium">{errors.prompt.message}</p>
+            </div>
           )}
         </div>
 
         {/* Optional Image Upload Area */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 mb-2">
-            <Label className="text-base font-semibold">
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-1 h-6 bg-gradient-to-b from-primary to-primary/50 rounded-full"></div>
+            <Label className="text-lg font-bold">
               Загрузить изображение
             </Label>
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="secondary" className="text-xs px-2 py-1">
               По желанию
             </Badge>
           </div>
-          <div className="p-4 border-2 border-dashed border-muted-foreground/25 rounded-xl bg-muted/20">
-            <FileUpload
-              onFileUploaded={handleFileUploaded}
-              onFileRemoved={handleFileRemoved}
-              uploadedFiles={uploadedImages}
-              maxFiles={1}
-              accept="image/*"
-              className="w-full"
-            />
-            <p className="text-xs text-muted-foreground mt-2 text-center">
-              Загрузите изображение, если хотите его изменить, или оставьте пустым для создания нового
-            </p>
+          <div className="relative group">
+            <div className="p-6 border-2 border-dashed border-primary/20 rounded-2xl bg-gradient-to-br from-primary/5 to-primary/10 group-hover:border-primary/40 transition-all duration-300">
+              <FileUpload
+                onFileUploaded={handleFileUploaded}
+                onFileRemoved={handleFileRemoved}
+                uploadedFiles={uploadedImages}
+                maxFiles={1}
+                accept="image/*"
+                className="w-full"
+              />
+              <p className="text-sm text-muted-foreground mt-3 text-center">
+                Загрузите изображение, если хотите его изменить, или оставьте пустым для создания нового
+              </p>
+            </div>
           </div>
         </div>
 
         {/* Style Presets */}
         {uploadedImages.length === 0 && (
-          <div className="space-y-3">
-            <h4 className="text-sm font-medium text-muted-foreground">Стили для вдохновения:</h4>
-            <div className="style-presets grid grid-cols-2 gap-2">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="w-1 h-6 bg-gradient-to-b from-primary to-primary/50 rounded-full"></div>
+              <h4 className="text-base font-semibold">Стили для вдохновения</h4>
+            </div>
+            <div className="style-presets grid grid-cols-2 gap-3">
               {STYLE_PRESETS.map((preset) => (
                 <Button
                   key={preset.name}
@@ -229,14 +238,17 @@ export function GenerationForm() {
                   variant="ghost"
                   onClick={() => applyStylePreset(preset)}
                   className={cn(
-                    "h-auto p-3 flex-col items-start gap-2 text-left",
-                    "hover:bg-primary/5 hover:border-primary/20 border border-transparent",
-                    "transition-all duration-200"
+                    "h-auto p-4 flex-col items-start gap-3 text-left group",
+                    "hover:bg-primary/10 hover:border-primary/30 border border-border/30 rounded-xl",
+                    "transition-all duration-300 hover:scale-[1.02] hover:shadow-md",
+                    "bg-gradient-to-br from-card/50 to-card/30 backdrop-blur-sm"
                   )}
                 >
-                  <div className="flex items-center gap-2 w-full">
-                    <span className="text-lg">{preset.icon}</span>
-                    <span className="text-sm font-medium">{preset.name}</span>
+                  <div className="flex items-center gap-3 w-full">
+                    <div className="w-8 h-8 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <span className="text-lg">{preset.icon}</span>
+                    </div>
+                    <span className="text-sm font-semibold group-hover:text-primary transition-colors duration-300">{preset.name}</span>
                   </div>
                 </Button>
               ))}
@@ -245,16 +257,19 @@ export function GenerationForm() {
         )}
 
         {/* Generation Options */}
-        <div className="generation-options grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="numImages" className="text-sm font-medium">
-              Количество изображений
-            </Label>
+        <div className="generation-options grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="w-1 h-4 bg-gradient-to-b from-primary to-primary/50 rounded-full"></div>
+              <Label htmlFor="numImages" className="text-base font-semibold">
+                Количество изображений
+              </Label>
+            </div>
             <Select
               value={watch("numImages")?.toString()}
               onValueChange={(value) => setValue("numImages", parseInt(value))}
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-12 rounded-xl border-2 focus:border-primary focus:ring-4 focus:ring-primary/20">
                 <SelectValue placeholder="Выберите количество" />
               </SelectTrigger>
               <SelectContent>
@@ -266,15 +281,18 @@ export function GenerationForm() {
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="outputFormat" className="text-sm font-medium">
-              Формат изображения
-            </Label>
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="w-1 h-4 bg-gradient-to-b from-primary to-primary/50 rounded-full"></div>
+              <Label htmlFor="outputFormat" className="text-base font-semibold">
+                Формат изображения
+              </Label>
+            </div>
             <Select
               value={watch("outputFormat")}
               onValueChange={(value) => setValue("outputFormat", value as 'JPEG' | 'PNG')}
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-12 rounded-xl border-2 focus:border-primary focus:ring-4 focus:ring-primary/20">
                 <SelectValue placeholder="Выберите формат" />
               </SelectTrigger>
               <SelectContent>
@@ -286,14 +304,22 @@ export function GenerationForm() {
         </div>
 
         {/* Balance Info */}
-        <div className="balance-info flex items-center justify-between p-4 bg-muted/50 rounded-xl border">
-          <div className="flex items-center gap-2">
-            <CreditCard className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium">Ваш баланс:</span>
-            <span className="text-sm font-bold text-primary">{getPointsText(points)}</span>
-          </div>
-          <div className="text-sm text-muted-foreground">
-            Стоимость: {getPointsText(watch("numImages") * 3)}
+        <div className="balance-info relative overflow-hidden bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border border-primary/20 rounded-2xl p-6">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent"></div>
+          <div className="relative flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl flex items-center justify-center">
+                <CreditCard className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <span className="text-sm font-medium text-muted-foreground">Ваш баланс:</span>
+                <div className="text-lg font-bold text-primary">{getPointsText(points)}</div>
+              </div>
+            </div>
+            <div className="text-right">
+              <span className="text-sm text-muted-foreground">Стоимость:</span>
+              <div className="text-lg font-semibold text-foreground">{getPointsText(watch("numImages") * 3)}</div>
+            </div>
           </div>
         </div>
 
@@ -302,12 +328,13 @@ export function GenerationForm() {
           type="submit"
           disabled={isGenerating || !canGenerate || !prompt?.trim()}
           className={cn(
-            "generate-button w-full h-14 text-base font-semibold rounded-xl",
-            "bg-gradient-to-r from-primary to-primary/80",
-            "hover:from-primary/90 hover:to-primary/70",
+            "generate-button relative w-full h-16 text-lg font-bold rounded-2xl overflow-hidden",
+            "bg-gradient-to-r from-primary via-primary to-primary/90",
+            "hover:from-primary/90 hover:via-primary/80 hover:to-primary/70",
             "disabled:opacity-50 disabled:cursor-not-allowed",
-            "transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]",
-            "shadow-lg hover:shadow-xl"
+            "transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]",
+            "shadow-2xl hover:shadow-3xl hover:shadow-primary/25",
+            "border border-primary/20"
           )}
         >
           {isGenerating ? (
@@ -372,37 +399,52 @@ export function GenerationForm() {
 
       {/* Generated Images */}
       {generatedImages.length > 0 && (
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-center">Результат генерации</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-6 mt-12">
+          <div className="text-center space-y-2">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full text-green-600 dark:text-green-400 font-medium">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              Готово!
+            </div>
+            <h3 className="text-2xl font-bold">Результат генерации</h3>
+            <p className="text-muted-foreground">Ваши изображения готовы к использованию</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {generatedImages.map((imageUrl, index) => (
-              <div key={index} className="relative group">
+              <div key={index} className="relative group overflow-hidden rounded-2xl bg-gradient-to-br from-card/50 to-card/30 backdrop-blur-sm border border-border/30 shadow-xl">
                 <Image
                   src={apiClient.getFileUrl(imageUrl)}
                   alt={`Generated image ${index + 1}`}
                   width={400}
                   height={533}
-                  className="rounded-lg object-cover aspect-3-4 w-full shadow-lg"
+                  className="rounded-2xl object-cover aspect-3-4 w-full transition-transform duration-300 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded-lg flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => window.open(apiClient.getFileUrl(imageUrl), '_blank')}
-                  >
-                    Открыть
-                  </Button>
-                  <ImageEditButton
-                    imageUrl={imageUrl}
-                    originalPrompt={prompt}
-                    onImageEdited={(newImages) => {
-                      setGeneratedImages(newImages);
-                      toast({
-                        title: "Изображение отредактировано!",
-                        description: "Новые варианты добавлены к результатам",
-                      });
-                    }}
-                  />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-2xl flex items-end justify-center p-4">
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => window.open(apiClient.getFileUrl(imageUrl), '_blank')}
+                      className="backdrop-blur-sm bg-white/20 border-white/30 text-white hover:bg-white/30"
+                    >
+                      Открыть
+                    </Button>
+                    <ImageEditButton
+                      imageUrl={imageUrl}
+                      originalPrompt={prompt}
+                      onImageEdited={(newImages) => {
+                        setGeneratedImages(newImages);
+                        toast({
+                          title: "Изображение отредактировано!",
+                          description: "Новые варианты добавлены к результатам",
+                        });
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="w-8 h-8 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm font-bold">#{index + 1}</span>
+                  </div>
                 </div>
               </div>
             ))}
