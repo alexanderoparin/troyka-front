@@ -8,10 +8,16 @@ import { GenerationForm } from "@/components/generation-form"
 import { EmailVerificationBanner } from "@/components/email-verification-banner"
 import { Sparkles, AlertCircle, User } from "lucide-react"
 import Link from "next/link"
+import { useState } from "react"
+import Image from "next/image"
+import { apiClient } from "@/lib/api-client"
+import { GenerationHistorySidebar } from "@/components/generation-history-sidebar"
 
 export default function StudioPage() {
   const { user, isAuthenticated, isLoading, isEmailVerified } = useAuth()
   const router = useRouter()
+  const [generatedImages, setGeneratedImages] = useState<string[]>([])
+  const [currentPrompt, setCurrentPrompt] = useState<string>("")
 
   if (isLoading) {
     return (
@@ -46,113 +52,82 @@ export default function StudioPage() {
     )
   }
 
+  const handleGenerationComplete = (images: string[], prompt: string) => {
+    setGeneratedImages(images)
+    setCurrentPrompt(prompt)
+  }
+
+  const handleNewGeneration = () => {
+    setGeneratedImages([])
+    setCurrentPrompt("")
+  }
 
   return (
-    <div className="studio-page min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      {/* Email Verification Banner */}
-      {isAuthenticated && user && !isEmailVerified() && (
-        <EmailVerificationBanner email={user.email} />
-      )}
+    <div className="flex h-screen bg-background text-foreground overflow-hidden">
+      {/* Left Sidebar - Generation History */}
+      <GenerationHistorySidebar onNewGeneration={handleNewGeneration} />
 
-      {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        {/* Background Elements */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5"></div>
-        <div className="absolute top-0 left-1/4 w-72 h-72 bg-primary/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
-        
-        {/* Header */}
-        <div className="relative studio-header text-center space-y-6 py-16 px-4">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-full text-primary font-medium">
-            <Sparkles className="w-4 h-4" />
-            Студия генерации
-          </div>
-          
-          <div className="space-y-4">
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
-              Создайте изображение товара
+      {/* Main Content Area */}
+      <main className="flex-1 flex flex-col items-center justify-center p-8 relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl animate-blob-1"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-secondary/5 rounded-full blur-3xl animate-blob-2"></div>
+
+        <div className="relative z-10 w-full max-w-3xl mx-auto">
+          {/* Email Verification Banner */}
+          {isAuthenticated && user && !isEmailVerified() && (
+            <EmailVerificationBanner email={user.email} />
+          )}
+
+          {/* Header */}
+          <div className="text-center space-y-4 mb-12">
+            <Badge variant="secondary" className="mb-4 px-4 py-2 text-sm rounded-full bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 text-primary">
+              <Sparkles className="w-4 h-4 mr-2 animate-pulse" />
+              Студия генерации
+            </Badge>
+            <h1 className="text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-foreground to-muted-foreground">
+              Krea 1
             </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Просто опишите ваш товар текстом и получите профессиональное изображение за 5-10 секунд. 
-              Загрузка изображения необязательна — только для редактирования существующих фото.
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Опишите вашу идею и получите профессиональное изображение за секунды.
             </p>
           </div>
-          
-          {/* User Info */}
-          <div className="flex items-center justify-center gap-4 text-sm">
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-card/50 backdrop-blur-sm border border-border/50 rounded-full">
-              <User className="w-3 h-3 text-primary" />
-              <span className="font-medium">{user?.username || 'Пользователь'}</span>
-            </div>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span>Готов к генерации</span>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      <div className="max-w-5xl mx-auto px-4">
-        {/* Main Generation Interface */}
-        <div className="generation-form-container relative overflow-hidden bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-xl border border-border/50 rounded-3xl p-8 mb-12 shadow-2xl">
-          {/* Background decoration */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-primary/10 rounded-full blur-xl"></div>
-          
-          <GenerationForm />
-        </div>
-
-        {/* Quick Actions */}
-        <div className="quick-actions bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-xl border border-border/50 rounded-3xl p-8 shadow-xl">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center shadow-lg">
-              <Sparkles className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <h3 className="text-2xl font-bold">Быстрые действия</h3>
-              <p className="text-muted-foreground">Дополнительные возможности</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Link href="/history" className="group">
-              <div className="relative overflow-hidden bg-gradient-to-br from-card/50 to-card/30 backdrop-blur-sm border border-border/30 rounded-2xl p-6 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="relative flex items-start gap-4">
-                  <div className="w-10 h-10 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <Sparkles className="h-5 w-5 text-primary" />
+          {/* Main Generation Interface or Generated Results */}
+          {generatedImages.length === 0 ? (
+            <GenerationForm onGenerationComplete={handleGenerationComplete} />
+          ) : (
+            <div className="space-y-8">
+              <h2 className="text-3xl font-bold text-center">Ваши сгенерированные изображения</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {generatedImages.map((imageUrl, index) => (
+                  <div key={index} className="relative group rounded-2xl overflow-hidden shadow-xl border border-border/50">
+                    <Image
+                      src={apiClient.getFileUrl(imageUrl)}
+                      alt={`Generated image ${index + 1}`}
+                      width={600}
+                      height={800}
+                      className="w-full h-auto object-cover aspect-[3/4]"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100">
+                      <Button size="icon" variant="secondary" className="rounded-full w-10 h-10">
+                        <Sparkles className="w-5 h-5" />
+                      </Button>
+                      <Button size="icon" variant="secondary" className="rounded-full w-10 h-10">
+                        <User className="w-5 h-5" />
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <h4 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors duration-300">
-                      История генераций
-                    </h4>
-                    <p className="text-muted-foreground text-sm leading-relaxed">
-                      Просмотрите все созданные изображения и управляйте ими
-                    </p>
-                  </div>
-                </div>
+                ))}
               </div>
-            </Link>
-            <Link href="/account" className="group">
-              <div className="relative overflow-hidden bg-gradient-to-br from-card/50 to-card/30 backdrop-blur-sm border border-border/30 rounded-2xl p-6 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="relative flex items-start gap-4">
-                  <div className="w-10 h-10 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <User className="h-5 w-5 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors duration-300">
-                      Мой аккаунт
-                    </h4>
-                    <p className="text-muted-foreground text-sm leading-relaxed">
-                      Управление профилем, настройками и балансом
-                    </p>
-                  </div>
-                </div>
+              <div className="mt-12">
+                <h3 className="text-2xl font-bold text-center mb-6">Продолжить редактирование?</h3>
+                <GenerationForm onGenerationComplete={handleGenerationComplete} initialPrompt={currentPrompt} />
               </div>
-            </Link>
-          </div>
+            </div>
+          )}
         </div>
-      </div>
+      </main>
     </div>
   )
 }
