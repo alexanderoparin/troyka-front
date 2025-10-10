@@ -31,8 +31,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     avatar: null,
   })
 
+  // Флаг для предотвращения дублирования запросов в Strict Mode
+  const [hasInitialized, setHasInitialized] = useState(false)
+
   // Проверяем аутентификацию при загрузке
   useEffect(() => {
+    if (hasInitialized) return // Предотвращаем повторные вызовы
+    
     const checkAuth = async () => {
       if (apiClient.isAuthenticated()) {
         try {
@@ -81,10 +86,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           avatar: null,
         }))
       }
+      
+      setHasInitialized(true) // Отмечаем, что инициализация завершена
     }
 
     checkAuth()
-  }, [])
+  }, [hasInitialized])
 
   const login = useCallback(async (credentials: LoginRequest) => {
     setState(prev => ({ ...prev, isLoading: true }))

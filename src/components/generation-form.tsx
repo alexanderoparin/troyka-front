@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useRef } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -8,16 +8,14 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
 import { apiClient, ImageRequest } from "@/lib/api-client"
-import { FileUpload } from "@/components/file-upload"
 import { useAuth } from "@/contexts/auth-context"
-import { Sparkles, Wand2, UploadCloud } from "lucide-react"
-import Image from "next/image"
+import { Wand2, UploadCloud, Layers, FileImage } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { getPointsText } from "@/lib/grammar"
 
 const generationSchema = z.object({
   prompt: z.string().min(10, "Описание должно содержать минимум 10 символов"),
-  numImages: z.number().min(1).max(4).default(1),
+  numImages: z.number().min(1).max(4).default(2),
   outputFormat: z.enum(['JPEG', 'PNG']).default('JPEG'),
 })
 
@@ -49,14 +47,13 @@ const STYLE_PRESETS = [
 interface GenerationFormProps {
   onGenerationComplete: (images: string[], prompt: string) => void
   initialPrompt?: string
+  initialImages?: string[]
 }
 
-export function GenerationForm({ onGenerationComplete, initialPrompt = "" }: GenerationFormProps) {
+export function GenerationForm({ onGenerationComplete, initialPrompt = "", initialImages = [] }: GenerationFormProps) {
   const [isGenerating, setIsGenerating] = useState(false)
-  const [uploadedImages, setUploadedImages] = useState<string[]>([])
-  const [generatedImages, setGeneratedImages] = useState<string[]>([])
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null)
-  const [uploadedFilePreview, setUploadedFilePreview] = useState<string | null>(null)
+  const [uploadedImages, setUploadedImages] = useState<string[]>(initialImages)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
   const { points, refreshPoints } = useAuth()
 
@@ -70,7 +67,7 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "" }: Gen
     resolver: zodResolver(generationSchema),
     defaultValues: {
       prompt: initialPrompt,
-      numImages: 1,
+      numImages: 2,
       outputFormat: 'JPEG',
     },
   })
@@ -83,6 +80,8 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "" }: Gen
   }, [initialPrompt, setValue])
 
   const prompt = watch("prompt")
+  const numImages = watch("numImages")
+  const outputFormat = watch("outputFormat")
   const canGenerate = true // Пока что убираем проверку поинтов
 
   const onSubmit = async (data: GenerationFormData) => {
@@ -119,7 +118,6 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "" }: Gen
       const response = await apiClient.generateImage(request)
 
       if (response.data) {
-        setGeneratedImages(response.data.imageUrls)
         // Вызываем callback для обновления родительского компонента
         onGenerationComplete(response.data.imageUrls, data.prompt)
         // Обновляем баланс после успешной генерации с небольшой задержкой
@@ -133,8 +131,6 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "" }: Gen
         // Очищаем форму после успешной генерации
         setValue("prompt", "")
         setUploadedImages([])
-        setUploadedFile(null)
-        setUploadedFilePreview(null)
       } else {
         throw new Error(response.error || "Ошибка генерации")
       }
@@ -150,33 +146,31 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "" }: Gen
     }
   }
 
-  const handleFileUploaded = (fileUrl: string) => {
-    setUploadedImages(prev => [...prev, fileUrl])
-  }
 
-  const handleFileRemoved = (fileUrl: string) => {
-    setUploadedImages(prev => prev.filter(url => url !== fileUrl))
-  }
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files
+    if (!files || files.length === 0) return
 
-  const handleFileSelected = (files: File[]) => {
-    if (files.length > 0) {
-      const file = files[0]
-      setUploadedFile(file)
-      setUploadedFilePreview(URL.createObjectURL(file))
+    const file = files[0]
+    
+    try {
+      const response = await apiClient.uploadFile(file)
+      if (response.data) {
+        setUploadedImages([response.data])
+        toast({
+          title: "Изображение загружено",
+          description: file.name,
+        })
+      } else {
+        throw new Error(response.error || "Ошибка загрузки файла")
+      }
+    } catch (error: any) {
       toast({
-        title: "Изображение загружено",
-        description: file.name,
+        title: "Ошибка загрузки",
+        description: error.message || "Не удалось загрузить файл",
+        variant: "destructive",
       })
     }
-  }
-
-  const handleFileRemovedFromPreview = () => {
-    setUploadedFile(null)
-    setUploadedFilePreview(null)
-    toast({
-      title: "Изображение удалено",
-      description: "Файл был удален из формы.",
-    })
   }
 
   const applyStylePreset = (preset: typeof STYLE_PRESETS[0]) => {
@@ -190,63 +184,84 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "" }: Gen
   return (
     <div className="generation-form space-y-6">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* Prompt Input - Main Required Field */}
+        {/* Prompt Input with Upload Button */}
         <div className="space-y-4">
-          <Textarea
-            {...register("prompt")}
-            placeholder={uploadedFilePreview
-              ? "Опишите, как изменить изображение..."
-              : "Опишите изображение, которое хотите создать..."
-            }
-            className={cn(
-              "min-h-[150px] text-base resize-none border-2 rounded-2xl px-6 py-4",
-              "focus:ring-4 focus:ring-primary/20 focus:border-primary",
-              "placeholder:text-muted-foreground/60",
-              "bg-background/70 transition-all duration-200",
-              errors.prompt && "border-destructive focus:border-destructive"
-            )}
-          />
-          
-          {errors.prompt && (
-            <p className="text-sm text-destructive">{errors.prompt.message}</p>
-          )}
-        </div>
-
-        {/* Image Upload or Preview */}
-        <div className="space-y-4">
-          {uploadedFilePreview ? (
-            <div className="relative w-full h-64 rounded-2xl overflow-hidden border-2 border-primary/50 group">
-              <Image
-                src={uploadedFilePreview}
-                alt="Uploaded preview"
-                fill
-                className="object-contain bg-muted"
+          <div className="relative">
+            <Textarea
+              {...register("prompt")}
+              placeholder={uploadedImages.length > 0
+                ? "Опишите, как изменить изображение..."
+                : initialPrompt 
+                  ? "Опишите изменения для изображения..."
+                  : "Опишите изображение, которое хотите создать..."
+              }
+              className={cn(
+                "min-h-[150px] text-base resize-none border-2 rounded-2xl px-6 py-4 pr-40",
+                "focus:ring-4 focus:ring-primary/20 focus:border-primary",
+                "placeholder:text-muted-foreground/60",
+                "bg-background/70 backdrop-blur-sm transition-all duration-200",
+                "shadow-lg hover:shadow-xl dark:shadow-2xl dark:hover:shadow-primary/10",
+                "border-border/50 hover:border-border",
+                errors.prompt && "border-destructive focus:border-destructive"
+              )}
+            />
+            
+            {/* Upload Button, Image Count and Format inside prompt area */}
+            <div className="absolute bottom-4 right-4 flex items-center gap-2">
+              {/* Format Button */}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const newFormat = outputFormat === 'JPEG' ? 'PNG' : 'JPEG'
+                  setValue("outputFormat", newFormat)
+                }}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/10 hover:bg-accent/20 text-accent-foreground border border-accent/20 transition-colors"
+              >
+                <FileImage className="w-4 h-4" />
+                <span className="text-sm font-medium">{outputFormat}</span>
+              </Button>
+              
+              {/* Image Count Button */}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const newCount = numImages >= 4 ? 1 : numImages + 1
+                  setValue("numImages", newCount)
+                }}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/10 hover:bg-secondary/20 text-secondary-foreground border border-secondary/20 transition-colors"
+              >
+                <Layers className="w-4 h-4" />
+                <span className="text-sm font-medium">{numImages}</span>
+              </Button>
+              
+              {/* Upload Button */}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="hidden"
+                ref={fileInputRef}
+                id="file-upload"
               />
               <Button
                 type="button"
-                variant="destructive"
-                size="icon"
-                className="absolute top-2 right-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={handleFileRemovedFromPreview}
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 transition-colors"
               >
-                ×
+                <UploadCloud className="w-4 h-4" />
+                <span className="text-sm font-medium">Фото</span>
               </Button>
             </div>
-          ) : (
-            <FileUpload
-              onFileUploaded={handleFileSelected}
-              onFileRemoved={handleFileRemoved}
-              uploadedFiles={uploadedImages}
-              maxFiles={1}
-              accept="image/*"
-              className="w-full h-48 flex items-center justify-center border-2 border-dashed border-border/50 rounded-2xl bg-background/70 hover:bg-background/50 transition-colors"
-            >
-              <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                <UploadCloud className="w-8 h-8" />
-                <span className="text-sm">Нажмите или перетащите файл для загрузки</span>
-                <span className="text-xs">(Макс. 20MB, JPG, PNG)</span>
-              </div>
-            </FileUpload>
+          </div>
+          
+          {errors.prompt && (
+            <p className="text-sm text-destructive">{errors.prompt.message}</p>
           )}
         </div>
 
@@ -262,6 +277,7 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "" }: Gen
             "disabled:opacity-50 disabled:cursor-not-allowed",
             "transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]",
             "shadow-2xl hover:shadow-3xl hover:shadow-primary/25",
+            "dark:shadow-primary/30 dark:hover:shadow-primary/40",
             "border border-primary/20"
           )}
         >

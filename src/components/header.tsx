@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -25,10 +26,12 @@ import {
   X
 } from "lucide-react"
 import { getPointsText } from "@/lib/grammar"
+import { cn } from "@/lib/utils"
 
 export function Header() {
   const { user, isAuthenticated, isLoading, logout, points, avatar } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const pathname = usePathname()
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -46,25 +49,37 @@ export function Header() {
           <nav className="hidden md:flex items-center space-x-6">
             <Link 
               href="/studio" 
-              className="text-sm font-medium transition-colors hover:text-primary"
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-primary",
+                pathname === "/studio" && "text-primary font-semibold"
+              )}
             >
               Студия
             </Link>
             <Link 
               href="/history" 
-              className="text-sm font-medium transition-colors hover:text-primary"
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-primary",
+                pathname === "/history" && "text-primary font-semibold"
+              )}
             >
               История генераций
             </Link>
             <Link 
               href="/pricing" 
-              className="text-sm font-medium transition-colors hover:text-primary"
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-primary",
+                pathname === "/pricing" && "text-primary font-semibold"
+              )}
             >
               Цены
             </Link>
             <Link 
               href="/contacts" 
-              className="text-sm font-medium transition-colors hover:text-primary"
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-primary",
+                pathname === "/contacts" && "text-primary font-semibold"
+              )}
             >
               Контакты
             </Link>
@@ -196,35 +211,50 @@ export function Header() {
             <nav className="flex flex-col space-y-3">
               <Link 
                 href="/studio" 
-                className="text-sm font-medium transition-colors hover:text-primary"
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-primary",
+                  pathname === "/studio" && "text-primary font-semibold"
+                )}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Студия
               </Link>
               <Link 
                 href="/history" 
-                className="text-sm font-medium transition-colors hover:text-primary"
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-primary",
+                  pathname === "/history" && "text-primary font-semibold"
+                )}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 История генераций
               </Link>
               <Link 
                 href="/payment-history" 
-                className="text-sm font-medium transition-colors hover:text-primary"
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-primary",
+                  pathname === "/payment-history" && "text-primary font-semibold"
+                )}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 История платежей
               </Link>
               <Link 
                 href="/pricing" 
-                className="text-sm font-medium transition-colors hover:text-primary"
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-primary",
+                  pathname === "/pricing" && "text-primary font-semibold"
+                )}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Цены
               </Link>
               <Link 
                 href="/contacts" 
-                className="text-sm font-medium transition-colors hover:text-primary"
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-primary",
+                  pathname === "/contacts" && "text-primary font-semibold"
+                )}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Контакты

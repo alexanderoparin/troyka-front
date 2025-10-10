@@ -556,8 +556,8 @@ class ApiClient {
     return this.request<UserInfo>('/api/users/me');
   }
 
-  async getImageHistory(): Promise<ApiResponse<ImageGenerationHistory[]>> {
-    return this.request<ImageGenerationHistory[]>('/api/users/me/image-history');
+  async getImageHistory(page: number = 0, size: number = 10): Promise<ApiResponse<ImageGenerationHistory[]>> {
+    return this.request<ImageGenerationHistory[]>(`/api/users/me/image-history?page=${page}&size=${size}`);
   }
 
   // Get user points/balance
