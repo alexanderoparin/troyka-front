@@ -263,6 +263,29 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
           {errors.prompt && (
             <p className="text-sm text-destructive">{errors.prompt.message}</p>
           )}
+          
+          {/* Превью загруженного изображения */}
+          {uploadedImages.length > 0 && (
+            <div className="mt-4">
+              <p className="text-sm text-muted-foreground mb-2">Загруженное изображение:</p>
+              <div className="relative inline-block">
+                <img
+                  src={uploadedImages[0]}
+                  alt="Загруженное изображение"
+                  className="max-w-xs max-h-48 rounded-lg border border-border/50 shadow-sm"
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => setUploadedImages([])}
+                  className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                >
+                  ×
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
 
 

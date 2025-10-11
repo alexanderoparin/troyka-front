@@ -313,6 +313,7 @@ class ApiClient {
       const fileUrl = await response.text();
       // Если URL относительный, делаем его абсолютным
       const fullUrl = fileUrl.startsWith('http') ? fileUrl : `${this.baseUrl}${fileUrl}`;
+      
       return {
         data: fullUrl,
         status: response.status,
