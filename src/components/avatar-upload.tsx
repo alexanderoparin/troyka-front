@@ -239,7 +239,7 @@ export function AvatarUpload({
         onClick={handleAvatarClick}
       >
         <AvatarImage 
-          src={previewUrl || (currentAvatar ? apiClient.getFileUrl(currentAvatar) : undefined)} 
+          src={previewUrl || currentAvatar || undefined} 
           alt="Аватар пользователя"
         />
         <AvatarFallback className="text-xs font-medium">
