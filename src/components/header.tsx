@@ -18,7 +18,6 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { 
   User, 
   LogOut, 
-  History, 
   CreditCard,
   Plus,
   Sparkles,
@@ -151,12 +150,6 @@ export function Header() {
                     <Link href="/account">
                       <User className="mr-2 h-4 w-4" />
                       Аккаунт
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/history">
-                      <History className="mr-2 h-4 w-4" />
-                      История генераций
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
