@@ -529,22 +529,16 @@ class ApiClient {
 
   // Get file URL
   getFileUrl(filename: string): string {
-    // Если filename уже полный URL, заменяем HTTP на HTTPS и IP на домен
-    if (filename.startsWith('http://')) {
-      let url = filename.replace('http://', 'https://');
-      // Заменяем IP адрес на домен для правильного SSL
-      url = url.replace('213.171.4.47:8080', '24reshai.ru');
-      return url;
-    }
-    if (filename.startsWith('https://')) {
+    // Если filename уже полный URL, возвращаем как есть
+    if (filename.startsWith('http://') || filename.startsWith('https://')) {
       return filename;
     }
-    // Если filename начинается с /files/, заменяем на /api/files/
+    // Если filename начинается с /files/, используем напрямую (для аватаров и других файлов)
     if (filename.startsWith('/files/')) {
-      return `${this.baseUrl}/api${filename}`;
+      return `${this.baseUrl}${filename}`;
     }
     // Иначе добавляем /files/ к filename
-    return `${this.baseUrl}/api/files/${filename}`;
+    return `${this.baseUrl}/files/${filename}`;
   }
 
   // Get example file URL
