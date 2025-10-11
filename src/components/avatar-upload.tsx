@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useToast } from "@/components/ui/use-toast"
 import { apiClient } from "@/lib/api-client"
-import { Camera, X, User } from "lucide-react"
+import { Camera, X, User, MoreVertical } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 
 interface AvatarUploadProps {
@@ -175,12 +175,13 @@ export function AvatarUpload({
   const handleAvatarClick = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    // Если есть аватар, открываем меню для замены/удаления
     // Если нет аватара, сразу открываем загрузку
-    if (currentAvatar) {
-      setShowMenu(!showMenu)
-    } else {
+    if (!currentAvatar) {
       handleUploadClick()
+    }
+    // Если есть аватар, показываем меню
+    else {
+      setShowMenu(!showMenu)
     }
   }
 
@@ -234,7 +235,7 @@ export function AvatarUpload({
   return (
     <div className={`relative inline-block avatar-upload-container ${className}`}>
       <Avatar 
-        className={`${sizeClasses[size]} cursor-pointer group ${isMobile && !showMenu ? 'ring-2 ring-blue-500/50' : ''}`}
+        className={`${sizeClasses[size]} cursor-pointer group hover:ring-2 hover:ring-primary/50 transition-all duration-200 ${isMobile && !showMenu ? 'ring-2 ring-blue-500/50' : ''}`}
         onClick={handleAvatarClick}
       >
         <AvatarImage 
@@ -246,37 +247,37 @@ export function AvatarUpload({
         </AvatarFallback>
       </Avatar>
       
-      {/* Overlay с кнопками - показывается при hover на десктопе или при клике на мобильных */}
-      <div className={`absolute inset-0 flex items-center justify-center bg-black/50 rounded-full transition-opacity ${
-        showMenu ? 'opacity-100' : (isMobile ? 'opacity-0' : 'opacity-0 group-hover:opacity-100')
-      }`}>
-        <div className="flex gap-1">
-          <Button
-            size="sm"
-            variant="secondary"
-            className="h-6 w-6 p-0"
-            onClick={handleUploadClick}
-            disabled={isUploading}
-          >
-            {isUploading ? (
-              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white" />
-            ) : (
-              <Camera className="h-3 w-3" />
-            )}
-          </Button>
-          
-          {currentAvatar && (
+      {/* Выпадающее меню */}
+      {showMenu && (
+        <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-background border border-border rounded-lg shadow-lg z-50 min-w-[160px]">
+          <div className="py-1">
             <Button
-              size="sm"
-              variant="destructive"
-              className="h-6 w-6 p-0"
-              onClick={handleRemoveClick}
+              variant="ghost"
+              className="w-full justify-start px-3 py-2 h-auto text-sm"
+              onClick={handleUploadClick}
+              disabled={isUploading}
             >
-              <X className="h-3 w-3" />
+              {isUploading ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
+              ) : (
+                <Camera className="h-4 w-4 mr-2" />
+              )}
+              {isUploading ? 'Загрузка...' : 'Изменить аватар'}
             </Button>
-          )}
+            
+            {currentAvatar && (
+              <Button
+                variant="ghost"
+                className="w-full justify-start px-3 py-2 h-auto text-sm text-destructive hover:text-destructive hover:bg-destructive/10"
+                onClick={handleRemoveClick}
+              >
+                <X className="h-4 w-4 mr-2" />
+                Удалить аватар
+              </Button>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Скрытый input для выбора файла */}
       <input
