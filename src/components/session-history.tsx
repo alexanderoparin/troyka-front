@@ -285,7 +285,7 @@ export function SessionHistory({
                   </div>
                   <div className="flex-1">
                     <Card className="p-3">
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="flex flex-wrap gap-2">
                         {message.imageUrls.map((imageUrl, index) => (
                           <div
                             key={index}
@@ -298,24 +298,26 @@ export function SessionHistory({
                             <img
                               src={imageUrl}
                               alt={`Сгенерированное изображение ${index + 1}`}
-                              className="w-full h-32 object-cover"
+                              className="w-20 h-24 sm:w-24 sm:h-32 object-cover"
                             />
                             
                             {/* Overlay с действиями */}
-                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
                               <Button
                                 size="sm"
                                 variant="secondary"
+                                className="h-5 w-5 p-0 text-xs"
                                 onClick={(e) => {
                                   e.stopPropagation()
                                   handleUseImage(imageUrl)
                                 }}
                               >
-                                Использовать
+                                <Plus className="h-3 w-3" />
                               </Button>
                               <Button
                                 size="sm"
                                 variant="secondary"
+                                className="h-5 w-5 p-0"
                                 onClick={(e) => {
                                   e.stopPropagation()
                                   downloadImage(imageUrl, `generated-${message.id}-${index + 1}.jpg`)
@@ -326,6 +328,7 @@ export function SessionHistory({
                               <Button
                                 size="sm"
                                 variant="secondary"
+                                className="h-5 w-5 p-0"
                                 onClick={(e) => {
                                   e.stopPropagation()
                                   handleCopyImageUrl(imageUrl)

@@ -108,7 +108,7 @@ export function StudioDialog({
       {/* Область сгенерированных изображений */}
       {generatedImages.length > 0 && (
         <div className="mb-6">
-          <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="flex flex-wrap gap-2 mb-4">
             {generatedImages.map((imageUrl, index) => (
               <div
                 key={index}
@@ -120,7 +120,7 @@ export function StudioDialog({
                 )}
                 onClick={() => handleImageSelect(imageUrl)}
               >
-                <div className="aspect-[3/4] relative">
+                <div className="w-24 h-32 sm:w-32 sm:h-40 relative">
                   <Image
                     src={imageUrl}
                     alt={`Сгенерированное изображение ${index + 1}`}
@@ -129,26 +129,28 @@ export function StudioDialog({
                   />
                   
                   {/* Overlay с действиями */}
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
                     <Button
                       size="sm"
                       variant="secondary"
+                      className="h-6 w-6 p-0"
                       onClick={(e) => {
                         e.stopPropagation()
                         window.open(imageUrl, '_blank')
                       }}
                     >
-                      <Eye className="h-4 w-4" />
+                      <Eye className="h-3 w-3" />
                     </Button>
                     <Button
                       size="sm"
                       variant="secondary"
+                      className="h-6 w-6 p-0"
                       onClick={(e) => {
                         e.stopPropagation()
                         // Скачивание изображения
                       }}
                     >
-                      <Download className="h-4 w-4" />
+                      <Download className="h-3 w-3" />
                     </Button>
                   </div>
 

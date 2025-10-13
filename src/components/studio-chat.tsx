@@ -299,7 +299,7 @@ export function StudioChat({
                   </div>
                   <div className="flex-1">
                     <Card className="p-4">
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="flex flex-wrap gap-2">
                         {message.imageUrls.map((imageUrl, index) => (
                           <div
                             key={index}
@@ -311,7 +311,7 @@ export function StudioChat({
                             )}
                             onClick={() => handleImageSelect(imageUrl)}
                           >
-                            <div className="aspect-[3/4] relative">
+                            <div className="w-24 h-32 sm:w-32 sm:h-40 relative">
                               <Image
                                 src={imageUrl}
                                 alt={`Сгенерированное изображение ${index + 1}`}
@@ -320,39 +320,42 @@ export function StudioChat({
                               />
                               
                               {/* Overlay с действиями */}
-                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
                                 <Button
                                   size="sm"
                                   variant="secondary"
+                                  className="h-6 w-6 p-0"
                                   onClick={(e) => {
                                     e.stopPropagation()
                                     window.open(imageUrl, '_blank')
                                   }}
                                 >
-                                  <Eye className="h-4 w-4" />
+                                  <Eye className="h-3 w-3" />
                                 </Button>
                                 <Button
                                   size="sm"
                                   variant="secondary"
+                                  className="h-6 w-6 p-0"
                                   onClick={(e) => {
                                     e.stopPropagation()
                                     downloadImage(imageUrl, `generated-${message.id}-${index + 1}.jpg`)
                                   }}
                                 >
-                                  <Download className="h-4 w-4" />
+                                  <Download className="h-3 w-3" />
                                 </Button>
                                 <Button
                                   size="sm"
                                   variant="secondary"
+                                  className="h-6 w-6 p-0"
                                   onClick={(e) => {
                                     e.stopPropagation()
                                     handleCopyImageUrl(imageUrl)
                                   }}
                                 >
                                   {copiedImageUrl === imageUrl ? (
-                                    <Check className="h-4 w-4" />
+                                    <Check className="h-3 w-3" />
                                   ) : (
-                                    <Copy className="h-4 w-4" />
+                                    <Copy className="h-3 w-3" />
                                   )}
                                 </Button>
                               </div>
