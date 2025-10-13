@@ -18,6 +18,13 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useSessionHistory } from "@/hooks/use-session-detail"
+
+// Функция для правильного склонения слова "изображение"
+const getImageText = (count: number) => {
+  if (count === 1) return 'изображение'
+  if (count >= 2 && count <= 4) return 'изображения'
+  return 'изображений'
+}
 import { SessionMessage } from "@/lib/api-client"
 import { useToast } from "@/components/ui/use-toast"
 import { apiClient } from "@/lib/api-client"
@@ -81,7 +88,7 @@ export function SessionHistory({
       setSelectedImages([])
       toast({
         title: "Изображения выбраны",
-        description: `${selectedImages.length} изображений добавлено в форму`,
+        description: `${selectedImages.length} ${getImageText(selectedImages.length)} добавлено в форму`,
       })
     }
   }
@@ -262,13 +269,15 @@ export function SessionHistory({
                     </div>
                   </div>
                   <div className="flex-1">
-                    <Card className="p-3">
-                      <p className="text-sm">{message.prompt}</p>
+                    <Card className="p-3 bg-muted/50 dark:bg-muted/20">
+                      <p className="text-sm">
+                        {message.prompt.replace(/\. Соотношение сторон изображения - \d+:\d+$/, '')}
+                      </p>
                       <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
                         <span>{formatDate(message.createdAt)}</span>
                         {message.inputImageUrls && message.inputImageUrls.length > 0 && (
                           <Badge variant="outline" className="text-xs">
-                            {message.inputImageUrls.length} входных изображений
+                            {message.inputImageUrls.length} входных {getImageText(message.inputImageUrls.length)}
                           </Badge>
                         )}
                       </div>
@@ -284,7 +293,7 @@ export function SessionHistory({
                     </div>
                   </div>
                   <div className="flex-1">
-                    <Card className="p-3">
+                    <Card className="p-3 bg-muted/50 dark:bg-muted/20">
                       <div className="flex flex-wrap gap-2">
                         {message.imageUrls.map((imageUrl, index) => (
                           <div
@@ -298,7 +307,7 @@ export function SessionHistory({
                             <img
                               src={imageUrl}
                               alt={`Сгенерированное изображение ${index + 1}`}
-                              className="w-20 h-24 sm:w-24 sm:h-32 object-cover"
+                              className="w-36 h-44 sm:w-40 sm:h-48 object-cover"
                             />
                             
                             {/* Overlay с действиями */}
@@ -356,7 +365,7 @@ export function SessionHistory({
                       
                       <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
                         <ImageIcon className="h-3 w-3" />
-                        <span>{message.imageCount} изображений</span>
+                        <span>{message.imageCount} {getImageText(message.imageCount)}</span>
                         <span>•</span>
                         <span>{message.outputFormat}</span>
                       </div>

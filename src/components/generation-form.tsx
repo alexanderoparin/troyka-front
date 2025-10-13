@@ -54,6 +54,7 @@ interface GenerationFormProps {
 export function GenerationForm({ onGenerationComplete, initialPrompt = "", initialImages = [], sessionId }: GenerationFormProps) {
   const [isGenerating, setIsGenerating] = useState(false)
   const [uploadedImages, setUploadedImages] = useState<string[]>(initialImages)
+  const [aspectRatio, setAspectRatio] = useState('1:1')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
   const { points, refreshPoints } = useAuth()
@@ -109,9 +110,12 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
     setIsGenerating(true)
 
     try {
+      // Добавляем соотношение сторон в конец промпта
+      const promptWithAspectRatio = `${data.prompt}. Соотношение сторон изображения - ${aspectRatio}`
+      
       const request: ImageRequest = {
-        prompt: data.prompt,
-        inputImageUrls: uploadedImages.length > 0 ? uploadedImages : undefined,
+        prompt: promptWithAspectRatio,
+        inputImageUrls: uploadedImages.length > 0 ? uploadedImages : [],
         numImages: data.numImages,
         outputFormat: data.outputFormat,
         sessionId: sessionId
@@ -240,6 +244,23 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
                 <span className="text-sm font-medium">{numImages}</span>
               </Button>
               
+              {/* Соотношение сторон */}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const aspectRatios = ['1:1', '4:3', '4:5', '3:2', '2:3', '16:9', '9:16', '7.5:2']
+                  const currentIndex = aspectRatios.indexOf(aspectRatio)
+                  const nextIndex = (currentIndex + 1) % aspectRatios.length
+                  setAspectRatio(aspectRatios[nextIndex])
+                }}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/10 hover:bg-accent/20 text-accent-foreground border border-accent/20 transition-colors"
+              >
+                <FileImage className="w-4 h-4" />
+                <span className="text-sm font-medium">{aspectRatio}</span>
+              </Button>
+              
               {/* Upload Button */}
               <input
                 type="file"
@@ -266,26 +287,27 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
             <p className="text-sm text-destructive">{errors.prompt.message}</p>
           )}
           
-          {/* Превью загруженного изображения */}
+          {/* Миниатюры загруженных изображений */}
           {uploadedImages.length > 0 && (
-            <div className="mt-4">
-              <p className="text-sm text-muted-foreground mb-2">Загруженное изображение:</p>
-              <div className="relative inline-block">
-                <img
-                  src={uploadedImages[0]}
-                  alt="Загруженное изображение"
-                  className="max-w-xs max-h-48 rounded-lg border border-border/50 shadow-sm"
-                />
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => setUploadedImages([])}
-                  className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
-                >
-                  ×
-                </Button>
-              </div>
+            <div className="mt-3 flex gap-2">
+              {uploadedImages.map((imageUrl, index) => (
+                <div key={index} className="relative w-8 h-8 rounded-lg overflow-hidden border border-border/50 group">
+                  <img
+                    src={imageUrl}
+                    alt={`Загруженное изображение ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => setUploadedImages(prev => prev.filter((_, i) => i !== index))}
+                    className="absolute -top-1 -right-1 h-4 w-4 rounded-full p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    ×
+                  </Button>
+                </div>
+              ))}
             </div>
           )}
         </div>

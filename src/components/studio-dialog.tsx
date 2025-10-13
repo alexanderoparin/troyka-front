@@ -120,7 +120,7 @@ export function StudioDialog({
                 )}
                 onClick={() => handleImageSelect(imageUrl)}
               >
-                <div className="w-24 h-32 sm:w-32 sm:h-40 relative">
+                <div className="w-40 h-48 sm:w-48 sm:h-56 relative">
                   <Image
                     src={imageUrl}
                     alt={`Сгенерированное изображение ${index + 1}`}

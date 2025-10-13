@@ -20,6 +20,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/components/ui/use-toast"
+import { apiClient } from "@/lib/api-client"
 import {
   Tooltip,
   TooltipContent,
@@ -48,12 +49,19 @@ export function StudioChat({
   const [numImages, setNumImages] = useState(2)
   const [outputFormat, setOutputFormat] = useState<'JPEG' | 'PNG'>('JPEG')
   const [aspectRatio, setAspectRatio] = useState('1:1')
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null)
+  const [uploadedImages, setUploadedImages] = useState<string[]>([])
   
   const aspectRatios = ['1:1', '4:3', '4:5', '3:2', '2:3', '16:9', '9:16', '7.5:2']
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
+
+  // Функция для правильного склонения слова "изображение"
+  const getImageText = (count: number) => {
+    if (count === 1) return 'изображение'
+    if (count >= 2 && count <= 4) return 'изображения'
+    return 'изображений'
+  }
 
   const {
     history,
@@ -89,7 +97,7 @@ export function StudioChat({
 
     // Создаем URL для предварительного просмотра
     const imageUrl = URL.createObjectURL(file)
-    setUploadedImage(imageUrl)
+    setUploadedImages([imageUrl])
     
     toast({
       title: "Изображение загружено",
@@ -109,23 +117,34 @@ export function StudioChat({
 
     setIsGenerating(true)
     try {
-      // Здесь будет вызов API для генерации
-      // Пока что симуляция
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      // Добавляем соотношение сторон в промпт
+      const promptWithAspectRatio = `${prompt}. Соотношение сторон изображения - ${aspectRatio}`
       
-      // Симулируем результат
-      const mockImages = Array.from({ length: numImages }, (_, i) => 
-        `https://via.placeholder.com/400x600/4F46E5/FFFFFF?text=Generated+${i + 1}`
-      )
+      // Вызываем API для генерации
+      const request = {
+        prompt: promptWithAspectRatio,
+        inputImageUrls: uploadedImages.length > 0 ? uploadedImages : [],
+        numImages: numImages,
+        outputFormat: outputFormat,
+        sessionId: sessionId
+      }
       
-      onGenerationComplete(mockImages, prompt)
-      setPrompt("")
-      setUploadedImage(null)
+      console.log('Отправляем запрос на генерацию:', request)
+      console.log('uploadedImages:', uploadedImages)
+      const response = await apiClient.generateImage(request)
       
-      toast({
-        title: "Изображения созданы!",
-        description: `Создано ${numImages} изображений в формате ${outputFormat} (${aspectRatio})`,
-      })
+      if (response.data) {
+        onGenerationComplete(response.data.imageUrls, promptWithAspectRatio)
+        setPrompt("")
+        setUploadedImage(null)
+        
+        toast({
+          title: "Изображения созданы!",
+          description: `Создано ${response.data.imageUrls.length} ${getImageText(response.data.imageUrls.length)} в формате ${outputFormat} (${aspectRatio})`,
+        })
+      } else {
+        throw new Error(response.error || 'Ошибка генерации')
+      }
     } catch (error) {
       toast({
         title: "Ошибка генерации",
@@ -138,10 +157,17 @@ export function StudioChat({
   }, [prompt, numImages, outputFormat, onGenerationComplete, toast])
 
   const handleImageSelect = (imageUrl: string) => {
+    console.log('handleImageSelect вызвана, imageUrl:', imageUrl, 'selectedImages:', selectedImages)
     if (selectedImages.includes(imageUrl)) {
+      // Удаляем изображение из выбора и из загруженных
       setSelectedImages(prev => prev.filter(url => url !== imageUrl))
+      setUploadedImages(prev => prev.filter(url => url !== imageUrl))
+      console.log('Изображение удалено из выбора')
     } else if (selectedImages.length < 4) {
+      // Добавляем изображение в выбор и сразу в загруженные для редактирования
       setSelectedImages(prev => [...prev, imageUrl])
+      setUploadedImages(prev => [...prev, imageUrl])
+      console.log('Изображение добавлено в выбор и загружено для редактирования')
     } else {
       toast({
         title: "Максимум изображений",
@@ -151,15 +177,6 @@ export function StudioChat({
     }
   }
 
-  const handleUseSelectedImages = () => {
-    if (selectedImages.length > 0) {
-      setPrompt("") // Очищаем промпт для нового редактирования
-      toast({
-        title: "Изображения выбраны",
-        description: `${selectedImages.length} изображений выбрано для редактирования`,
-      })
-    }
-  }
 
   const handleCopyImageUrl = async (imageUrl: string) => {
     try {
@@ -232,7 +249,7 @@ export function StudioChat({
       <div className={cn("h-full flex flex-col", className)}>
       {/* История диалога */}
       <ScrollArea ref={scrollAreaRef} className="flex-1 p-6">
-        <div className="space-y-6 pb-6">
+        <div className="space-y-6 pb-32">
           {/* Кнопка загрузки предыдущих сообщений */}
           {hasMore && (
             <div className="flex justify-center">
@@ -267,39 +284,63 @@ export function StudioChat({
             </div>
           ) : (
             history.map((message) => (
-              <div key={message.id} className="space-y-4">
-                {/* Сообщение пользователя (промпт) */}
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <User className="h-5 w-5 text-primary" />
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <Card className="p-4">
-                      <p className="text-sm leading-relaxed">{message.prompt}</p>
-                      <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
-                        <span>{formatDate(message.createdAt)}</span>
-                        {message.inputImageUrls && message.inputImageUrls.length > 0 && (
-                          <Badge variant="outline" className="text-xs">
-                            {message.inputImageUrls.length} входных изображений
-                          </Badge>
-                        )}
+              <div key={message.id} className="mb-6">
+                {/* Промпт слева, изображения справа */}
+                <div className="flex flex-col lg:flex-row gap-6">
+                  {/* Левая часть - промпт */}
+                  <div className="flex-1 lg:max-w-xs">
+                    <div className="flex gap-3">
+                      <div className="flex-shrink-0">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                          <User className="h-4 w-4 text-primary" />
+                        </div>
                       </div>
-                    </Card>
-                  </div>
-                </div>
-
-                {/* Ответ AI (изображения) */}
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
-                      <Bot className="h-5 w-5 text-secondary-foreground" />
+                      <div className="flex-1">
+                        <Card className="p-4 bg-muted/50 dark:bg-muted/20">
+                          <p className="text-sm leading-relaxed text-foreground">
+                            {message.prompt.replace(/\. Соотношение сторон изображения - \d+:\d+$/, '')}
+                          </p>
+                          
+                          {/* Миниатюры входных изображений */}
+                          {message.inputImageUrls && message.inputImageUrls.length > 0 && (
+                            <div className="mt-3 flex gap-2">
+                              {message.inputImageUrls.map((imageUrl, index) => (
+                                <div key={index} className="relative w-8 h-8 rounded-lg overflow-hidden border border-border/50">
+                                  <Image
+                                    src={imageUrl}
+                                    alt={`Входное изображение ${index + 1}`}
+                                    fill
+                                    className="object-cover"
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          
+                          <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
+                            <span>{formatDate(message.createdAt)}</span>
+                            {message.inputImageUrls && message.inputImageUrls.length > 0 && (
+                              <Badge variant="outline" className="text-xs">
+                                {message.inputImageUrls.length} входных {getImageText(message.inputImageUrls.length)}
+                              </Badge>
+                            )}
+                          </div>
+                        </Card>
+                      </div>
                     </div>
                   </div>
+
+                  {/* Правая часть - изображения */}
                   <div className="flex-1">
-                    <Card className="p-4">
-                      <div className="flex flex-wrap gap-2">
+                    <div className="flex gap-3">
+                      <div className="flex-shrink-0">
+                        <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
+                          <Bot className="h-4 w-4 text-secondary-foreground" />
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <Card className="p-4 bg-muted/50 dark:bg-muted/20">
+                          <div className="flex flex-wrap gap-2">
                         {message.imageUrls.map((imageUrl, index) => (
                           <div
                             key={index}
@@ -311,7 +352,7 @@ export function StudioChat({
                             )}
                             onClick={() => handleImageSelect(imageUrl)}
                           >
-                            <div className="w-24 h-32 sm:w-32 sm:h-40 relative">
+                            <div className="w-48 h-56 sm:w-56 sm:h-64 relative">
                               <Image
                                 src={imageUrl}
                                 alt={`Сгенерированное изображение ${index + 1}`}
@@ -375,13 +416,15 @@ export function StudioChat({
                         ))}
                       </div>
                       
-                      <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
-                        <ImageIcon className="h-3 w-3" />
-                        <span>{message.imageCount} изображений</span>
-                        <span>•</span>
-                        <span>{message.outputFormat}</span>
+                          <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
+                            <ImageIcon className="h-3 w-3" />
+                            <span>{message.imageCount} {getImageText(message.imageCount)}</span>
+                            <span>•</span>
+                            <span>{message.outputFormat}</span>
+                          </div>
+                        </Card>
                       </div>
-                    </Card>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -394,45 +437,52 @@ export function StudioChat({
             <div className="fixed bottom-12 left-0 right-0 z-50">
               <div className="flex justify-center px-6">
                 <div className="bg-background/95 backdrop-blur-md border border-border/20 rounded-2xl shadow-2xl px-4 pt-4 pb-3 min-w-[600px] max-w-[700px] w-full">
-          {/* Загруженное изображение */}
-          {uploadedImage && (
+          {/* Загруженные изображения */}
+          {uploadedImages.length > 0 && (
             <div className="mb-3">
               <div className="flex items-center gap-2 mb-2">
                 <Badge variant="secondary">
-                  Изображение загружено
+                  {uploadedImages.length} {getImageText(uploadedImages.length)} выбрано для редактирования
                 </Badge>
+                {/* Миниатюры изображений справа от текста */}
+                <div className="flex gap-1">
+                  {uploadedImages.map((imageUrl, index) => (
+                    <div key={index} className="relative w-6 h-6 rounded overflow-hidden border group">
+                      <Image
+                        src={imageUrl}
+                        alt={`Загруженное изображение ${index + 1}`}
+                        fill
+                        className="object-cover"
+                      />
+                      <Button
+                        onClick={() => {
+                          const imageUrl = uploadedImages[index]
+                          setUploadedImages(prev => prev.filter((_, i) => i !== index))
+                          setSelectedImages(prev => prev.filter(url => url !== imageUrl))
+                        }}
+                        size="sm"
+                        variant="destructive"
+                        className="absolute -top-1 -right-1 h-3 w-3 p-0 opacity-0 group-hover:opacity-100 transition-opacity text-xs"
+                      >
+                        ×
+                      </Button>
+                    </div>
+                  ))}
+                </div>
                 <Button 
-                  onClick={() => setUploadedImage(null)} 
+                  onClick={() => {
+                    setUploadedImages([])
+                    setSelectedImages([])
+                  }} 
                   size="sm" 
                   variant="outline"
                 >
-                  Удалить
+                  Удалить все
                 </Button>
-              </div>
-              <div className="relative w-20 h-20 rounded-lg overflow-hidden">
-                <Image
-                  src={uploadedImage}
-                  alt="Загруженное изображение"
-                  fill
-                  className="object-cover"
-                />
               </div>
             </div>
           )}
 
-          {/* Выбранные изображения */}
-          {selectedImages.length > 0 && (
-            <div className="mb-3">
-              <div className="flex items-center gap-2 mb-2">
-                <Badge variant="secondary">
-                  {selectedImages.length} изображений выбрано
-                </Badge>
-                <Button onClick={handleUseSelectedImages} size="sm" variant="outline">
-                  Использовать для редактирования
-                </Button>
-              </div>
-            </div>
-          )}
 
                   {/* Поле ввода промпта */}
                   <div className="mb-3">
