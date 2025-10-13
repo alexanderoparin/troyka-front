@@ -104,7 +104,7 @@ export default function HistoryPage() {
                 <div key={index} className="group border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
                   <div className="relative aspect-square bg-muted">
                   <Image
-                      src={apiClient.getFileUrl(item.imageUrl)}
+                      src={apiClient.getFileUrl(item.imageUrls[0])}
                       alt={item.prompt}
                     fill
                       className="object-cover group-hover:scale-105 transition-transform duration-200"
@@ -119,7 +119,7 @@ export default function HistoryPage() {
                         className="h-8 w-8 p-0"
                       >
                         <a
-                          href={apiClient.getFileUrl(item.imageUrl)}
+                          href={apiClient.getFileUrl(item.imageUrls[0])}
                           target="_blank"
                           rel="noopener noreferrer"
                         >
@@ -127,7 +127,7 @@ export default function HistoryPage() {
                         </a>
                       </Button>
                       <ImageEditButton
-                        imageUrl={item.imageUrl}
+                        imageUrl={item.imageUrls[0]}
                         originalPrompt={item.prompt}
                         onImageEdited={() => {
                           // Обновляем историю после редактирования
@@ -149,7 +149,7 @@ export default function HistoryPage() {
                         className="h-6 px-2 text-xs"
                       >
                         <a
-                          href={apiClient.getFileUrl(item.imageUrl)}
+                          href={apiClient.getFileUrl(item.imageUrls[0])}
                           download
                           target="_blank"
                           rel="noopener noreferrer"

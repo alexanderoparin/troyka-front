@@ -93,6 +93,7 @@ export function StudioSessions({
       await createSession({ name: newSessionName.trim() })
       setIsCreateDialogOpen(false)
       setNewSessionName("")
+      setPage(0) // Сбрасываем на первую страницу
       toast({
         title: "Сессия создана",
         description: `Сессия "${newSessionName.trim()}" успешно создана`,

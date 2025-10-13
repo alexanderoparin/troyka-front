@@ -61,6 +61,13 @@ export function StudioChat({
     return 'изображений'
   }
 
+  // Функция для правильного склонения слова "входное изображение"
+  const getInputImageText = (count: number) => {
+    if (count === 1) return 'входное изображение'
+    if (count >= 2 && count <= 4) return 'входных изображения'
+    return 'входных изображений'
+  }
+
   const {
     history,
     hasMore,
@@ -317,7 +324,7 @@ export function StudioChat({
                             <span>{formatDate(message.createdAt)}</span>
                             {message.inputImageUrls && message.inputImageUrls.length > 0 && (
                               <Badge variant="outline" className="text-xs">
-                                {message.inputImageUrls.length} входных {getImageText(message.inputImageUrls.length)}
+                                {getInputImageText(message.inputImageUrls.length)}
                               </Badge>
                             )}
                           </div>

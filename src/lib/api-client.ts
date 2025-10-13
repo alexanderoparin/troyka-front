@@ -55,7 +55,6 @@ export interface SessionMessage {
   prompt: string;
   imageUrls: string[];
   inputImageUrls: string[];
-  iterationNumber: number;
   createdAt: string;
   imageCount: number;
   outputFormat: string;
@@ -124,7 +123,7 @@ export interface UserInfo {
 }
 
 export interface ImageGenerationHistory {
-  imageUrl: string;
+  imageUrls: string[];
   prompt: string;
   createdAt: string;
 }

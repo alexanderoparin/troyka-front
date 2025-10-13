@@ -26,6 +26,13 @@ const getImageText = (count: number) => {
   if (count >= 2 && count <= 4) return 'изображения'
   return 'изображений'
 }
+
+// Функция для правильного склонения слова "входное изображение"
+const getInputImageText = (count: number) => {
+  if (count === 1) return 'входное изображение'
+  if (count >= 2 && count <= 4) return 'входных изображения'
+  return 'входных изображений'
+}
 import { useToast } from "@/components/ui/use-toast"
 
 interface SessionHistoryProps {
@@ -274,7 +281,7 @@ export function SessionHistory({
                         <span>{formatDate(message.createdAt)}</span>
                         {message.inputImageUrls && message.inputImageUrls.length > 0 && (
                           <Badge variant="outline" className="text-xs">
-                            {message.inputImageUrls.length} входных {getImageText(message.inputImageUrls.length)}
+                            {getInputImageText(message.inputImageUrls.length)}
                           </Badge>
                         )}
                       </div>

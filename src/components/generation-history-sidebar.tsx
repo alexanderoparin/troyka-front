@@ -83,7 +83,7 @@ export const GenerationHistorySidebar: React.FC<GenerationHistorySidebarProps> =
     
     if (refreshTrigger > lastRefreshTriggerRef.current && history.length > 0 && newImagesCount > 0) {
       // Находим новые изображения (первые в списке)
-      const newImages = history.slice(0, newImagesCount).map(item => item.imageUrl)
+      const newImages = history.slice(0, newImagesCount).flatMap(item => item.imageUrls)
       const newPrompts = history.slice(0, newImagesCount).map(item => item.prompt || "")
       
       console.log('Selecting new images:', newImages)
@@ -101,14 +101,14 @@ export const GenerationHistorySidebar: React.FC<GenerationHistorySidebarProps> =
       // Убираем из выбранных
       const newSelected = selectedImages.filter(url => url !== imageUrl)
       const newPrompts = history
-        .filter(item => newSelected.includes(item.imageUrl))
+        .filter(item => item.imageUrls.some(url => newSelected.includes(url)))
         .map(item => item.prompt || "")
       onImagesSelect?.(newSelected, newPrompts)
     } else if (selectedImages.length < 4) {
       // Добавляем к выбранным
       const newSelected = [...selectedImages, imageUrl]
       const newPrompts = history
-        .filter(item => newSelected.includes(item.imageUrl))
+        .filter(item => item.imageUrls.some(url => newSelected.includes(url)))
         .map(item => item.prompt || "")
       onImagesSelect?.(newSelected, newPrompts)
     }
@@ -129,43 +129,47 @@ export const GenerationHistorySidebar: React.FC<GenerationHistorySidebarProps> =
         ) : (
           <>
             {history.map((item, index) => (
-              <TooltipProvider key={item.imageUrl + index}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div
-                      ref={index === history.length - 1 ? lastItemRef : null}
-                      className={cn(
-                        "relative w-full aspect-[3/4] rounded-lg overflow-hidden cursor-pointer group",
-                        "border-2 border-transparent hover:border-primary/50 transition-all duration-200",
-                        "shadow-lg hover:shadow-xl dark:shadow-2xl dark:hover:shadow-primary/20",
-                        "bg-card/50 backdrop-blur-sm",
-                        index < newImagesCount && refreshTrigger > 0 && "animate-pulse-border border-primary", // Подсветка новых изображений
-                        selectedImages.includes(item.imageUrl) && "border-primary ring-2 ring-primary/20" // Подсветка выбранного
-                      )}
-                      onClick={() => handleImageClick(item.imageUrl, item.prompt || "")}
-                    >
-                      <Image
-                        src={apiClient.getFileUrl(item.imageUrl)}
-                        alt={item.prompt || "Generated image"}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-200"
-                      />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200"></div>
-                      {selectedImages.includes(item.imageUrl) && (
-                        <div className="absolute top-1 right-1 w-5 h-5 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">
-                          {selectedImages.indexOf(item.imageUrl) + 1}
+              <div key={item.prompt + index} className="space-y-2">
+                {item.imageUrls.map((imageUrl, imgIndex) => (
+                  <TooltipProvider key={imageUrl + imgIndex}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div
+                          ref={index === history.length - 1 && imgIndex === item.imageUrls.length - 1 ? lastItemRef : null}
+                          className={cn(
+                            "relative w-full aspect-[3/4] rounded-lg overflow-hidden cursor-pointer group",
+                            "border-2 border-transparent hover:border-primary/50 transition-all duration-200",
+                            "shadow-lg hover:shadow-xl dark:shadow-2xl dark:hover:shadow-primary/20",
+                            "bg-card/50 backdrop-blur-sm",
+                            index < newImagesCount && refreshTrigger > 0 && "animate-pulse-border border-primary", // Подсветка новых изображений
+                            selectedImages.includes(imageUrl) && "border-primary ring-2 ring-primary/20" // Подсветка выбранного
+                          )}
+                          onClick={() => handleImageClick(imageUrl, item.prompt || "")}
+                        >
+                          <Image
+                            src={apiClient.getFileUrl(imageUrl)}
+                            alt={item.prompt || "Generated image"}
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-200"
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200"></div>
+                          {selectedImages.includes(imageUrl) && (
+                            <div className="absolute top-1 right-1 w-5 h-5 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">
+                              {selectedImages.indexOf(imageUrl) + 1}
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent side="right" className="max-w-xs">
-                    <p className="text-sm text-muted-foreground">{item.prompt}</p>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      {new Date(item.createdAt).toLocaleDateString()}
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+                      </TooltipTrigger>
+                      <TooltipContent side="right" className="max-w-xs">
+                        <p className="text-sm text-muted-foreground">{item.prompt}</p>
+                        <p className="text-xs text-muted-foreground mt-2">
+                          {new Date(item.createdAt).toLocaleDateString()}
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ))}
+              </div>
             ))}
             
             {/* Loading indicator for more items */}

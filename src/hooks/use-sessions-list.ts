@@ -24,8 +24,10 @@ export function useSessionsList(page: number = 0, size: number = 10) {
   const createSessionMutation = useMutation({
     mutationFn: (request: CreateSessionRequest) => apiClient.createSession(request),
     onSuccess: () => {
-      // Обновляем список сессий после создания
+      // Обновляем список сессий после создания и сбрасываем на первую страницу
       queryClient.invalidateQueries({ queryKey: ['sessions'] });
+      // Принудительно обновляем первую страницу
+      queryClient.refetchQueries({ queryKey: ['sessions', 0, size] });
     },
   });
 
