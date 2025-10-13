@@ -4,11 +4,9 @@ import { Badge } from '@/components/ui/badge'
 import { Sparkles, Shield, ArrowRight, Star, Users, Clock, Target, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { useAuth } from '@/contexts/auth-context'
-import { getPointsText } from '@/lib/grammar'
 import { apiClient } from '@/lib/api-client'
-
 export default function HomePage() {
-  const { isAuthenticated, isLoading, points, user } = useAuth()
+  const { isAuthenticated } = useAuth()
 
   return (
     <div className="space-y-20">

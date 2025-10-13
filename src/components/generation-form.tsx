@@ -45,7 +45,7 @@ const STYLE_PRESETS = [
 ]
 
 interface GenerationFormProps {
-  onGenerationComplete: (images: string[], prompt: string) => void
+  onGenerationComplete: (images: string[]) => void
   initialPrompt?: string
   initialImages?: string[]
   sessionId?: number
@@ -125,7 +125,7 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
 
       if (response.data) {
         // Вызываем callback для обновления родительского компонента
-        onGenerationComplete(response.data.imageUrls, data.prompt)
+        onGenerationComplete(response.data.imageUrls)
         // Обновляем баланс после успешной генерации с небольшой задержкой
         setTimeout(async () => {
           await refreshPoints()
@@ -179,13 +179,6 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
     }
   }
 
-  const applyStylePreset = (preset: typeof STYLE_PRESETS[0]) => {
-    const currentPrompt = prompt?.trim() || ""
-    const newPrompt = currentPrompt 
-      ? `${currentPrompt}, ${preset.prompt}`
-      : preset.prompt
-    setValue("prompt", newPrompt)
-  }
 
   return (
     <div className="generation-form space-y-6">

@@ -1,7 +1,6 @@
 "use client"
 
 import { useAuth } from "@/contexts/auth-context"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { EmailVerificationBanner } from "@/components/email-verification-banner"
 import { StudioSessions } from "@/components/studio-sessions"
@@ -10,12 +9,10 @@ import { AlertCircle, User, Eye } from "lucide-react"
 import Link from "next/link"
 import { useState, useCallback, useEffect } from "react"
 import { useDefaultSession } from "@/hooks/use-sessions-list"
-import { cn } from "@/lib/utils"
 import { useToast } from "@/components/ui/use-toast"
 
 export default function StudioPage() {
-  const { user, isAuthenticated, isLoading, isEmailVerified } = useAuth()
-  const router = useRouter()
+  const { user, isAuthenticated, isEmailVerified } = useAuth()
   const { toast } = useToast()
   
   // Состояние сессий
@@ -32,9 +29,7 @@ export default function StudioPage() {
   }, [defaultSession, currentSessionId])
 
   // Обработчик завершения генерации
-  const handleGenerationComplete = useCallback((images: string[], prompt: string) => {
-    console.log('Generation complete:', images.length, 'images')
-    
+  const handleGenerationComplete = useCallback((images: string[]) => {
     toast({
       title: "Изображения созданы!",
       description: `Создано ${images.length} изображений`,

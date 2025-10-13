@@ -2,7 +2,6 @@
 
 import React, { useState, useCallback } from "react"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { 
@@ -16,18 +15,14 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/components/ui/use-toast"
-import { GenerationForm } from "@/components/generation-form"
-import { SessionMessage } from "@/lib/api-client"
 import Image from "next/image"
 
 interface StudioDialogProps {
-  sessionId?: number
-  onGenerationComplete: (images: string[], prompt: string) => void
+  onGenerationComplete: (images: string[]) => void
   className?: string
 }
 
 export function StudioDialog({ 
-  sessionId, 
   onGenerationComplete,
   className 
 }: StudioDialogProps) {
@@ -60,7 +55,7 @@ export function StudioDialog({
       ]
       
       setGeneratedImages(mockImages)
-      onGenerationComplete(mockImages, prompt)
+      onGenerationComplete(mockImages)
       
       toast({
         title: "Изображения созданы!",
@@ -75,7 +70,7 @@ export function StudioDialog({
     } finally {
       setIsGenerating(false)
     }
-  }, [prompt, onGenerationComplete, toast])
+  }, [onGenerationComplete, toast])
 
   const handleImageSelect = (imageUrl: string) => {
     if (selectedImages.includes(imageUrl)) {

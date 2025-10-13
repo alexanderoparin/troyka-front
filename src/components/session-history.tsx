@@ -14,7 +14,8 @@ import {
   Copy,
   Check,
   Loader2,
-  ArrowUp
+  ArrowUp,
+  Plus
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useSessionHistory } from "@/hooks/use-session-detail"
@@ -25,9 +26,7 @@ const getImageText = (count: number) => {
   if (count >= 2 && count <= 4) return 'изображения'
   return 'изображений'
 }
-import { SessionMessage } from "@/lib/api-client"
 import { useToast } from "@/components/ui/use-toast"
-import { apiClient } from "@/lib/api-client"
 
 interface SessionHistoryProps {
   sessionId: number | null
@@ -51,11 +50,9 @@ export function SessionHistory({
 
   const {
     history,
-    totalMessages,
     hasMore,
     isLoading,
     loadMoreHistory,
-    updateHistoryAfterGeneration,
   } = useSessionHistory(sessionId, 20)
 
   // Автоматическая прокрутка к низу при загрузке новых сообщений
@@ -205,7 +202,7 @@ export function SessionHistory({
           <div>
             <h3 className="font-semibold text-lg">История диалога</h3>
             <p className="text-sm text-muted-foreground">
-              {totalMessages} сообщений
+              {history.length} сообщений
             </p>
           </div>
           

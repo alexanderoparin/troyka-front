@@ -7,7 +7,6 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { 
-  Send, 
   Image as ImageIcon, 
   Download, 
   Eye, 
@@ -28,7 +27,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { useSessionHistory } from "@/hooks/use-session-detail"
-import { SessionMessage } from "@/lib/api-client"
 import Image from "next/image"
 
 interface StudioChatProps {
@@ -65,7 +63,6 @@ export function StudioChat({
 
   const {
     history,
-    totalMessages,
     hasMore,
     isLoading,
     loadMoreHistory,
@@ -129,14 +126,12 @@ export function StudioChat({
         sessionId: sessionId
       }
       
-      console.log('Отправляем запрос на генерацию:', request)
-      console.log('uploadedImages:', uploadedImages)
       const response = await apiClient.generateImage(request)
       
       if (response.data) {
         onGenerationComplete(response.data.imageUrls, promptWithAspectRatio)
         setPrompt("")
-        setUploadedImage(null)
+        setUploadedImages([])
         
         toast({
           title: "Изображения созданы!",
@@ -154,20 +149,17 @@ export function StudioChat({
     } finally {
       setIsGenerating(false)
     }
-  }, [prompt, numImages, outputFormat, onGenerationComplete, toast])
+  }, [prompt, numImages, outputFormat, onGenerationComplete, toast, aspectRatio, sessionId, uploadedImages])
 
   const handleImageSelect = (imageUrl: string) => {
-    console.log('handleImageSelect вызвана, imageUrl:', imageUrl, 'selectedImages:', selectedImages)
     if (selectedImages.includes(imageUrl)) {
       // Удаляем изображение из выбора и из загруженных
       setSelectedImages(prev => prev.filter(url => url !== imageUrl))
       setUploadedImages(prev => prev.filter(url => url !== imageUrl))
-      console.log('Изображение удалено из выбора')
     } else if (selectedImages.length < 4) {
       // Добавляем изображение в выбор и сразу в загруженные для редактирования
       setSelectedImages(prev => [...prev, imageUrl])
       setUploadedImages(prev => [...prev, imageUrl])
-      console.log('Изображение добавлено в выбор и загружено для редактирования')
     } else {
       toast({
         title: "Максимум изображений",

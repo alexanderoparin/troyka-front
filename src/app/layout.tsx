@@ -5,8 +5,6 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { QueryProvider } from '@/components/query-provider'
 import { AuthProvider } from '@/contexts/auth-context'
 import { Toaster } from '@/components/ui/toaster'
-import { Header } from '@/components/header'
-import Footer from '@/components/footer'
 import { ConditionalLayout } from '@/components/conditional-layout'
 
 const inter = Inter({ subsets: ['latin', 'cyrillic'] })
