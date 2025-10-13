@@ -48,9 +48,10 @@ interface GenerationFormProps {
   onGenerationComplete: (images: string[], prompt: string) => void
   initialPrompt?: string
   initialImages?: string[]
+  sessionId?: number
 }
 
-export function GenerationForm({ onGenerationComplete, initialPrompt = "", initialImages = [] }: GenerationFormProps) {
+export function GenerationForm({ onGenerationComplete, initialPrompt = "", initialImages = [], sessionId }: GenerationFormProps) {
   const [isGenerating, setIsGenerating] = useState(false)
   const [uploadedImages, setUploadedImages] = useState<string[]>(initialImages)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -110,9 +111,10 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
     try {
       const request: ImageRequest = {
         prompt: data.prompt,
-        imageUrls: uploadedImages.length > 0 ? uploadedImages : undefined,
+        inputImageUrls: uploadedImages.length > 0 ? uploadedImages : undefined,
         numImages: data.numImages,
-        outputFormat: data.outputFormat
+        outputFormat: data.outputFormat,
+        sessionId: sessionId
       }
 
       const response = await apiClient.generateImage(request)

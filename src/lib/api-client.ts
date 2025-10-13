@@ -29,14 +29,85 @@ export interface RegisterRequest {
 
 export interface ImageRequest {
   prompt: string;
-  imageUrls?: string[];
+  inputImageUrls?: string[];
   numImages?: number;
   outputFormat?: 'JPEG' | 'PNG';
+  sessionId?: number;
 }
 
 export interface ImageResponse {
   description: string;
   imageUrls: string[];
+}
+
+// Типы для сессий
+export interface Session {
+  id: number;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+  lastImageUrl?: string;
+  messageCount: number;
+}
+
+export interface SessionMessage {
+  id: number;
+  prompt: string;
+  imageUrls: string[];
+  inputImageUrls: string[];
+  iterationNumber: number;
+  createdAt: string;
+  imageCount: number;
+  outputFormat: string;
+}
+
+export interface SessionDetail {
+  id: number;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+  history: SessionMessage[];
+  totalMessages: number;
+  hasMore: boolean;
+}
+
+export interface CreateSessionRequest {
+  name?: string;
+}
+
+export interface CreateSessionResponse {
+  id: number;
+  name: string;
+  createdAt: string;
+  message: string;
+}
+
+export interface RenameSessionRequest {
+  name: string;
+}
+
+export interface RenameSessionResponse {
+  id: number;
+  name: string;
+  message: string;
+}
+
+export interface DeleteSessionResponse {
+  id: number;
+  message: string;
+  deletedHistoryCount: number;
+}
+
+export interface PageResponse<T> {
+  content: T[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  isFirst: boolean;
+  isLast: boolean;
 }
 
 export interface UserInfo {
@@ -660,6 +731,39 @@ class ApiClient {
       method: 'GET',
     });
     return response;
+  }
+
+  // Sessions API
+  async getSessionsList(page: number = 0, size: number = 10): Promise<ApiResponse<PageResponse<Session>>> {
+    return this.request<PageResponse<Session>>(`/api/sessions?page=${page}&size=${size}`);
+  }
+
+  async createSession(request: CreateSessionRequest = {}): Promise<ApiResponse<CreateSessionResponse>> {
+    return this.request<CreateSessionResponse>('/api/sessions', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    });
+  }
+
+  async getSessionDetail(sessionId: number, page: number = 0, size: number = 20): Promise<ApiResponse<SessionDetail>> {
+    return this.request<SessionDetail>(`/api/sessions/${sessionId}?page=${page}&size=${size}`);
+  }
+
+  async renameSession(sessionId: number, request: RenameSessionRequest): Promise<ApiResponse<RenameSessionResponse>> {
+    return this.request<RenameSessionResponse>(`/api/sessions/${sessionId}/rename`, {
+      method: 'PUT',
+      body: JSON.stringify(request),
+    });
+  }
+
+  async deleteSession(sessionId: number): Promise<ApiResponse<DeleteSessionResponse>> {
+    return this.request<DeleteSessionResponse>(`/api/sessions/${sessionId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async getDefaultSession(): Promise<ApiResponse<Session>> {
+    return this.request<Session>('/api/sessions/default');
   }
 
 }

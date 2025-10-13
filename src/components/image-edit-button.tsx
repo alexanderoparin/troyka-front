@@ -61,7 +61,7 @@ export function ImageEditButton({
     try {
       const request: ImageRequest = {
         prompt: prompt.trim(),
-        imageUrls: [imageUrl],
+        inputImageUrls: [imageUrl],
         numImages,
         outputFormat
       };
