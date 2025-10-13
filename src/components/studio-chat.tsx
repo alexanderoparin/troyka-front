@@ -66,6 +66,7 @@ export function StudioChat({
     hasMore,
     isLoading,
     loadMoreHistory,
+    updateHistoryAfterGeneration,
   } = useSessionHistory(sessionId || null, 20)
 
   // Автоматическая прокрутка к низу при новых сообщениях
@@ -133,6 +134,9 @@ export function StudioChat({
         setPrompt("")
         setUploadedImages([])
         
+        // Обновляем историю после успешной генерации
+        updateHistoryAfterGeneration()
+        
         toast({
           title: "Изображения созданы!",
           description: `Создано ${response.data.imageUrls.length} ${getImageText(response.data.imageUrls.length)} в формате ${outputFormat} (${aspectRatio})`,
@@ -149,7 +153,7 @@ export function StudioChat({
     } finally {
       setIsGenerating(false)
     }
-  }, [prompt, numImages, outputFormat, onGenerationComplete, toast, aspectRatio, sessionId, uploadedImages])
+  }, [prompt, numImages, outputFormat, onGenerationComplete, toast, aspectRatio, sessionId, uploadedImages, updateHistoryAfterGeneration])
 
   const handleImageSelect = (imageUrl: string) => {
     if (selectedImages.includes(imageUrl)) {
