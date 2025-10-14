@@ -123,8 +123,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           user: {
             username: response.data.username,
             email: response.data.email,
-            firstName: '',
-            lastName: '',
             role: response.data.role,
           },
           isAuthenticated: true,
@@ -176,8 +174,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           user: {
             username: response.data.username,
             email: response.data.email,
-            firstName: userData.firstName || '',
-            lastName: userData.lastName || '',
             role: response.data.role,
           },
           isAuthenticated: true,
