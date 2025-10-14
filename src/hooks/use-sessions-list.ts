@@ -1,3 +1,4 @@
+import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient, Session, CreateSessionRequest, RenameSessionRequest, DeleteSessionResponse } from '@/lib/api-client';
 
@@ -23,11 +24,16 @@ export function useSessionsList(page: number = 0, size: number = 10) {
   // Создание новой сессии
   const createSessionMutation = useMutation({
     mutationFn: (request: CreateSessionRequest) => apiClient.createSession(request),
-    onSuccess: () => {
-      // Обновляем список сессий после создания и сбрасываем на первую страницу
-      queryClient.invalidateQueries({ queryKey: ['sessions'] });
+    onSuccess: async (newSession) => {
+      // Полностью очищаем кеш сессий
+      await queryClient.cancelQueries({ queryKey: ['sessions'] });
+      queryClient.removeQueries({ queryKey: ['sessions'] });
+      
       // Принудительно обновляем первую страницу
-      queryClient.refetchQueries({ queryKey: ['sessions', 0, size] });
+      await queryClient.refetchQueries({ 
+        queryKey: ['sessions', 0, size],
+        type: 'active'
+      });
     },
   });
 
@@ -51,9 +57,15 @@ export function useSessionsList(page: number = 0, size: number = 10) {
     },
   });
 
+  // Сортируем сессии по дате создания (новые первые) на случай, если бэкенд вернул неправильный порядок
+  const sortedSessions = React.useMemo(() => {
+    const sessions = sessionsData?.data?.content || [];
+    return [...sessions].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }, [sessionsData?.data?.content]);
+
   return {
     // Данные
-    sessions: sessionsData?.data?.content || [],
+    sessions: sortedSessions,
     totalElements: sessionsData?.data?.totalElements || 0,
     totalPages: sessionsData?.data?.totalPages || 0,
     hasNext: sessionsData?.data?.hasNext || false,

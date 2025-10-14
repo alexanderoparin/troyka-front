@@ -83,15 +83,19 @@ export function SessionsSidebar({
     }
 
     try {
+      setPage(0) // Сбрасываем на первую страницу перед созданием
       await createSession({ name: newSessionName.trim() })
       setIsCreateDialogOpen(false)
       setNewSessionName("")
-      setPage(0) // Сбрасываем на первую страницу
-      toast({
-        title: "Сессия создана",
-        description: `Сессия "${newSessionName.trim()}" успешно создана`,
-      })
-      onNewSession()
+      
+      // Небольшая задержка для обновления списка
+      setTimeout(() => {
+        toast({
+          title: "Сессия создана",
+          description: `Сессия "${newSessionName.trim()}" успешно создана`,
+        })
+        onNewSession()
+      }, 100)
     } catch (error) {
       toast({
         title: "Ошибка",
