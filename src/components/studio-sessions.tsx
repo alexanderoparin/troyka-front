@@ -289,12 +289,6 @@ export function StudioSessions({
                               </DropdownMenu>
                             </div>
                             
-                            <div className="text-white text-xs">
-                              <div className="flex items-center gap-1">
-                                <MessageSquare className="h-3 w-3" />
-                                <span>{session.messageCount}</span>
-                              </div>
-                            </div>
                           </div>
 
                           {/* Индикатор активной сессии */}
@@ -306,7 +300,7 @@ export function StudioSessions({
                         </div>
                       </Card>
                     </TooltipTrigger>
-                         <TooltipContent side="right" className="max-w-xs z-[9999]">
+                         <TooltipContent side="right" className="max-w-xs z-[40]" sideOffset={5}>
                       <div className="space-y-1">
                         <p className="font-medium text-sm">{session.name}</p>
                         <p className="text-xs text-muted-foreground">

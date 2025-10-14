@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useCallback, useRef, useEffect } from "react"
+import NextImage from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
@@ -15,10 +16,13 @@ import {
   User,
   Bot,
   Copy,
-  Check
+  Check,
+  Maximize2,
+  X
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/components/ui/use-toast"
+import { useAuth } from "@/contexts/auth-context"
 import { apiClient } from "@/lib/api-client"
 import {
   Tooltip,
@@ -37,9 +41,10 @@ interface StudioChatProps {
 
 export function StudioChat({ 
   sessionId, 
-  onGenerationComplete,
+  onGenerationComplete, 
   className 
 }: StudioChatProps) {
+  const { avatar } = useAuth()
   const [prompt, setPrompt] = useState("")
   const [isGenerating, setIsGenerating] = useState(false)
   const [selectedImages, setSelectedImages] = useState<string[]>([])
@@ -49,6 +54,7 @@ export function StudioChat({
   const [aspectRatio, setAspectRatio] = useState('1:1')
   const [uploadedImages, setUploadedImages] = useState<string[]>([])
   const [isFocused, setIsFocused] = useState(false)
+  const [selectedImageForModal, setSelectedImageForModal] = useState<string | null>(null)
   
   const aspectRatios = ['1:1', '4:3', '4:5', '3:2', '2:3', '16:9', '9:16', '7.5:2']
   const scrollAreaRef = useRef<HTMLDivElement>(null)
@@ -208,6 +214,36 @@ export function StudioChat({
     }
   }, [prompt, numImages, outputFormat, onGenerationComplete, toast, aspectRatio, sessionId, uploadedImages, updateHistoryAfterGeneration])
 
+  const handleImageExpand = (imageUrl: string) => {
+    setSelectedImageForModal(imageUrl)
+  }
+
+  const handleImageDownload = async (imageUrl: string) => {
+    try {
+      const response = await fetch(imageUrl)
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `generated-image-${Date.now()}.jpg`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+      
+      toast({
+        title: "Изображение скачано",
+        description: "Файл сохранен в папку загрузок",
+      })
+    } catch (error) {
+      toast({
+        title: "Ошибка скачивания",
+        description: "Не удалось скачать изображение",
+        variant: "destructive",
+      })
+    }
+  }
+
   const handleImageSelect = (imageUrl: string) => {
     if (selectedImages.includes(imageUrl)) {
       // Удаляем изображение из выбора и из загруженных
@@ -339,10 +375,22 @@ export function StudioChat({
                   {/* Левая часть - промпт */}
                   <div className="flex-1 lg:max-w-xs">
                     <div className="flex gap-3">
-                      <div className="flex-shrink-0">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                          <User className="h-4 w-4 text-primary" />
-                        </div>
+                      <div className="flex-shrink-0 relative z-0">
+                        {avatar ? (
+                          <div className="w-8 h-8 rounded-full overflow-hidden relative">
+                            <NextImage
+                              src={avatar}
+                              alt="Аватар пользователя"
+                              width={32}
+                              height={32}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center relative">
+                            <User className="h-4 w-4 text-primary" />
+                          </div>
+                        )}
                       </div>
                       <div className="flex-1">
                         <Card className="p-4 bg-muted/50 dark:bg-muted/20">
@@ -401,7 +449,7 @@ export function StudioChat({
                             )}
                             onClick={() => handleImageSelect(imageUrl)}
                           >
-                            <div className="w-48 h-56 sm:w-56 sm:h-64 relative">
+                            <div className="w-80 h-96 sm:w-96 sm:h-[28rem] relative">
                               <Image
                                 src={imageUrl}
                                 alt={`Сгенерированное изображение ${index + 1}`}
@@ -410,43 +458,28 @@ export function StudioChat({
                               />
                               
                               {/* Overlay с действиями */}
-                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                                 <Button
                                   size="sm"
                                   variant="secondary"
-                                  className="h-6 w-6 p-0"
+                                  className="h-8 w-8 p-0"
                                   onClick={(e) => {
                                     e.stopPropagation()
-                                    window.open(imageUrl, '_blank')
+                                    handleImageExpand(imageUrl)
                                   }}
                                 >
-                                  <Eye className="h-3 w-3" />
+                                  <Maximize2 className="h-4 w-4" />
                                 </Button>
                                 <Button
                                   size="sm"
                                   variant="secondary"
-                                  className="h-6 w-6 p-0"
+                                  className="h-8 w-8 p-0"
                                   onClick={(e) => {
                                     e.stopPropagation()
-                                    downloadImage(imageUrl, `generated-${message.id}-${index + 1}.jpg`)
+                                    handleImageDownload(imageUrl)
                                   }}
                                 >
-                                  <Download className="h-3 w-3" />
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="secondary"
-                                  className="h-6 w-6 p-0"
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    handleCopyImageUrl(imageUrl)
-                                  }}
-                                >
-                                  {copiedImageUrl === imageUrl ? (
-                                    <Check className="h-3 w-3" />
-                                  ) : (
-                                    <Copy className="h-3 w-3" />
-                                  )}
+                                  <Download className="h-4 w-4" />
                                 </Button>
                               </div>
 
@@ -487,7 +520,7 @@ export function StudioChat({
             {/* Плавающее окно ввода промпта */}
             <div className="fixed bottom-2 left-0 right-0 z-50">
               <div className="flex justify-center px-6">
-                <div className={`${isFocused ? 'bg-background/95' : 'bg-background/60'} backdrop-blur-md border border-border/20 rounded-lg shadow-2xl px-2 pt-1 pb-1 min-w-[600px] max-w-[700px] w-full transition-all duration-200`}>
+                <div className={`${isFocused ? 'bg-background/95' : 'bg-background/60'} backdrop-blur-md border-2 border-border/40 rounded-lg shadow-2xl px-2 pt-1 pb-1 min-w-[600px] max-w-[700px] w-full transition-all duration-200 ring-1 ring-black/5`}>
           {/* Загруженные изображения */}
           {uploadedImages.length > 0 && (
             <div className="mb-1">
@@ -542,7 +575,7 @@ export function StudioChat({
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
                         placeholder="Опишите изображение, которое хотите создать..."
-                        className="h-[54px] resize-none text-base flex-1"
+                        className="h-[54px] resize-none text-base flex-1 bg-muted/80 border-2 border-border/80 focus:border-primary/80 focus:bg-muted/95"
                         onFocus={() => setIsFocused(true)}
                         onBlur={() => setIsFocused(false)}
                         onKeyDown={(e) => {
@@ -562,13 +595,13 @@ export function StudioChat({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-10 w-14 p-0 text-sm"
+                                className="h-10 w-14 p-0 text-sm bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
                                 onClick={() => setOutputFormat(prev => prev === 'JPEG' ? 'PNG' : 'JPEG')}
                               >
                                 {outputFormat}
                               </Button>
                             </TooltipTrigger>
-                            <TooltipContent className="z-[9999]">
+                            <TooltipContent className="z-[9998]">
                               <p>Формат изображения (нажмите для смены)</p>
                             </TooltipContent>
                           </Tooltip>
@@ -579,13 +612,13 @@ export function StudioChat({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-10 w-12 p-0 text-sm"
+                                className="h-10 w-12 p-0 text-sm bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
                                 onClick={() => setNumImages(prev => prev >= 4 ? 1 : prev + 1)}
                               >
                                 {numImages}
                               </Button>
                             </TooltipTrigger>
-                            <TooltipContent className="z-[9999]">
+                            <TooltipContent className="z-[9998]">
                               <p>Количество изображений (нажмите для смены)</p>
                             </TooltipContent>
                           </Tooltip>
@@ -599,7 +632,7 @@ export function StudioChat({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-9 w-14 p-0 text-sm"
+                                className="h-9 w-14 p-0 text-sm bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
                                 onClick={() => {
                                   const currentIndex = aspectRatios.indexOf(aspectRatio)
                                   const nextIndex = (currentIndex + 1) % aspectRatios.length
@@ -609,7 +642,7 @@ export function StudioChat({
                                 {aspectRatio}
                               </Button>
                             </TooltipTrigger>
-                            <TooltipContent className="z-[9999]">
+                            <TooltipContent className="z-[9998]">
                               <p>Соотношение сторон (нажмите для смены)</p>
                             </TooltipContent>
                           </Tooltip>
@@ -627,13 +660,13 @@ export function StudioChat({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-9 w-12 p-0"
+                                className="h-9 w-12 p-0 bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
                                 onClick={() => fileInputRef.current?.click()}
                               >
                                 <ImageIcon className="h-4 w-4" />
                               </Button>
                             </TooltipTrigger>
-                          <TooltipContent className="z-[9999]">
+                          <TooltipContent className="z-[9998]">
                             <p>Загрузить изображение</p>
                           </TooltipContent>
                           </Tooltip>
@@ -656,7 +689,7 @@ export function StudioChat({
                               )}
                             </Button>
                           </TooltipTrigger>
-                          <TooltipContent className="z-[9999]">
+                          <TooltipContent className="z-[9998]">
                             <p>{isGenerating ? "Генерация изображений..." : "Генерировать изображения"}</p>
                           </TooltipContent>
                         </Tooltip>
@@ -667,6 +700,31 @@ export function StudioChat({
         </div>
       </div>
       </div>
+
+      {/* Модальное окно для просмотра изображения */}
+      {selectedImageForModal && (
+        <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4">
+          <div className="relative max-w-7xl max-h-[90vh] w-full h-full">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-white"
+              onClick={() => setSelectedImageForModal(null)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+            <div className="w-full h-full flex items-center justify-center">
+              <Image
+                src={selectedImageForModal}
+                alt="Полноразмерное изображение"
+                width={1200}
+                height={800}
+                className="max-w-full max-h-full object-contain"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </TooltipProvider>
   )
 }
