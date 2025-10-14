@@ -86,7 +86,7 @@ export function StudioChat({
     }
   }, [history.length])
 
-  const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
 
@@ -100,14 +100,59 @@ export function StudioChat({
       return
     }
 
-    // Создаем URL для предварительного просмотра
-    const imageUrl = URL.createObjectURL(file)
-    setUploadedImages([imageUrl])
-    
-    toast({
-      title: "Изображение загружено",
-      description: "Изображение готово для использования",
-    })
+    try {
+      // Загружаем файл на сервер
+      const response = await apiClient.uploadFile(file)
+      if (response.data) {
+        setUploadedImages([response.data])
+        toast({
+          title: "Изображение загружено",
+          description: "Изображение готово для использования",
+        })
+      } else {
+        throw new Error(response.error || "Ошибка загрузки файла")
+      }
+    } catch (error: any) {
+      toast({
+        title: "Ошибка загрузки",
+        description: error.message || "Не удалось загрузить файл",
+        variant: "destructive",
+      })
+    }
+  }, [toast])
+
+  const handlePaste = useCallback(async (event: React.ClipboardEvent) => {
+    const items = event.clipboardData?.items
+    if (!items) return
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i]
+      if (item.type.startsWith('image/')) {
+        const file = item.getAsFile()
+        if (file) {
+          try {
+            // Загружаем файл на сервер
+            const response = await apiClient.uploadFile(file)
+            if (response.data) {
+              setUploadedImages([response.data])
+              toast({
+                title: "Изображение загружено",
+                description: "Изображение из буфера обмена загружено",
+              })
+            } else {
+              throw new Error(response.error || "Ошибка загрузки файла")
+            }
+          } catch (error: any) {
+            toast({
+              title: "Ошибка загрузки",
+              description: error.message || "Не удалось загрузить файл",
+              variant: "destructive",
+            })
+          }
+        }
+        break
+      }
+    }
   }, [toast])
 
   const handleGenerate = useCallback(async () => {
@@ -125,39 +170,10 @@ export function StudioChat({
       // Добавляем соотношение сторон в промпт
       const promptWithAspectRatio = `${prompt}. Соотношение сторон изображения - ${aspectRatio}`
       
-      // Обрабатываем загруженные изображения - загружаем blob URL'ы на сервер
-      let processedImageUrls: string[] = []
-      if (uploadedImages.length > 0) {
-        const uploadPromises = uploadedImages.map(async (url) => {
-          if (url.startsWith('blob:')) {
-            // Если это blob URL, нужно загрузить файл на сервер
-            try {
-              const response = await fetch(url)
-              const blob = await response.blob()
-              const file = new File([blob], 'image.jpg', { type: blob.type })
-              const uploadResponse = await apiClient.uploadFile(file)
-              if (uploadResponse.data) {
-                return uploadResponse.data
-              } else {
-                throw new Error(uploadResponse.error || 'Ошибка загрузки файла')
-              }
-            } catch (error) {
-              console.error('Ошибка загрузки blob URL:', error)
-              throw error
-            }
-          } else {
-            // Обычный URL - возвращаем как есть
-            return url
-          }
-        })
-        
-        processedImageUrls = await Promise.all(uploadPromises)
-      }
-      
       // Вызываем API для генерации
       const request = {
         prompt: promptWithAspectRatio,
-        inputImageUrls: processedImageUrls,
+        inputImageUrls: uploadedImages.length > 0 ? uploadedImages : [],
         numImages: numImages,
         outputFormat: outputFormat,
         sessionId: sessionId
@@ -278,7 +294,7 @@ export function StudioChat({
 
   return (
     <TooltipProvider>
-      <div className={cn("h-full flex flex-col", className)}>
+      <div className={cn("h-full flex flex-col", className)} onPaste={handlePaste}>
       {/* История диалога */}
       <ScrollArea ref={scrollAreaRef} className="flex-1 p-6">
         <div className="space-y-6 pb-32">
