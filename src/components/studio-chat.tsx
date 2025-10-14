@@ -464,12 +464,14 @@ export function StudioChat({
                         ))}
                       </div>
                       
-                          <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
-                            <ImageIcon className="h-3 w-3" />
-                            <span>{message.imageCount} {getImageText(message.imageCount)}</span>
-                            <span>•</span>
-                            <span>{message.outputFormat}</span>
-                          </div>
+                          {message.imageUrls && Array.isArray(message.imageUrls) && message.imageUrls.length > 0 && (
+                            <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
+                              <ImageIcon className="h-3 w-3" />
+                              <span>{message.imageUrls.length} {getImageText(message.imageUrls.length)}</span>
+                              <span>•</span>
+                              <span>{message.outputFormat || 'JPEG'}</span>
+                            </div>
+                          )}
                         </Card>
                       </div>
                     </div>
@@ -482,13 +484,13 @@ export function StudioChat({
       </ScrollArea>
 
             {/* Плавающее окно ввода промпта */}
-            <div className="fixed bottom-12 left-0 right-0 z-50">
+            <div className="fixed bottom-2 left-0 right-0 z-50">
               <div className="flex justify-center px-6">
-                <div className="bg-background/95 backdrop-blur-md border border-border/20 rounded-2xl shadow-2xl px-4 pt-4 pb-3 min-w-[600px] max-w-[700px] w-full">
+                <div className="bg-background/95 backdrop-blur-md border border-border/20 rounded-lg shadow-2xl px-2 pt-1 pb-1 min-w-[600px] max-w-[700px] w-full">
           {/* Загруженные изображения */}
           {uploadedImages.length > 0 && (
-            <div className="mb-3">
-              <div className="flex items-center gap-2 mb-2">
+            <div className="mb-1">
+              <div className="flex items-center gap-2 mb-1">
                 <Badge variant="secondary">
                   {uploadedImages.length} {getImageText(uploadedImages.length)} выбрано для редактирования
                 </Badge>
@@ -533,13 +535,13 @@ export function StudioChat({
 
 
                   {/* Поле ввода промпта */}
-                  <div className="mb-3">
+                  <div className="mb-1">
                     <div className="flex gap-2">
                       <Textarea
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
                         placeholder="Опишите изображение, которое хотите создать..."
-                        className="h-[88px] resize-none text-base flex-1"
+                        className="h-[54px] resize-none text-base flex-1"
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
                             e.preventDefault()
@@ -548,7 +550,7 @@ export function StudioChat({
                         }}
                       />
                       {/* Опции генерации */}
-                      <div className="flex flex-col gap-2">
+                      <div className="flex flex-col gap-1">
                         {/* Первый ряд */}
                         <div className="flex items-center gap-2">
                           {/* Формат изображения */}
@@ -557,7 +559,7 @@ export function StudioChat({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-10 w-16 p-0"
+                                className="h-10 w-14 p-0 text-sm"
                                 onClick={() => setOutputFormat(prev => prev === 'JPEG' ? 'PNG' : 'JPEG')}
                               >
                                 {outputFormat}
@@ -574,7 +576,7 @@ export function StudioChat({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-10 w-12 p-0"
+                                className="h-10 w-12 p-0 text-sm"
                                 onClick={() => setNumImages(prev => prev >= 4 ? 1 : prev + 1)}
                               >
                                 {numImages}
@@ -594,7 +596,7 @@ export function StudioChat({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-10 w-16 p-0"
+                                className="h-9 w-14 p-0 text-sm"
                                 onClick={() => {
                                   const currentIndex = aspectRatios.indexOf(aspectRatio)
                                   const nextIndex = (currentIndex + 1) % aspectRatios.length
@@ -622,7 +624,7 @@ export function StudioChat({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-10 w-12 p-0"
+                                className="h-9 w-12 p-0"
                                 onClick={() => fileInputRef.current?.click()}
                               >
                                 <ImageIcon className="h-4 w-4" />
@@ -640,7 +642,7 @@ export function StudioChat({
                           <TooltipTrigger asChild>
                             <Button
                               size="lg"
-                              className="h-[88px] w-[88px] p-0 bg-primary hover:bg-primary/90 text-primary-foreground"
+                              className="h-[80px] w-[80px] p-0 bg-primary hover:bg-primary/90 text-primary-foreground"
                               onClick={handleGenerate}
                               disabled={isGenerating || !prompt.trim()}
                             >

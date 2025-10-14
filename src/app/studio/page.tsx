@@ -110,7 +110,7 @@ export default function StudioPage() {
   }
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-screen">
       {/* Левая панель - Сессии */}
       <div className="w-20 border-r bg-muted/5 flex flex-col">
         <StudioSessions
