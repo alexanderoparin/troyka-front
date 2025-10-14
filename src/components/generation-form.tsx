@@ -113,9 +113,38 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
       // Добавляем соотношение сторон в конец промпта
       const promptWithAspectRatio = `${data.prompt}. Соотношение сторон изображения - ${aspectRatio}`
       
+      // Обрабатываем загруженные изображения - загружаем blob URL'ы на сервер
+      let processedImageUrls: string[] = []
+      if (uploadedImages.length > 0) {
+        const uploadPromises = uploadedImages.map(async (url) => {
+          if (url.startsWith('blob:')) {
+            // Если это blob URL, нужно загрузить файл на сервер
+            try {
+              const response = await fetch(url)
+              const blob = await response.blob()
+              const file = new File([blob], 'image.jpg', { type: blob.type })
+              const uploadResponse = await apiClient.uploadFile(file)
+              if (uploadResponse.data) {
+                return uploadResponse.data
+              } else {
+                throw new Error(uploadResponse.error || 'Ошибка загрузки файла')
+              }
+            } catch (error) {
+              console.error('Ошибка загрузки blob URL:', error)
+              throw error
+            }
+          } else {
+            // Обычный URL - возвращаем как есть
+            return url
+          }
+        })
+        
+        processedImageUrls = await Promise.all(uploadPromises)
+      }
+      
       const request: ImageRequest = {
         prompt: promptWithAspectRatio,
-        inputImageUrls: uploadedImages.length > 0 ? uploadedImages : [],
+        inputImageUrls: processedImageUrls,
         numImages: data.numImages,
         outputFormat: data.outputFormat,
         sessionId: sessionId
