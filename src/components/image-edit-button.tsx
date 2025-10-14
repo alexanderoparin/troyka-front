@@ -59,9 +59,28 @@ export function ImageEditButton({
     setIsEditing(true);
 
     try {
+      // Обрабатываем imageUrl - если это blob URL, загружаем файл на сервер
+      let processedImageUrl = imageUrl;
+      if (imageUrl.startsWith('blob:')) {
+        try {
+          const response = await fetch(imageUrl);
+          const blob = await response.blob();
+          const file = new File([blob], 'image.jpg', { type: blob.type });
+          const uploadResponse = await apiClient.uploadFile(file);
+          if (uploadResponse.data) {
+            processedImageUrl = uploadResponse.data;
+          } else {
+            throw new Error(uploadResponse.error || 'Ошибка загрузки файла');
+          }
+        } catch (error) {
+          console.error('Ошибка загрузки blob URL:', error);
+          throw error;
+        }
+      }
+
       const request: ImageRequest = {
         prompt: prompt.trim(),
-        inputImageUrls: [imageUrl],
+        inputImageUrls: [processedImageUrl],
         numImages,
         outputFormat
       };
