@@ -80,11 +80,11 @@ export default function PricingPage() {
             <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center mb-6">
               <Target className="h-8 w-8 text-blue-600 dark:text-blue-400" />
             </div>
-            <h3 className="text-title-3 text-foreground mb-4">100% Точность товара</h3>
+            <h3 className="text-title-3 text-foreground mb-4">Максимальная точность</h3>
             <ul className="space-y-3">
               <li className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-blue-500" />
-                <span className="text-body text-foreground">Точная передача всех деталей товара</span>
+                <span className="text-body text-foreground">Точная передача всех деталей</span>
                 </li>
               <li className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-blue-500" />
