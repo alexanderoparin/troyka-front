@@ -48,6 +48,7 @@ export function StudioChat({
   const [outputFormat, setOutputFormat] = useState<'JPEG' | 'PNG'>('JPEG')
   const [aspectRatio, setAspectRatio] = useState('1:1')
   const [uploadedImages, setUploadedImages] = useState<string[]>([])
+  const [isFocused, setIsFocused] = useState(false)
   
   const aspectRatios = ['1:1', '4:3', '4:5', '3:2', '2:3', '16:9', '9:16', '7.5:2']
   const scrollAreaRef = useRef<HTMLDivElement>(null)
@@ -486,7 +487,7 @@ export function StudioChat({
             {/* Плавающее окно ввода промпта */}
             <div className="fixed bottom-2 left-0 right-0 z-50">
               <div className="flex justify-center px-6">
-                <div className="bg-background/95 backdrop-blur-md border border-border/20 rounded-lg shadow-2xl px-2 pt-1 pb-1 min-w-[600px] max-w-[700px] w-full">
+                <div className={`${isFocused ? 'bg-background/95' : 'bg-background/60'} backdrop-blur-md border border-border/20 rounded-lg shadow-2xl px-2 pt-1 pb-1 min-w-[600px] max-w-[700px] w-full transition-all duration-200`}>
           {/* Загруженные изображения */}
           {uploadedImages.length > 0 && (
             <div className="mb-1">
@@ -542,6 +543,8 @@ export function StudioChat({
                         onChange={(e) => setPrompt(e.target.value)}
                         placeholder="Опишите изображение, которое хотите создать..."
                         className="h-[54px] resize-none text-base flex-1"
+                        onFocus={() => setIsFocused(true)}
+                        onBlur={() => setIsFocused(false)}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
                             e.preventDefault()
