@@ -449,7 +449,7 @@ export function StudioChat({
                             )}
                             onClick={() => handleImageSelect(imageUrl)}
                           >
-                            <div className="w-80 h-96 sm:w-96 sm:h-[28rem] relative">
+                            <div className="w-64 h-80 sm:w-80 sm:h-96 md:w-96 md:h-[28rem] relative">
                               <Image
                                 src={imageUrl}
                                 alt={`Сгенерированное изображение ${index + 1}`}
@@ -519,8 +519,8 @@ export function StudioChat({
 
             {/* Плавающее окно ввода промпта */}
             <div className="fixed bottom-2 left-0 right-0 z-50">
-              <div className="flex justify-center px-6">
-                <div className={`${isFocused ? 'bg-background/95' : 'bg-background/60'} backdrop-blur-md border-2 border-border/40 rounded-lg shadow-2xl px-2 pt-1 pb-1 min-w-[600px] max-w-[700px] w-full transition-all duration-200 ring-1 ring-black/5`}>
+              <div className="flex justify-center px-2 sm:px-6">
+                <div className={`${isFocused ? 'bg-background/95' : 'bg-background/60'} backdrop-blur-md border-2 border-border/40 rounded-lg shadow-2xl px-2 pt-1 pb-1 w-full max-w-[700px] transition-all duration-200 ring-1 ring-black/5`}>
           {/* Загруженные изображения */}
           {uploadedImages.length > 0 && (
             <div className="mb-1">
@@ -570,7 +570,7 @@ export function StudioChat({
 
                   {/* Поле ввода промпта */}
                   <div className="mb-1">
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <Textarea
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
@@ -586,16 +586,16 @@ export function StudioChat({
                         }}
                       />
                       {/* Опции генерации */}
-                      <div className="flex flex-col gap-1">
+                      <div className="flex flex-col gap-1 sm:flex-row">
                         {/* Первый ряд */}
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1 sm:gap-2">
                           {/* Формат изображения */}
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-10 w-14 p-0 text-sm bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
+                                className="h-8 w-12 sm:h-10 sm:w-14 p-0 text-xs sm:text-sm bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
                                 onClick={() => setOutputFormat(prev => prev === 'JPEG' ? 'PNG' : 'JPEG')}
                               >
                                 {outputFormat}
@@ -612,7 +612,7 @@ export function StudioChat({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-10 w-12 p-0 text-sm bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
+                                className="h-8 w-10 sm:h-10 sm:w-12 p-0 text-xs sm:text-sm bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
                                 onClick={() => setNumImages(prev => prev >= 4 ? 1 : prev + 1)}
                               >
                                 {numImages}
@@ -625,14 +625,14 @@ export function StudioChat({
                         </div>
                         
                         {/* Второй ряд */}
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1 sm:gap-2">
                           {/* Соотношение сторон */}
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-9 w-14 p-0 text-sm bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
+                                className="h-8 w-12 sm:h-9 sm:w-14 p-0 text-xs sm:text-sm bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
                                 onClick={() => {
                                   const currentIndex = aspectRatios.indexOf(aspectRatio)
                                   const nextIndex = (currentIndex + 1) % aspectRatios.length
@@ -660,10 +660,10 @@ export function StudioChat({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-9 w-12 p-0 bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
+                                className="h-8 w-10 sm:h-9 sm:w-12 p-0 bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
                                 onClick={() => fileInputRef.current?.click()}
                               >
-                                <ImageIcon className="h-4 w-4" />
+                                <ImageIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                               </Button>
                             </TooltipTrigger>
                           <TooltipContent className="z-[9998]">
@@ -678,14 +678,14 @@ export function StudioChat({
                           <TooltipTrigger asChild>
                             <Button
                               size="lg"
-                              className="h-[80px] w-[80px] p-0 bg-primary hover:bg-primary/90 text-primary-foreground"
+                              className="h-12 w-full sm:h-[80px] sm:w-[80px] p-0 bg-primary hover:bg-primary/90 text-primary-foreground"
                               onClick={handleGenerate}
                               disabled={isGenerating || !prompt.trim()}
                             >
                               {isGenerating ? (
-                                <Loader2 className="h-6 w-6 animate-spin" />
+                                <Loader2 className="h-4 w-4 sm:h-6 sm:w-6 animate-spin" />
                               ) : (
-                                <Sparkles className="h-6 w-6" />
+                                <Sparkles className="h-4 w-4 sm:h-6 sm:w-6" />
                               )}
                             </Button>
                           </TooltipTrigger>

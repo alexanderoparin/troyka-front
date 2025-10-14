@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { EmailVerificationBanner } from "@/components/email-verification-banner"
 import { StudioSessions } from "@/components/studio-sessions"
 import { StudioChat } from "@/components/studio-chat"
-import { AlertCircle, User, Eye } from "lucide-react"
+import { AlertCircle, User, Eye, Menu } from "lucide-react"
 import Link from "next/link"
 import { useState, useCallback, useEffect } from "react"
 import { useDefaultSession } from "@/hooks/use-sessions-list"
@@ -17,6 +17,7 @@ export default function StudioPage() {
   
   // Состояние сессий
   const [currentSessionId, setCurrentSessionId] = useState<number | null>(null)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   
   // Получаем дефолтную сессию
   const { defaultSession, isLoading: isLoadingDefaultSession } = useDefaultSession()
@@ -110,9 +111,43 @@ export default function StudioPage() {
   }
 
   return (
-    <div className="flex h-screen">
-      {/* Левая панель - Сессии */}
-      <div className="w-20 border-r bg-muted/5 flex flex-col">
+    <div className="flex h-screen relative">
+      {/* Мобильное меню - Сессии */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden fixed inset-0 z-50 bg-black/50" onClick={() => setIsMobileMenuOpen(false)}>
+          <div className="absolute left-0 top-0 bottom-0 w-80 bg-background border-r" onClick={(e) => e.stopPropagation()}>
+            <div className="p-4 border-b">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold">Сессии</h2>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <Menu className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <div className="h-full">
+              <StudioSessions
+                currentSessionId={currentSessionId || undefined}
+                onSessionSelect={(sessionId) => {
+                  handleSessionSelect(sessionId)
+                  setIsMobileMenuOpen(false)
+                }}
+                onNewSession={() => {
+                  handleNewSession()
+                  setIsMobileMenuOpen(false)
+                }}
+                className="h-full"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Левая панель - Сессии (скрыта на мобильных) */}
+      <div className="hidden md:block w-20 border-r bg-muted/5 flex flex-col">
         <StudioSessions
           currentSessionId={currentSessionId || undefined}
           onSessionSelect={handleSessionSelect}
@@ -123,6 +158,19 @@ export default function StudioPage() {
 
       {/* Центральная область - Диалог */}
       <div className="flex-1 flex flex-col">
+        {/* Мобильная кнопка меню */}
+        <div className="md:hidden p-4 border-b bg-background/80 backdrop-blur-sm">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="flex items-center gap-2"
+          >
+            <Menu className="h-4 w-4" />
+            Сессии
+          </Button>
+        </div>
+        
         <StudioChat
           sessionId={currentSessionId || undefined}
           onGenerationComplete={handleGenerationComplete}
