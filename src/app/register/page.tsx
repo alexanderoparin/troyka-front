@@ -23,9 +23,6 @@ const registerSchema = z.object({
     .regex(/[A-ZА-Я]/, "Пароль должен содержать заглавные буквы")
     .regex(/\d/, "Пароль должен содержать цифры")
     .regex(/[@$!%*?&]/, "Пароль должен содержать специальные символы (@$!%*?&)"),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  phone: z.string().optional(),
 })
 
 type RegisterFormData = z.infer<typeof registerSchema>
@@ -102,27 +99,6 @@ export default function RegisterPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">Имя</Label>
-                  <Input
-                    id="firstName"
-                    {...register("firstName")}
-                    placeholder="Имя"
-                    disabled={isLoading}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Фамилия</Label>
-                  <Input
-                    id="lastName"
-                    {...register("lastName")}
-                    placeholder="Фамилия"
-                    disabled={isLoading}
-                  />
-                </div>
-              </div>
-
               <div className="space-y-2">
                 <Label htmlFor="username">Логин *</Label>
                 <Input
@@ -181,20 +157,6 @@ export default function RegisterPage() {
                 </div>
                 {errors.password && (
                   <p className="text-sm text-destructive">{errors.password.message}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="phone">Телефон</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  {...register("phone")}
-                  placeholder="+7 (999) 123-45-67"
-                  disabled={isLoading}
-                />
-                {errors.phone && (
-                  <p className="text-sm text-destructive">{errors.phone.message}</p>
                 )}
               </div>
 

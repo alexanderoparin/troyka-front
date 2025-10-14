@@ -99,9 +99,7 @@ export default function AccountPage() {
                 />
                 <div>
                   <p className="font-medium">
-                    {user.firstName && user.lastName 
-                      ? `${user.firstName} ${user.lastName}` 
-                      : user.username}
+                    {user.username}
                   </p>
                 </div>
               </div>
@@ -136,18 +134,6 @@ export default function AccountPage() {
                       Не подтвержден
                     </Badge>
                   )}
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Имя</p>
-                  <p className="font-medium">{user.firstName || '—'}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Фамилия</p>
-                  <p className="font-medium">{user.lastName || '—'}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Телефон</p>
-                  <p className="font-medium">{user.phone || '—'}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Дата регистрации</p>
