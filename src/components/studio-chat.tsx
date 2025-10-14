@@ -586,7 +586,7 @@ export function StudioChat({
                         }}
                       />
                       {/* Опции генерации */}
-                      <div className="flex flex-col gap-1 sm:flex-row">
+                      <div className="flex flex-col gap-1">
                         {/* Первый ряд */}
                         <div className="flex items-center gap-1 sm:gap-2">
                           {/* Формат изображения */}
