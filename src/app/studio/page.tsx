@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { EmailVerificationBanner } from "@/components/email-verification-banner"
 import { StudioSessions } from "@/components/studio-sessions"
 import { StudioChat } from "@/components/studio-chat"
+import { Header } from "@/components/header"
 import { AlertCircle, User, Eye, Menu } from "lucide-react"
 import Link from "next/link"
 import { useState, useCallback, useEffect } from "react"
@@ -112,6 +113,8 @@ export default function StudioPage() {
 
   return (
     <div className="flex h-screen relative">
+      {/* Floating Header */}
+      <Header />
       {/* Мобильное меню - Сессии */}
       {isMobileMenuOpen && (
         <div className="md:hidden fixed inset-0 z-50 bg-black/50" onClick={() => setIsMobileMenuOpen(false)}>

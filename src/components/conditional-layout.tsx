@@ -11,14 +11,11 @@ interface ConditionalLayoutProps {
 export function ConditionalLayout({ children }: ConditionalLayoutProps) {
   const pathname = usePathname()
   
-  // Для студии используем специальный layout с header, но без footer
+  // Для студии используем специальный layout без header и footer
   if (pathname === '/studio') {
     return (
-      <div className="h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700 flex flex-col">
-        <Header />
-        <main className="flex-1 overflow-hidden">
-          {children}
-        </main>
+      <div className="h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">
+        {children}
       </div>
     )
   }

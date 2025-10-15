@@ -1070,3 +1070,215 @@
     padding: 0.75rem !important;
   }
 }
+
+/* Logo Home Button Styles */
+@layer components {
+  .logo-home-button {
+    @apply flex items-center space-x-1 sm:space-x-2 flex-shrink-0 transition-all duration-200;
+    @apply hover:scale-105 active:scale-95;
+  }
+
+  .logo-home-button:hover {
+    @apply transform-gpu;
+  }
+
+  .logo-home-button.active {
+    @apply bg-primary/10 ring-1 ring-primary/20;
+  }
+
+  .logo-icon {
+    @apply h-6 w-6 sm:h-8 sm:w-8 text-primary transition-all duration-200;
+  }
+
+  .logo-home-button:hover .logo-icon {
+    @apply text-primary/80 rotate-12 scale-110;
+  }
+
+  .logo-icon.active {
+    @apply text-primary;
+  }
+
+  .logo-text {
+    @apply text-lg sm:text-2xl font-bold gradient-text transition-all duration-200;
+  }
+
+  .logo-home-button:hover .logo-text {
+    @apply scale-105;
+  }
+
+  .logo-text.active {
+    @apply text-primary;
+  }
+
+  /* Pulsing animation for active logo */
+  .logo-home-button.active .logo-icon {
+    animation: logo-pulse 2s ease-in-out infinite;
+  }
+
+  .logo-home-button.active .logo-text {
+    animation: logo-glow 2s ease-in-out infinite;
+  }
+
+}
+
+/* Floating Toolbar Styles */
+@layer components {
+  .floating-toolbar {
+    @apply inline-flex items-center gap-0.5 px-3 py-2 rounded-xl transition-all duration-300;
+    @apply bg-background/85 backdrop-blur-xl border border-border/40;
+    @apply shadow-lg hover:shadow-xl hover:shadow-primary/10;
+    @apply dark:bg-background/90 dark:border-border/20;
+    @apply dark:hover:shadow-primary/20;
+  }
+
+  .floating-toolbar:hover {
+    @apply scale-105 shadow-xl shadow-primary/15 dark:shadow-primary/25;
+  }
+
+  .floating-toolbar-button {
+    @apply h-8 w-8 rounded-lg transition-all duration-200;
+    @apply hover:bg-primary/15 hover:scale-110;
+    @apply dark:hover:bg-primary/25;
+    @apply active:scale-95;
+  }
+
+  .floating-toolbar-button.active {
+    @apply bg-primary/20 text-primary scale-110 ring-1 ring-primary/30;
+  }
+
+  .floating-user-info {
+    @apply flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300;
+    @apply bg-background/90 backdrop-blur-xl border border-border/50 shadow-lg;
+    @apply hover:shadow-xl hover:scale-105;
+    @apply dark:bg-background/95 dark:border-border/30;
+  }
+
+  /* Floating toolbar animations */
+  .floating-toolbar-enter {
+    animation: floating-toolbar-enter 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .floating-toolbar-exit {
+    animation: floating-toolbar-exit 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* Glow effect for active buttons */
+  .floating-toolbar-button.active::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, hsl(var(--primary)), hsl(var(--primary) / 0.3));
+    border-radius: 12px;
+    z-index: -1;
+    opacity: 0.6;
+    animation: floating-glow 2s ease-in-out infinite alternate;
+  }
+
+  /* Pulse effect for new items */
+  .floating-toolbar-button.new {
+    animation: floating-pulse 1s ease-in-out infinite;
+  }
+}
+
+/* Floating toolbar keyframes */
+@keyframes floating-toolbar-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes floating-toolbar-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+}
+
+@keyframes floating-glow {
+  from {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes floating-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0.7);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 8px hsl(var(--primary) / 0);
+  }
+}
+
+/* Logo animations */
+@keyframes logo-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+@keyframes logo-glow {
+  0%, 100% {
+    text-shadow: 0 0 5px hsl(var(--primary) / 0.3);
+  }
+  50% {
+    text-shadow: 0 0 15px hsl(var(--primary) / 0.6), 0 0 25px hsl(var(--primary) / 0.3);
+  }
+}
+
+/* Mobile floating toolbar adjustments */
+@media screen and (max-width: 768px) {
+  .floating-toolbar {
+    @apply px-3 py-2 gap-0.5;
+  }
+
+  .floating-toolbar-button {
+    @apply h-8 w-8;
+  }
+
+  .floating-user-info {
+    @apply px-3 py-1.5 text-xs;
+  }
+}
+
+/* iPhone specific floating toolbar fixes */
+@media screen and (max-width: 428px) {
+  .floating-toolbar {
+    @apply px-2 py-1.5 gap-0;
+  }
+
+  .floating-toolbar-button {
+    @apply h-7 w-7;
+  }
+
+  .floating-toolbar-button svg {
+    @apply h-3 w-3;
+  }
+
+  .floating-user-info {
+    @apply px-2 py-1 text-xs;
+  }
+}

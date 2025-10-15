@@ -333,8 +333,8 @@ export function StudioChat({
     <TooltipProvider>
       <div className={cn("h-full flex flex-col", className)} onPaste={handlePaste}>
       {/* История диалога */}
-      <ScrollArea ref={scrollAreaRef} className="flex-1 p-6">
-        <div className="space-y-6 pb-32">
+      <ScrollArea ref={scrollAreaRef} className="flex-1">
+        <div className="space-y-6 pb-32 p-6">
           {/* Кнопка загрузки предыдущих сообщений */}
           {hasMore && (
             <div className="flex justify-center">
