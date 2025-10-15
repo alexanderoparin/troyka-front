@@ -72,14 +72,14 @@ export default function ContactsPage() {
     }
   };
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-20">
         {/* Заголовок */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+          <h1 className="text-4xl font-bold text-foreground mb-4">
             Контакты
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Свяжитесь с нами для получения поддержки или по любым вопросам
           </p>
         </div>
@@ -87,21 +87,21 @@ export default function ContactsPage() {
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Контактная информация */}
           <div className="space-y-6">
-            <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+            <Card className="bg-slate-50 dark:bg-card border-slate-200 dark:border-border">
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2 text-gray-900 dark:text-gray-100">
-                  <MessageCircle className="w-5 h-5 text-blue-600" />
+                <CardTitle className="flex items-center space-x-2">
+                  <MessageCircle className="w-5 h-5 text-primary" />
                   <span>Контактная информация</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center space-x-3">
-                  <Mail className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                  <Mail className="w-5 h-5 text-muted-foreground" />
                   <div>
-                    <p className="font-medium text-gray-900 dark:text-gray-100">Email</p>
+                    <p className="font-medium">Email</p>
                     <a 
                       href="mailto:support@24reshai.ru" 
-                      className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200"
+                      className="text-primary hover:text-primary/80 transition-colors duration-200"
                     >
                       support@24reshai.ru
                     </a>
@@ -111,38 +111,38 @@ export default function ContactsPage() {
             </Card>
 
             {/* Реквизиты */}
-            <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+            <Card className="bg-slate-50 dark:bg-card border-slate-200 dark:border-border">
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2 text-gray-900 dark:text-gray-100">
-                  <MapPin className="w-5 h-5 text-blue-600" />
+                <CardTitle className="flex items-center space-x-2">
+                  <MapPin className="w-5 h-5 text-primary" />
                   <span>Реквизиты</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-gray-100">Индивидуальный предприниматель</p>
-                  <p className="text-gray-700 dark:text-gray-300">Бурцев Даниил Викторович</p>
+                  <p className="font-medium">Индивидуальный предприниматель</p>
+                  <p className="text-muted-foreground">Бурцев Даниил Викторович</p>
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-gray-100">ИНН</p>
-                  <p className="text-gray-700 dark:text-gray-300 font-mono">482619660921</p>
+                  <p className="font-medium">ИНН</p>
+                  <p className="text-muted-foreground font-mono">482619660921</p>
                 </div>
               </CardContent>
             </Card>
 
             {/* Время работы */}
-            <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+            <Card className="bg-slate-50 dark:bg-card border-slate-200 dark:border-border">
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2 text-gray-900 dark:text-gray-100">
-                  <Clock className="w-5 h-5 text-blue-600" />
+                <CardTitle className="flex items-center space-x-2">
+                  <Clock className="w-5 h-5 text-primary" />
                   <span>Время работы</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className="text-muted-foreground">
                   Поддержка работает 24/7
                 </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                <p className="text-sm text-muted-foreground/70 mt-2">
                   Мы отвечаем на письма в течение 24 часов
                 </p>
               </CardContent>
@@ -151,18 +151,18 @@ export default function ContactsPage() {
 
           {/* Форма обратной связи */}
           <div>
-            <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+            <Card className="bg-slate-50 dark:bg-card border-slate-200 dark:border-border">
               <CardHeader>
-                <CardTitle className="text-gray-900 dark:text-gray-100">Написать нам</CardTitle>
+                <CardTitle>Написать нам</CardTitle>
               </CardHeader>
               <CardContent>
                 {isSubmitted ? (
                   <div className="text-center py-8">
                     <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                    <h3 className="text-xl font-semibold mb-2">
                       Сообщение отправлено!
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-300 mb-4">
+                    <p className="text-muted-foreground mb-4">
                       Спасибо за обращение! Мы ответим в течение 24 часов.
                     </p>
                     <Button 

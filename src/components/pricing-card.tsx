@@ -65,7 +65,7 @@ export function PricingCard({ plan, isPopular = false, className }: PricingCardP
 
   return (
     <div className={cn(
-      "card-ios p-8 relative animate-ios-fade-in",
+      "card-ios p-8 relative animate-ios-fade-in bg-slate-50 dark:bg-card border-slate-200 dark:border-border",
       isPlanPopular && "card-ios-elevated",
       className
     )}>

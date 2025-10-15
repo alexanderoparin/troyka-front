@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { useAuth } from "@/contexts/auth-context"
 import { useImageHistory } from "@/hooks/use-image-history"
 import { useRouter } from "next/navigation"
@@ -8,12 +9,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { 
   History,
   Image as ImageIcon,
-  ExternalLink,
   AlertCircle,
   ArrowLeft,
-  Download
+  Download,
+  Maximize2,
+  X
 } from "lucide-react"
-import { ImageEditButton } from "@/components/image-edit-button"
 import { formatDate } from "@/lib/utils"
 import { apiClient } from "@/lib/api-client"
 import Link from "next/link"
@@ -23,6 +24,22 @@ export default function HistoryPage() {
   const { isAuthenticated, isLoading } = useAuth()
   const { history: imageHistory, isLoading: historyLoading, error: historyError, refetch } = useImageHistory()
   const router = useRouter()
+  const [selectedImageForModal, setSelectedImageForModal] = useState<string | null>(null)
+
+  // Функция для открытия изображения в полный размер
+  const handleImageExpand = (imageUrl: string) => {
+    setSelectedImageForModal(imageUrl)
+  }
+
+  // Функция для скачивания изображения
+  const handleImageDownload = (imageUrl: string) => {
+    const link = document.createElement('a')
+    link.href = imageUrl
+    link.download = `generated-image-${Date.now()}.jpg`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 
   if (isLoading) {
     return (
@@ -103,38 +120,39 @@ export default function HistoryPage() {
               {imageHistory.map((item, index) => (
                 <div key={index} className="group border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
                   <div className="relative aspect-square bg-muted">
-                  <Image
+                    <Image
                       src={apiClient.getFileUrl(item.imageUrls[0])}
                       alt={item.prompt}
-                    fill
+                      fill
                       className="object-cover group-hover:scale-105 transition-transform duration-200"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
-                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                    
+                    {/* Overlay с действиями - только при hover */}
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                       <Button
-                        variant="secondary"
                         size="sm"
-                        asChild
+                        variant="secondary"
                         className="h-8 w-8 p-0"
-                      >
-                        <a
-                          href={apiClient.getFileUrl(item.imageUrls[0])}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                        </a>
-                      </Button>
-                      <ImageEditButton
-                        imageUrl={item.imageUrls[0]}
-                        originalPrompt={item.prompt}
-                        onImageEdited={() => {
-                          // Обновляем историю после редактирования
-                          refetch();
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleImageExpand(apiClient.getFileUrl(item.imageUrls[0]))
                         }}
-                      />
-                      </div>
+                      >
+                        <Maximize2 className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="h-8 w-8 p-0"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleImageDownload(apiClient.getFileUrl(item.imageUrls[0]))
+                        }}
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                   <div className="p-4">
                     <p className="text-sm font-medium line-clamp-2 mb-2" title={item.prompt}>
@@ -142,22 +160,6 @@ export default function HistoryPage() {
                     </p>
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
                       <span>{formatDate(new Date(item.createdAt))}</span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        asChild
-                        className="h-6 px-2 text-xs"
-                      >
-                        <a
-                          href={apiClient.getFileUrl(item.imageUrls[0])}
-                          download
-                          target="_blank"
-                          rel="noopener noreferrer"
-                      >
-                        <Download className="h-3 w-3 mr-1" />
-                        Скачать
-                        </a>
-                      </Button>
                     </div>
                   </div>
                 </div>
@@ -178,6 +180,32 @@ export default function HistoryPage() {
       )}
         </CardContent>
       </Card>
+
+      {/* Модальное окно для просмотра изображения */}
+      {selectedImageForModal && (
+        <div
+          className="fixed inset-0 bg-black/80 flex items-center justify-center z-[9999] p-4"
+          onClick={() => setSelectedImageForModal(null)}
+        >
+          <div className="relative max-w-4xl max-h-[90vh] w-full h-full">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-white"
+              onClick={() => setSelectedImageForModal(null)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+            <Image
+              src={selectedImageForModal}
+              alt="Полный размер изображения"
+              fill
+              className="object-contain"
+              sizes="90vw"
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

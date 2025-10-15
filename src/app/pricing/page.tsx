@@ -14,7 +14,7 @@ export default function PricingPage() {
   const { isAuthenticated, points } = useAuth()
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-12 pt-20">
       {/* Header */}
       <div className="text-center space-y-6">
         <Badge variant="secondary" className="mb-4 text-callout bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-700 px-4 py-2 rounded-full">
@@ -76,7 +76,7 @@ export default function PricingPage() {
         </div>
         
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="card-ios p-8 animate-ios-fade-in">
+          <div className="card-ios p-8 animate-ios-fade-in bg-slate-50 dark:bg-card border-slate-200 dark:border-border">
             <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center mb-6">
               <Target className="h-8 w-8 text-blue-600 dark:text-blue-400" />
             </div>
@@ -97,7 +97,7 @@ export default function PricingPage() {
               </ul>
           </div>
 
-          <div className="card-ios p-8 animate-ios-fade-in" style={{ animationDelay: '0.1s' }}>
+          <div className="card-ios p-8 animate-ios-fade-in bg-slate-50 dark:bg-card border-slate-200 dark:border-border" style={{ animationDelay: '0.1s' }}>
             <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-2xl flex items-center justify-center mb-6">
               <Zap className="h-8 w-8 text-green-600 dark:text-green-400" />
             </div>
@@ -118,7 +118,7 @@ export default function PricingPage() {
               </ul>
           </div>
 
-          <div className="card-ios p-8 animate-ios-fade-in" style={{ animationDelay: '0.2s' }}>
+          <div className="card-ios p-8 animate-ios-fade-in bg-slate-50 dark:bg-card border-slate-200 dark:border-border" style={{ animationDelay: '0.2s' }}>
             <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-2xl flex items-center justify-center mb-6">
               <Star className="h-8 w-8 text-purple-600 dark:text-purple-400" />
             </div>
@@ -148,28 +148,28 @@ export default function PricingPage() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
-          <div className="card-ios p-6 animate-ios-fade-in">
+          <div className="card-ios p-6 animate-ios-fade-in bg-slate-50 dark:bg-card border-slate-200 dark:border-border">
             <h3 className="text-title-3 text-foreground mb-4">Как работает система поинтов?</h3>
             <p className="text-body text-muted-foreground">
               1 генерация изображения = 3 поинта. Поинты не сгорают и остаются на вашем счету навсегда.
             </p>
           </div>
 
-          <div className="card-ios p-6 animate-ios-fade-in" style={{ animationDelay: '0.1s' }}>
+          <div className="card-ios p-6 animate-ios-fade-in bg-slate-50 dark:bg-card border-slate-200 dark:border-border" style={{ animationDelay: '0.1s' }}>
             <h3 className="text-title-3 text-foreground mb-4">Безопасны ли платежи?</h3>
             <p className="text-body text-muted-foreground">
               Да, все платежи проходят через защищенный шлюз Робокассы с SSL-шифрованием. Мы не храним данные ваших карт.
             </p>
           </div>
 
-          <div className="card-ios p-6 animate-ios-fade-in" style={{ animationDelay: '0.2s' }}>
+          <div className="card-ios p-6 animate-ios-fade-in bg-slate-50 dark:bg-card border-slate-200 dark:border-border" style={{ animationDelay: '0.2s' }}>
             <h3 className="text-title-3 text-foreground mb-4">Есть ли ограничения по использованию?</h3>
             <p className="text-body text-muted-foreground">
               Нет ограничений. Вы можете использовать созданные изображения в коммерческих целях.
             </p>
           </div>
 
-          <div className="card-ios p-6 animate-ios-fade-in" style={{ animationDelay: '0.3s' }}>
+          <div className="card-ios p-6 animate-ios-fade-in bg-slate-50 dark:bg-card border-slate-200 dark:border-border" style={{ animationDelay: '0.3s' }}>
             <h3 className="text-title-3 text-foreground mb-4">Как получить +6 поинтов при регистрации?</h3>
             <p className="text-body text-muted-foreground mb-3">
               Поинты автоматически начисляются на ваш счет сразу после создания аккаунта.
@@ -180,7 +180,7 @@ export default function PricingPage() {
             </p>
           </div>
 
-          <div className="card-ios p-6 animate-ios-fade-in" style={{ animationDelay: '0.4s' }}>
+          <div className="card-ios p-6 animate-ios-fade-in bg-slate-50 dark:bg-card border-slate-200 dark:border-border" style={{ animationDelay: '0.4s' }}>
             <h3 className="text-title-3 text-foreground mb-4">Можно ли вернуть деньги?</h3>
             <p className="text-body text-muted-foreground">
               Да, возврат денежных средств возможен. Подробные условия возврата 
@@ -191,7 +191,7 @@ export default function PricingPage() {
       </div>
 
       {/* CTA */}
-      <div className="text-center py-16 card-ios-elevated">
+      <div className="text-center py-16 card-ios-elevated bg-slate-50 dark:bg-card border-slate-200 dark:border-border rounded-xl">
         <h2 className="text-title-1 text-foreground mb-6">Готовы начать?</h2>
         {isAuthenticated ? (
           <div className="space-y-6">

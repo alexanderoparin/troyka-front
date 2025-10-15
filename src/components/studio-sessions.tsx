@@ -41,8 +41,6 @@ import { cn } from "@/lib/utils"
 import { useSessionsList } from "@/hooks/use-sessions-list"
 import { Session } from "@/lib/api-client"
 import Image from "next/image"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
 
 interface StudioSessionsProps {
   currentSessionId?: number
@@ -51,14 +49,13 @@ interface StudioSessionsProps {
   className?: string
 }
 
-export function StudioSessions({ 
-  currentSessionId, 
-  onSessionSelect, 
+export function StudioSessions({
+  currentSessionId,
+  onSessionSelect,
   onNewSession,
-  className 
+  className
 }: StudioSessionsProps) {
   const [page, setPage] = useState(0)
-  const pathname = usePathname()
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
@@ -209,22 +206,6 @@ export function StudioSessions({
   return (
     <TooltipProvider>
       <div className={cn("h-full flex flex-col bg-background/80 backdrop-blur-sm rounded-r-xl border-r border-border/20 shadow-lg relative z-[60]", className)}>
-        {/* Логотип - Clickable Home Button */}
-        <div className="p-3 border-b border-border/20 flex justify-center">
-          <Link 
-            href="/" 
-            className={cn(
-              "inline-flex items-center justify-center h-12 w-12 rounded-xl transition-all duration-200 relative z-[70] cursor-pointer",
-              "hover:scale-110 active:scale-95 hover:bg-primary/10",
-              pathname === "/" && "!bg-primary !text-primary-foreground scale-110"
-            )}
-            title="24reshai - Главная страница"
-          >
-            <svg className="h-7 w-7 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-          </Link>
-        </div>
 
         {/* Кнопка создания */}
         <div className="p-1.5 border-b border-border/20">
