@@ -55,6 +55,7 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
   const [isGenerating, setIsGenerating] = useState(false)
   const [uploadedImages, setUploadedImages] = useState<string[]>(initialImages)
   const [aspectRatio, setAspectRatio] = useState('3:4')
+  const [isDragOver, setIsDragOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
   const { points, refreshPoints } = useAuth()
@@ -182,11 +183,26 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
   }
 
 
-  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files
-    if (!files || files.length === 0) return
+  const handleFileUpload = async (file: File) => {
+    // Проверяем тип файла
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Ошибка",
+        description: "Пожалуйста, выберите изображение",
+        variant: "destructive",
+      })
+      return
+    }
 
-    const file = files[0]
+    // Проверяем размер файла (максимум 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: "Ошибка",
+        description: "Файл слишком большой (максимум 10MB)",
+        variant: "destructive",
+      })
+      return
+    }
     
     try {
       const response = await apiClient.uploadFile(file)
@@ -208,20 +224,59 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
     }
   }
 
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files
+    if (!files || files.length === 0) return
+
+    const file = files[0]
+    await handleFileUpload(file)
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragOver(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragOver(false)
+  }
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragOver(false)
+
+    const files = e.dataTransfer.files
+    if (files && files.length > 0) {
+      const file = files[0]
+      await handleFileUpload(file)
+    }
+  }
+
 
   return (
-    <div className="generation-form space-y-6">
+    <div 
+      className={`generation-form space-y-6 ${isDragOver ? 'bg-primary/5 border-2 border-dashed border-primary/60 rounded-lg p-4' : ''}`}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Prompt Input with Upload Button */}
         <div className="space-y-4">
           <div className="relative">
             <Textarea
               {...register("prompt")}
-              placeholder={uploadedImages.length > 0
-                ? "Опишите, как изменить изображение..."
-                : initialPrompt 
-                  ? "Опишите изменения для изображения..."
-                  : "Опишите изображение, которое хотите создать..."
+              placeholder={isDragOver 
+                ? "Отпустите файл для загрузки..."
+                : uploadedImages.length > 0
+                  ? "Опишите, как изменить изображение..."
+                  : initialPrompt 
+                    ? "Опишите изменения для изображения..."
+                    : "Опишите изображение, которое хотите создать..."
               }
               className={cn(
                 "min-h-[150px] text-base resize-none border-2 rounded-2xl px-6 py-4 pr-40",

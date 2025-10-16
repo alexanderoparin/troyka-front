@@ -55,6 +55,7 @@ export function StudioChat({
   const [uploadedImages, setUploadedImages] = useState<string[]>([])
   const [isFocused, setIsFocused] = useState(false)
   const [selectedImageForModal, setSelectedImageForModal] = useState<string | null>(null)
+  const [isDragOver, setIsDragOver] = useState(false)
   
   const aspectRatios = ['3:4', '1:1', '4:3', '4:5', '3:2', '2:3', '16:9', '9:16', '7.5:2']
   const scrollAreaRef = useRef<HTMLDivElement>(null)
@@ -93,15 +94,22 @@ export function StudioChat({
     }
   }, [history.length])
 
-  const handleFileUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-
+  const handleFileUpload = useCallback(async (file: File) => {
     // Проверяем тип файла
     if (!file.type.startsWith('image/')) {
       toast({
         title: "Ошибка",
         description: "Пожалуйста, выберите изображение",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Проверяем размер файла (максимум 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: "Ошибка",
+        description: "Файл слишком большой (максимум 10MB)",
         variant: "destructive",
       })
       return
@@ -127,6 +135,36 @@ export function StudioChat({
       })
     }
   }, [toast])
+
+  const handleFileInputChange = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    await handleFileUpload(file)
+  }, [handleFileUpload])
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragOver(true)
+  }, [])
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragOver(false)
+  }, [])
+
+  const handleDrop = useCallback(async (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragOver(false)
+
+    const files = e.dataTransfer.files
+    if (files && files.length > 0) {
+      const file = files[0]
+      await handleFileUpload(file)
+    }
+  }, [handleFileUpload])
 
   const handlePaste = useCallback(async (event: React.ClipboardEvent) => {
     const items = event.clipboardData?.items
@@ -520,7 +558,14 @@ export function StudioChat({
             {/* Плавающее окно ввода промпта */}
             <div className="fixed bottom-2 left-0 right-0 z-50">
               <div className="flex justify-center px-2 sm:px-6">
-                <div className={`${isFocused ? 'bg-background/95' : 'bg-background/60'} backdrop-blur-md border border-border/40 rounded-lg shadow-lg px-2 py-1 w-full max-w-[700px] transition-all duration-200`}>
+                <div 
+                  className={`${isFocused ? 'bg-background/95' : 'bg-background/60'} backdrop-blur-md border border-border/40 rounded-lg shadow-lg px-2 py-1 w-full max-w-[700px] transition-all duration-200 ${
+                    isDragOver ? 'border-primary/60 bg-primary/5' : ''
+                  }`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                >
           {/* Загруженные изображения */}
           {uploadedImages.length > 0 && (
             <div className="mb-1">
@@ -575,7 +620,7 @@ export function StudioChat({
                       <Textarea
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
-                        placeholder="Опишите изображение, которое хотите создать..."
+                        placeholder={isDragOver ? "Отпустите файл для загрузки..." : "Опишите изображение, которое хотите создать..."}
                         className="h-8 sm:h-[54px] resize-none text-xs sm:text-base flex-1 bg-muted/80 border border-border/80 focus:border-primary/80 focus:bg-muted/95"
                         onFocus={() => setIsFocused(true)}
                         onBlur={() => setIsFocused(false)}
@@ -654,7 +699,7 @@ export function StudioChat({
                             ref={fileInputRef}
                             type="file"
                             accept="image/*"
-                            onChange={handleFileUpload}
+                            onChange={handleFileInputChange}
                             className="hidden"
                           />
                           <Tooltip>
