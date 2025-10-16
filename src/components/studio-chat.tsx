@@ -18,7 +18,8 @@ import {
   Copy,
   Check,
   Maximize2,
-  X
+  X,
+  Pencil
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/components/ui/use-toast"
@@ -485,7 +486,7 @@ export function StudioChat({
                                 ? "border-primary ring-2 ring-primary/20" 
                                 : "border-border hover:border-primary/50"
                             )}
-                            onClick={() => handleImageSelect(imageUrl)}
+                            onClick={() => handleImageExpand(imageUrl)}
                           >
                             <div className="w-full aspect-square relative">
                               <Image
@@ -495,35 +496,49 @@ export function StudioChat({
                                 className="object-cover"
                               />
                               
-                              {/* Overlay с действиями */}
-                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="secondary"
-                                  className="h-8 w-8 p-0"
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    handleImageExpand(imageUrl)
-                                  }}
-                                >
-                                  <Maximize2 className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="secondary"
-                                  className="h-8 w-8 p-0"
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    handleImageDownload(imageUrl)
-                                  }}
-                                >
-                                  <Download className="h-4 w-4" />
-                                </Button>
+                              {/* Overlay с действиями в правом верхнем углу */}
+                              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      size="sm"
+                                      variant="secondary"
+                                      className="h-7 w-7 p-0 bg-black/50 hover:bg-black/70 text-white border-0"
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        handleImageSelect(imageUrl)
+                                      }}
+                                    >
+                                      <Pencil className="h-3 w-3" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent className="z-[9998]">
+                                    <p>Редактировать изображение</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      size="sm"
+                                      variant="secondary"
+                                      className="h-7 w-7 p-0 bg-black/50 hover:bg-black/70 text-white border-0"
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        handleImageDownload(imageUrl)
+                                      }}
+                                    >
+                                      <Download className="h-3 w-3" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent className="z-[9998]">
+                                    <p>Скачать изображение</p>
+                                  </TooltipContent>
+                                </Tooltip>
                               </div>
 
                               {/* Индикатор выбора */}
                               {selectedImages.includes(imageUrl) && (
-                                <div className="absolute top-2 right-2">
+                                <div className="absolute top-2 left-2">
                                   <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
                                     <span className="text-primary-foreground text-xs font-bold">
                                       {selectedImages.indexOf(imageUrl) + 1}
