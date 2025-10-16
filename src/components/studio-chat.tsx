@@ -522,7 +522,7 @@ export function StudioChat({
                                           <Pencil className="h-3 w-3" />
                                         </Button>
                                       </TooltipTrigger>
-                                      <TooltipContent className="z-[9998]">
+                                      <TooltipContent className="z-[140]">
                                         <p>Редактировать изображение</p>
                                       </TooltipContent>
                                     </Tooltip>
@@ -586,7 +586,7 @@ export function StudioChat({
                                       <Pencil className="h-3 w-3" />
                                     </Button>
                                   </TooltipTrigger>
-                                  <TooltipContent className="z-[9998]">
+                                  <TooltipContent className="z-[140]">
                                     <p>Редактировать изображение</p>
                                   </TooltipContent>
                                 </Tooltip>
@@ -604,7 +604,7 @@ export function StudioChat({
                                       <Download className="h-3 w-3" />
                                     </Button>
                                   </TooltipTrigger>
-                                  <TooltipContent className="z-[9998]">
+                                  <TooltipContent className="z-[140]">
                                     <p>Скачать изображение</p>
                                   </TooltipContent>
                                 </Tooltip>
@@ -645,7 +645,7 @@ export function StudioChat({
       </ScrollArea>
 
             {/* Плавающее окно ввода промпта */}
-            <div className="fixed bottom-2 left-0 right-0 z-50">
+            <div className="fixed bottom-2 left-0 right-0" style={{ zIndex: 10 }}>
               <div className="flex justify-center px-2 sm:px-6">
                 <div 
                   className={`${isFocused ? 'bg-background/95' : 'bg-background/60'} backdrop-blur-md border border-border/40 rounded-lg shadow-lg px-2 py-1 w-full max-w-[700px] transition-all duration-200 ${
@@ -735,7 +735,7 @@ export function StudioChat({
                               <Settings className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent className="w-56 z-[9999]" align="end">
+                          <DropdownMenuContent className="w-56 z-[150]" align="end">
                             <DropdownMenuLabel>Настройки генерации</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             
@@ -854,7 +854,7 @@ export function StudioChat({
                                 {outputFormat}
                               </Button>
                             </TooltipTrigger>
-                            <TooltipContent className="z-[9998]">
+                            <TooltipContent className="z-[140]">
                               <p>Формат изображения (нажмите для смены)</p>
                             </TooltipContent>
                           </Tooltip>
@@ -871,7 +871,7 @@ export function StudioChat({
                                 {numImages}
                               </Button>
                             </TooltipTrigger>
-                            <TooltipContent className="z-[9998]">
+                            <TooltipContent className="z-[140]">
                               <p>Количество изображений (нажмите для смены)</p>
                             </TooltipContent>
                           </Tooltip>
@@ -895,7 +895,7 @@ export function StudioChat({
                                 <ImageIcon className="h-4 w-4" />
                               </Button>
                             </TooltipTrigger>
-                            <TooltipContent className="z-[9998]">
+                            <TooltipContent className="z-[140]">
                               <p>Загрузить изображение</p>
                             </TooltipContent>
                           </Tooltip>
@@ -918,7 +918,7 @@ export function StudioChat({
                                 {artStyle}
                               </Button>
                             </TooltipTrigger>
-                            <TooltipContent className="z-[9998]">
+                            <TooltipContent className="z-[140]">
                               <p>Стиль изображения (нажмите для смены)</p>
                             </TooltipContent>
                           </Tooltip>
@@ -955,7 +955,7 @@ export function StudioChat({
 
       {/* Модальное окно для просмотра изображения */}
       {selectedImageForModal && (
-        <div className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/90 z-[200] flex items-center justify-center p-4">
           <div className="relative w-full h-full flex items-center justify-center">
             <Button
               variant="ghost"

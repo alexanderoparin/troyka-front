@@ -208,14 +208,14 @@ export function StudioSessions({
       <div className={cn("h-full flex flex-col bg-background/80 backdrop-blur-sm rounded-r-xl border-r border-border/20 shadow-lg relative z-[70]", className)}>
 
         {/* Кнопка создания */}
-        <div className="p-1.5 border-b border-border/20">
+        <div className="p-1 border-b border-border/20">
           <div className="flex justify-center">
             <button
               onClick={() => setIsCreateDialogOpen(true)}
               disabled={isCreating}
-              className="aspect-square w-full max-w-[80px] rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="aspect-square w-full max-w-[48px] rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center bg-primary/10 hover:bg-primary/20"
             >
-              <Plus className="h-10 w-10 text-primary" />
+              <Plus className="h-6 w-6 text-primary" />
             </button>
           </div>
         </div>
@@ -224,12 +224,11 @@ export function StudioSessions({
         <div className="flex-1 overflow-y-auto p-1">
           {isLoading ? (
             <div className="text-center text-muted-foreground py-4">
-              <div className="text-xs opacity-50">...</div>
+              <div className="w-4 h-4 mx-auto border-2 border-muted-foreground/20 border-t-muted-foreground rounded-full animate-spin"></div>
             </div>
           ) : sessions.length === 0 ? (
             <div className="text-center text-muted-foreground py-4">
-              <MessageSquare className="h-6 w-6 mx-auto mb-1 opacity-20" />
-              <p className="text-xs opacity-50">Нет сессий</p>
+              <MessageSquare className="h-4 w-4 mx-auto opacity-20" />
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-0.5">
@@ -244,7 +243,7 @@ export function StudioSessions({
                         onClick={() => onSessionSelect(session.id)}
                       >
                         {/* Миниатюра сессии - занимает всю ширину */}
-                        <div className="aspect-square relative rounded-xl overflow-hidden">
+                        <div className="aspect-square relative rounded-lg overflow-hidden">
                           {session.lastImageUrl ? (
                             <Image
                               src={session.lastImageUrl}
@@ -266,13 +265,13 @@ export function StudioSessions({
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="h-6 w-6 p-0 text-white hover:bg-white/20 rounded-full"
+                                    className="h-5 w-5 p-0 text-white hover:bg-white/20 rounded-full"
                                     onClick={(e) => e.stopPropagation()}
                                   >
                                     <MoreVertical className="h-3 w-3" />
                                   </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="z-[9999]">
+                                <DropdownMenuContent align="end" className="z-[10000]">
                                   <DropdownMenuItem onClick={() => openRenameDialog(session)}>
                                     <Edit3 className="h-4 w-4 mr-2" />
                                     Переименовать
@@ -319,14 +318,14 @@ export function StudioSessions({
 
         {/* Пагинация */}
         {totalPages > 1 && (
-          <div className="p-2 border-t border-border/20">
-            <div className="flex justify-center items-center gap-2">
+          <div className="p-1 border-t border-border/20">
+            <div className="flex justify-center items-center gap-1">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setPage(Math.max(0, page - 1))}
                 disabled={page === 0}
-                className="h-6 w-6 p-0 text-xs text-muted-foreground hover:text-foreground hover:bg-muted rounded-full"
+                className="h-5 w-5 p-0 text-xs text-muted-foreground hover:text-foreground hover:bg-muted rounded-full"
               >
                 ←
               </Button>
@@ -338,7 +337,7 @@ export function StudioSessions({
                 size="sm"
                 onClick={() => setPage(page + 1)}
                 disabled={!hasNext}
-                className="h-6 w-6 p-0 text-xs text-muted-foreground hover:text-foreground hover:bg-muted rounded-full"
+                className="h-5 w-5 p-0 text-xs text-muted-foreground hover:text-foreground hover:bg-muted rounded-full"
               >
                 →
               </Button>
