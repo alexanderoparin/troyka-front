@@ -19,7 +19,9 @@ import {
   Check,
   Maximize2,
   X,
-  Pencil
+  Pencil,
+  Settings,
+  ChevronDown
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/components/ui/use-toast"
@@ -31,6 +33,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { useSessionHistory } from "@/hooks/use-session-detail"
 import Image from "next/image"
 
@@ -63,6 +73,7 @@ export function StudioChat({
   const [isFocused, setIsFocused] = useState(false)
   const [selectedImageForModal, setSelectedImageForModal] = useState<string | null>(null)
   const [isDragOver, setIsDragOver] = useState(false)
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   
   const artStyles = [
     { name: 'Реалистичный', prompt: ', photorealistic, high quality, detailed, professional photography' },
@@ -693,13 +704,123 @@ export function StudioChat({
 
                   {/* Поле ввода промпта */}
                   <div className="mb-0">
-                    <div className="flex items-center gap-2">
+                    {/* Мобильная версия - минималистичный layout */}
+                    <div className="flex items-start gap-2 sm:hidden">
+                      {/* Поле ввода - полная ширина */}
+                      <Textarea
+                        value={prompt}
+                        onChange={(e) => handlePromptChange(e.target.value)}
+                        placeholder={isDragOver ? "Отпустите файл для загрузки..." : "Опишите изображение, которое хотите создать..."}
+                        className="h-12 resize-none text-sm flex-1 bg-muted/80 border border-border/80 focus:border-primary/80 focus:bg-muted/95"
+                        onFocus={() => setIsFocused(true)}
+                        onBlur={() => setIsFocused(false)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                            e.preventDefault()
+                            handleGenerate()
+                          }
+                        }}
+                      />
+                      
+                      {/* Кнопки управления - вертикально */}
+                      <div className="flex flex-col gap-1">
+                        {/* Кнопка настроек - сверху */}
+                        <DropdownMenu open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-10 w-10 p-0 bg-muted/80 hover:bg-muted/95 border border-border/80"
+                            >
+                              <Settings className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="w-56 z-[9999]" align="end">
+                            <DropdownMenuLabel>Настройки генерации</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            
+                            {/* Формат изображения */}
+                            <DropdownMenuItem
+                              onClick={() => setOutputFormat(prev => prev === 'JPEG' ? 'PNG' : 'JPEG')}
+                              className="flex items-center justify-between"
+                            >
+                              <span>Формат</span>
+                              <span className="text-muted-foreground">{outputFormat}</span>
+                            </DropdownMenuItem>
+                            
+                            {/* Количество изображений */}
+                            <DropdownMenuItem
+                              onClick={() => setNumImages(prev => prev >= 4 ? 1 : prev + 1)}
+                              className="flex items-center justify-between"
+                            >
+                              <span>Количество</span>
+                              <span className="text-muted-foreground">{numImages}</span>
+                            </DropdownMenuItem>
+                            
+                            {/* Стиль */}
+                            <DropdownMenuItem
+                              onClick={() => {
+                                const currentIndex = artStyles.findIndex(style => style.name === artStyle)
+                                const nextIndex = (currentIndex + 1) % artStyles.length
+                                setArtStyle(artStyles[nextIndex].name)
+                              }}
+                              className="flex items-center justify-between"
+                            >
+                              <span>Стиль</span>
+                              <span className="text-muted-foreground text-xs">{artStyle}</span>
+                            </DropdownMenuItem>
+                            
+                            <DropdownMenuSeparator />
+                            
+                            {/* Загрузка изображения */}
+                            <input
+                              ref={fileInputRef}
+                              type="file"
+                              accept="image/*"
+                              onChange={handleFileInputChange}
+                              className="hidden"
+                            />
+                            <DropdownMenuItem
+                              onClick={() => fileInputRef.current?.click()}
+                              className="flex items-center gap-2"
+                            >
+                              <ImageIcon className="h-4 w-4" />
+                              <span>Загрузить изображение</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+
+                        {/* Кнопка генерации - снизу */}
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              size="sm"
+                              className="h-10 w-10 p-0 bg-primary hover:bg-primary/90 text-primary-foreground"
+                              onClick={handleGenerate}
+                              disabled={isGenerating || !prompt.trim()}
+                            >
+                              {isGenerating ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Sparkles className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent className="z-[9998]">
+                            <p>{isGenerating ? "Генерация..." : "Генерировать"}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                    </div>
+
+                    {/* Десктопная версия - горизонтальный layout */}
+                    <div className="hidden sm:flex items-center gap-2">
                       {/* Поле ввода - слева */}
                       <Textarea
                         value={prompt}
                         onChange={(e) => handlePromptChange(e.target.value)}
                         placeholder={isDragOver ? "Отпустите файл для загрузки..." : "Опишите изображение, которое хотите создать..."}
-                        className="h-8 sm:h-[54px] resize-none text-xs sm:text-base flex-1 bg-muted/80 border border-border/80 focus:border-primary/80 focus:bg-muted/95"
+                        className="h-[54px] resize-none text-base flex-1 bg-muted/80 border border-border/80 focus:border-primary/80 focus:bg-muted/95"
                         onFocus={() => setIsFocused(true)}
                         onBlur={() => setIsFocused(false)}
                         onKeyDown={(e) => {
@@ -720,7 +841,7 @@ export function StudioChat({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-7 w-7 sm:h-10 sm:w-14 p-0 text-xs sm:text-sm bg-muted/80 hover:bg-muted/95 border border-border/80"
+                                className="h-10 w-14 p-0 text-sm bg-muted/80 hover:bg-muted/95 border border-border/80"
                                 onClick={() => setOutputFormat(prev => prev === 'JPEG' ? 'PNG' : 'JPEG')}
                               >
                                 {outputFormat}
@@ -737,7 +858,7 @@ export function StudioChat({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-7 w-7 sm:h-10 sm:w-12 p-0 text-xs sm:text-sm bg-muted/80 hover:bg-muted/95 border border-border/80"
+                                className="h-10 w-12 p-0 text-sm bg-muted/80 hover:bg-muted/95 border border-border/80"
                                 onClick={() => setNumImages(prev => prev >= 4 ? 1 : prev + 1)}
                               >
                                 {numImages}
@@ -761,10 +882,10 @@ export function StudioChat({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-7 w-7 sm:h-10 sm:w-12 p-0 bg-muted/80 hover:bg-muted/95 border border-border/80"
+                                className="h-10 w-12 p-0 bg-muted/80 hover:bg-muted/95 border border-border/80"
                                 onClick={() => fileInputRef.current?.click()}
                               >
-                                <ImageIcon className="h-3 w-3 sm:h-4 sm:w-4" />
+                                <ImageIcon className="h-4 w-4" />
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent className="z-[9998]">
@@ -780,7 +901,7 @@ export function StudioChat({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-7 w-full sm:h-9 sm:w-full p-0 text-xs sm:text-sm bg-muted/80 hover:bg-muted/95 border border-border/80"
+                                className="h-9 w-full p-0 text-sm bg-muted/80 hover:bg-muted/95 border border-border/80"
                                 onClick={() => {
                                   const currentIndex = artStyles.findIndex(style => style.name === artStyle)
                                   const nextIndex = (currentIndex + 1) % artStyles.length
@@ -802,14 +923,14 @@ export function StudioChat({
                         <TooltipTrigger asChild>
                           <Button
                             size="sm"
-                            className="h-9 w-12 sm:h-[80px] sm:w-[80px] p-0 bg-primary hover:bg-primary/90 text-primary-foreground"
+                            className="h-[80px] w-[80px] p-0 bg-primary hover:bg-primary/90 text-primary-foreground"
                             onClick={handleGenerate}
                             disabled={isGenerating || !prompt.trim()}
                           >
                             {isGenerating ? (
-                              <Loader2 className="h-3 w-3 sm:h-6 sm:w-6 animate-spin" />
+                              <Loader2 className="h-6 w-6 animate-spin" />
                             ) : (
-                              <Sparkles className="h-3 w-3 sm:h-6 sm:w-6" />
+                              <Sparkles className="h-6 w-6" />
                             )}
                           </Button>
                         </TooltipTrigger>
