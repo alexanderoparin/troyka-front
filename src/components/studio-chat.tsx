@@ -597,7 +597,7 @@ export function StudioChat({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-10 w-10 sm:h-10 sm:w-14 p-0 text-xs sm:text-sm bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
+                                className="h-8 w-8 sm:h-10 sm:w-14 p-0 text-xs sm:text-sm bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
                                 onClick={() => setOutputFormat(prev => prev === 'JPEG' ? 'PNG' : 'JPEG')}
                               >
                                 {outputFormat}
@@ -614,7 +614,7 @@ export function StudioChat({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-10 w-10 sm:h-10 sm:w-12 p-0 text-xs sm:text-sm bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
+                                className="h-8 w-8 sm:h-10 sm:w-12 p-0 text-xs sm:text-sm bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
                                 onClick={() => setNumImages(prev => prev >= 4 ? 1 : prev + 1)}
                               >
                                 {numImages}
@@ -634,7 +634,7 @@ export function StudioChat({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-10 w-10 sm:h-9 sm:w-14 p-0 text-xs sm:text-sm bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
+                                className="h-8 w-8 sm:h-9 sm:w-14 p-0 text-xs sm:text-sm bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
                                 onClick={() => {
                                   const currentIndex = aspectRatios.indexOf(aspectRatio)
                                   const nextIndex = (currentIndex + 1) % aspectRatios.length
@@ -662,7 +662,7 @@ export function StudioChat({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-10 w-10 sm:h-9 sm:w-12 p-0 bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
+                                className="h-8 w-8 sm:h-9 sm:w-12 p-0 bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
                                 onClick={() => fileInputRef.current?.click()}
                               >
                                 <ImageIcon className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -680,7 +680,7 @@ export function StudioChat({
                         <TooltipTrigger asChild>
                           <Button
                             size="lg"
-                            className="h-10 w-12 sm:h-[80px] sm:w-[80px] p-0 bg-primary hover:bg-primary/90 text-primary-foreground"
+                            className="h-8 w-10 sm:h-[80px] sm:w-[80px] p-0 bg-primary hover:bg-primary/90 text-primary-foreground"
                             onClick={handleGenerate}
                             disabled={isGenerating || !prompt.trim()}
                           >
