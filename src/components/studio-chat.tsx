@@ -741,7 +741,10 @@ export function StudioChat({
                             
                             {/* Формат изображения */}
                             <DropdownMenuItem
-                              onClick={() => setOutputFormat(prev => prev === 'JPEG' ? 'PNG' : 'JPEG')}
+                              onClick={(e) => {
+                                e.preventDefault()
+                                setOutputFormat(prev => prev === 'JPEG' ? 'PNG' : 'JPEG')
+                              }}
                               className="flex items-center justify-between"
                             >
                               <span>Формат</span>
@@ -750,7 +753,10 @@ export function StudioChat({
                             
                             {/* Количество изображений */}
                             <DropdownMenuItem
-                              onClick={() => setNumImages(prev => prev >= 4 ? 1 : prev + 1)}
+                              onClick={(e) => {
+                                e.preventDefault()
+                                setNumImages(prev => prev >= 4 ? 1 : prev + 1)
+                              }}
                               className="flex items-center justify-between"
                             >
                               <span>Количество</span>
@@ -759,7 +765,8 @@ export function StudioChat({
                             
                             {/* Стиль */}
                             <DropdownMenuItem
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.preventDefault()
                                 const currentIndex = artStyles.findIndex(style => style.name === artStyle)
                                 const nextIndex = (currentIndex + 1) % artStyles.length
                                 setArtStyle(artStyles[nextIndex].name)
