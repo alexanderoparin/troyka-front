@@ -205,7 +205,7 @@ export function StudioSessions({
 
   return (
     <TooltipProvider>
-      <div className={cn("h-full flex flex-col bg-background/80 backdrop-blur-sm rounded-r-xl border-r border-border/20 shadow-lg relative z-[60]", className)}>
+      <div className={cn("h-full flex flex-col bg-background/80 backdrop-blur-sm rounded-r-xl border-r border-border/20 shadow-lg relative z-[70]", className)}>
 
         {/* Кнопка создания */}
         <div className="p-1.5 border-b border-border/20">
@@ -213,9 +213,9 @@ export function StudioSessions({
             <button
               onClick={() => setIsCreateDialogOpen(true)}
               disabled={isCreating}
-              className="aspect-square w-full max-w-[60px] rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="aspect-square w-full max-w-[80px] rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
-              <Plus className="h-8 w-8 text-primary" />
+              <Plus className="h-10 w-10 text-primary" />
             </button>
           </div>
         </div>
@@ -272,7 +272,7 @@ export function StudioSessions({
                                     <MoreVertical className="h-3 w-3" />
                                   </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
+                                <DropdownMenuContent align="end" className="z-[9999]">
                                   <DropdownMenuItem onClick={() => openRenameDialog(session)}>
                                     <Edit3 className="h-4 w-4 mr-2" />
                                     Переименовать
