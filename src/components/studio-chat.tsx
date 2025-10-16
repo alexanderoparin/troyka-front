@@ -487,7 +487,7 @@ export function StudioChat({
                             )}
                             onClick={() => handleImageSelect(imageUrl)}
                           >
-                            <div className="w-full aspect-[3/4] relative">
+                            <div className="w-full aspect-square relative">
                               <Image
                                 src={imageUrl}
                                 alt={`Сгенерированное изображение ${index + 1}`}
@@ -750,23 +750,23 @@ export function StudioChat({
 
       {/* Модальное окно для просмотра изображения */}
       {selectedImageForModal && (
-        <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4">
-          <div className="relative max-w-7xl max-h-[90vh] w-full h-full">
+        <div className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4">
+          <div className="relative w-full h-full flex items-center justify-center">
             <Button
               variant="ghost"
               size="sm"
-              className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-white"
+              className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full w-10 h-10"
               onClick={() => setSelectedImageForModal(null)}
             >
-              <X className="h-4 w-4" />
+              <X className="h-5 w-5" />
             </Button>
             <div className="w-full h-full flex items-center justify-center">
               <Image
                 src={selectedImageForModal}
                 alt="Полноразмерное изображение"
-                width={1200}
-                height={800}
-                className="max-w-full max-h-full object-contain"
+                fill
+                className="object-contain"
+                priority
               />
             </div>
           </div>

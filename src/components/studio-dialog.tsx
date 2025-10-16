@@ -11,7 +11,9 @@ import {
   Eye, 
   Loader2,
   Sparkles,
-  Plus
+  Plus,
+  Maximize2,
+  X
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/components/ui/use-toast"
@@ -30,6 +32,7 @@ export function StudioDialog({
   const [isGenerating, setIsGenerating] = useState(false)
   const [generatedImages, setGeneratedImages] = useState<string[]>([])
   const [selectedImages, setSelectedImages] = useState<string[]>([])
+  const [selectedImageForModal, setSelectedImageForModal] = useState<string | null>(null)
   const { toast } = useToast()
 
   const handleGenerate = useCallback(async () => {
@@ -80,6 +83,10 @@ export function StudioDialog({
     }
   }
 
+  const handleImageExpand = (imageUrl: string) => {
+    setSelectedImageForModal(imageUrl)
+  }
+
   const handleEditSelected = () => {
     if (selectedImages.length === 0) {
       toast({
@@ -115,7 +122,7 @@ export function StudioDialog({
                 )}
                 onClick={() => handleImageSelect(imageUrl)}
               >
-                <div className="w-full aspect-[3/4] relative">
+                <div className="w-full aspect-square relative">
                   <Image
                     src={imageUrl}
                     alt={`Сгенерированное изображение ${index + 1}`}
@@ -131,10 +138,10 @@ export function StudioDialog({
                       className="h-6 w-6 p-0"
                       onClick={(e) => {
                         e.stopPropagation()
-                        window.open(imageUrl, '_blank')
+                        handleImageExpand(imageUrl)
                       }}
                     >
-                      <Eye className="h-3 w-3" />
+                      <Maximize2 className="h-3 w-3" />
                     </Button>
                     <Button
                       size="sm"
@@ -230,6 +237,31 @@ export function StudioDialog({
           </div>
         </div>
       </div>
+
+      {/* Модальное окно для просмотра изображения */}
+      {selectedImageForModal && (
+        <div className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4">
+          <div className="relative w-full h-full flex items-center justify-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full w-10 h-10"
+              onClick={() => setSelectedImageForModal(null)}
+            >
+              <X className="h-5 w-5" />
+            </Button>
+            <div className="w-full h-full flex items-center justify-center">
+              <Image
+                src={selectedImageForModal}
+                alt="Полноразмерное изображение"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
