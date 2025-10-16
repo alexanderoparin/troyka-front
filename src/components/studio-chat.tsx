@@ -518,9 +518,9 @@ export function StudioChat({
       </ScrollArea>
 
             {/* Плавающее окно ввода промпта */}
-            <div className="fixed bottom-2 left-0 right-0 z-50">
+            <div className="fixed bottom-4 left-0 right-0 z-50">
               <div className="flex justify-center px-2 sm:px-6">
-                <div className={`${isFocused ? 'bg-background/95' : 'bg-background/60'} backdrop-blur-md border-2 border-border/40 rounded-lg shadow-2xl px-2 pt-1 pb-1 w-full max-w-[700px] transition-all duration-200 ring-1 ring-black/5`}>
+                <div className={`${isFocused ? 'bg-background/95' : 'bg-background/60'} backdrop-blur-md border-2 border-border/40 rounded-lg shadow-2xl px-2 pt-0 pb-0 w-full max-w-[700px] transition-all duration-200 ring-1 ring-black/5`}>
           {/* Загруженные изображения */}
           {uploadedImages.length > 0 && (
             <div className="mb-1">
@@ -569,7 +569,7 @@ export function StudioChat({
 
 
                   {/* Поле ввода промпта */}
-                  <div className="mb-1">
+                  <div className="mb-0">
                     <div className="flex flex-col sm:flex-row gap-2 sm:items-start items-center">
                       {/* Поле ввода */}
                       <Textarea
@@ -588,9 +588,9 @@ export function StudioChat({
                       />
                       
                       {/* Опции генерации - адаптивные */}
-                      <div className="flex flex-col sm:flex-row gap-1 sm:gap-2 sm:items-start items-center">
+                      <div className="flex flex-col sm:flex-row gap-0.5 sm:gap-2 sm:items-start items-center">
                         {/* Первый ряд */}
-                        <div className="flex items-center gap-1 sm:gap-2">
+                        <div className="flex items-center gap-0.5 sm:gap-2">
                           {/* Формат изображения */}
                           <Tooltip>
                             <TooltipTrigger asChild>
@@ -627,7 +627,7 @@ export function StudioChat({
                         </div>
                         
                         {/* Второй ряд */}
-                        <div className="flex items-center gap-1 sm:gap-2">
+                        <div className="flex items-center gap-0.5 sm:gap-2">
                           {/* Соотношение сторон */}
                           <Tooltip>
                             <TooltipTrigger asChild>

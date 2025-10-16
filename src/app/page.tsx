@@ -9,9 +9,9 @@ export default function HomePage() {
   const { isAuthenticated } = useAuth()
 
   return (
-    <div className="space-y-20">
+    <div className="space-y-8">
       {/* Hero Section - Compact Layout */}
-      <section className="hero-section py-8 sm:py-12 px-4">
+      <section className="hero-section py-16 sm:py-24 px-4">
         <div className="max-w-none mx-auto w-full px-4">
           <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6 lg:gap-8">
             {/* Left Side - Content */}
