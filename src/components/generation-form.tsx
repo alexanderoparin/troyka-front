@@ -21,27 +21,25 @@ const generationSchema = z.object({
 
 type GenerationFormData = z.infer<typeof generationSchema>
 
-const STYLE_PRESETS = [
-  {
-    name: "Студийная съёмка",
-    prompt: "профессиональная фотография товара, чистый белый фон, студийное освещение, высокое качество, коммерческий стиль",
-    icon: "📸"
-  },
-  {
-    name: "Минимализм", 
-    prompt: "минималистичный снимок товара, мягкие тени, нейтральный фон, чистый эстетичный стиль, современный дизайн",
-    icon: "🎨"
-  },
-  {
-    name: "Премиум",
-    prompt: "роскошная фотография товара, элегантная подача, драматичное освещение, премиум качество, изысканный стиль",
-    icon: "✨"
-  },
-  {
-    name: "Lifestyle",
-    prompt: "жизненная фотография товара, естественная обстановка, теплое освещение, повседневная атмосфера, аутентичный стиль",
-    icon: "🌟"
-  },
+const ART_STYLES = [
+  { name: 'Реалистичный', prompt: ', photorealistic, high quality, detailed, professional photography' },
+  { name: 'Аниме', prompt: ', anime style, manga art, vibrant colors, Japanese animation' },
+  { name: 'Пиксель-арт', prompt: ', pixel art, 8-bit style, retro gaming aesthetic' },
+  { name: 'Масляная живопись', prompt: ', oil painting, classical art style, brushstrokes visible' },
+  { name: 'Акварель', prompt: ', watercolor painting, soft brushstrokes, translucent colors' },
+  { name: 'Цифровая живопись', prompt: ', digital art, concept art style, clean lines' },
+  { name: 'Карандашный рисунок', prompt: ', pencil sketch, hand-drawn illustration, graphite shading' },
+  { name: 'Портрет', prompt: ', professional portrait photography, studio lighting, sharp focus' },
+  { name: 'Пейзаж', prompt: ', landscape photography, golden hour lighting, wide angle' },
+  { name: 'Макро', prompt: ', macro photography, extreme close-up, detailed textures' },
+  { name: 'Черно-белое', prompt: ', black and white photography, monochrome, high contrast' },
+  { name: 'HDR', prompt: ', HDR photography, high dynamic range, vibrant colors' },
+  { name: 'Винтаж', prompt: ', vintage photography, film grain, retro aesthetic' },
+  { name: 'Кинематографичный', prompt: ', cinematic lighting, movie still, dramatic composition' },
+  { name: 'Сюрреализм', prompt: ', surreal art, dreamlike atmosphere, impossible elements' },
+  { name: 'Минимализм', prompt: ', minimalist art, clean composition, simple background' },
+  { name: 'Готика', prompt: ', gothic art, dark atmosphere, mysterious mood' },
+  { name: 'Футуризм', prompt: ', futuristic style, sci-fi aesthetic, cyberpunk elements' }
 ]
 
 interface GenerationFormProps {
@@ -54,7 +52,7 @@ interface GenerationFormProps {
 export function GenerationForm({ onGenerationComplete, initialPrompt = "", initialImages = [], sessionId }: GenerationFormProps) {
   const [isGenerating, setIsGenerating] = useState(false)
   const [uploadedImages, setUploadedImages] = useState<string[]>(initialImages)
-  const [aspectRatio, setAspectRatio] = useState('3:4')
+  const [artStyle, setArtStyle] = useState('Реалистичный')
   const [isDragOver, setIsDragOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
@@ -111,8 +109,9 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
     setIsGenerating(true)
 
     try {
-      // Добавляем соотношение сторон в конец промпта
-      const promptWithAspectRatio = `${data.prompt}. Соотношение сторон изображения - ${aspectRatio}`
+      // Добавляем стиль к промпту
+      const selectedStyle = ART_STYLES.find(style => style.name === artStyle)
+      const promptWithStyle = `${data.prompt}${selectedStyle?.prompt || ''}`
       
       // Обрабатываем загруженные изображения - загружаем blob URL'ы на сервер
       let processedImageUrls: string[] = []
@@ -144,7 +143,7 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
       }
       
       const request: ImageRequest = {
-        prompt: promptWithAspectRatio,
+        prompt: promptWithStyle,
         inputImageUrls: processedImageUrls,
         numImages: data.numImages,
         outputFormat: data.outputFormat,
@@ -290,73 +289,77 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
             />
             
             {/* Upload Button, Image Count and Format inside prompt area */}
-            <div className="absolute bottom-4 right-4 flex items-center gap-2">
-              {/* Format Button */}
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  const newFormat = outputFormat === 'JPEG' ? 'PNG' : 'JPEG'
-                  setValue("outputFormat", newFormat)
-                }}
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/10 hover:bg-accent/20 text-accent-foreground border border-accent/20 transition-colors"
-              >
-                <FileImage className="w-4 h-4" />
-                <span className="text-sm font-medium">{outputFormat}</span>
-              </Button>
+            <div className="absolute bottom-4 right-4 flex flex-col gap-2">
+              {/* Первый ряд - 3 кнопки */}
+              <div className="flex items-center gap-2">
+                {/* Format Button */}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const newFormat = outputFormat === 'JPEG' ? 'PNG' : 'JPEG'
+                    setValue("outputFormat", newFormat)
+                  }}
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/10 hover:bg-accent/20 text-accent-foreground border border-accent/20 transition-colors"
+                >
+                  <FileImage className="w-4 h-4" />
+                  <span className="text-sm font-medium">{outputFormat}</span>
+                </Button>
+                
+                {/* Image Count Button */}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const newCount = numImages >= 4 ? 1 : numImages + 1
+                    setValue("numImages", newCount)
+                  }}
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/10 hover:bg-secondary/20 text-secondary-foreground border border-secondary/20 transition-colors"
+                >
+                  <Layers className="w-4 h-4" />
+                  <span className="text-sm font-medium">{numImages}</span>
+                </Button>
+                
+                {/* Upload Button */}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                  ref={fileInputRef}
+                  id="file-upload"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 transition-colors"
+                >
+                  <UploadCloud className="w-4 h-4" />
+                  <span className="text-sm font-medium">Фото</span>
+                </Button>
+              </div>
               
-              {/* Image Count Button */}
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  const newCount = numImages >= 4 ? 1 : numImages + 1
-                  setValue("numImages", newCount)
-                }}
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/10 hover:bg-secondary/20 text-secondary-foreground border border-secondary/20 transition-colors"
-              >
-                <Layers className="w-4 h-4" />
-                <span className="text-sm font-medium">{numImages}</span>
-              </Button>
-              
-              {/* Соотношение сторон */}
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  const aspectRatios = ['3:4', '1:1', '4:3', '4:5', '3:2', '2:3', '16:9', '9:16', '7.5:2']
-                  const currentIndex = aspectRatios.indexOf(aspectRatio)
-                  const nextIndex = (currentIndex + 1) % aspectRatios.length
-                  setAspectRatio(aspectRatios[nextIndex])
-                }}
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/10 hover:bg-accent/20 text-accent-foreground border border-accent/20 transition-colors"
-              >
-                <FileImage className="w-4 h-4" />
-                <span className="text-sm font-medium">{aspectRatio}</span>
-              </Button>
-              
-              {/* Upload Button */}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileSelect}
-                className="hidden"
-                ref={fileInputRef}
-                id="file-upload"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => fileInputRef.current?.click()}
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 transition-colors"
-              >
-                <UploadCloud className="w-4 h-4" />
-                <span className="text-sm font-medium">Фото</span>
-              </Button>
+              {/* Второй ряд - кнопка стиля (широкая) */}
+              <div className="flex items-center">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const currentIndex = ART_STYLES.findIndex(style => style.name === artStyle)
+                    const nextIndex = (currentIndex + 1) % ART_STYLES.length
+                    setArtStyle(ART_STYLES[nextIndex].name)
+                  }}
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/10 hover:bg-accent/20 text-accent-foreground border border-accent/20 transition-colors w-full"
+                >
+                  <FileImage className="w-4 h-4" />
+                  <span className="text-sm font-medium">{artStyle}</span>
+                </Button>
+              </div>
             </div>
           </div>
           

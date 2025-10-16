@@ -52,13 +52,32 @@ export function StudioChat({
   const [copiedImageUrl, setCopiedImageUrl] = useState<string | null>(null)
   const [numImages, setNumImages] = useState(2)
   const [outputFormat, setOutputFormat] = useState<'JPEG' | 'PNG'>('JPEG')
-  const [aspectRatio, setAspectRatio] = useState('3:4')
+  const [artStyle, setArtStyle] = useState('Реалистичный')
   const [uploadedImages, setUploadedImages] = useState<string[]>([])
   const [isFocused, setIsFocused] = useState(false)
   const [selectedImageForModal, setSelectedImageForModal] = useState<string | null>(null)
   const [isDragOver, setIsDragOver] = useState(false)
   
-  const aspectRatios = ['3:4', '1:1', '4:3', '4:5', '3:2', '2:3', '16:9', '9:16', '7.5:2']
+  const artStyles = [
+    { name: 'Реалистичный', prompt: ', photorealistic, high quality, detailed, professional photography' },
+    { name: 'Аниме', prompt: ', anime style, manga art, vibrant colors, Japanese animation' },
+    { name: 'Пиксель-арт', prompt: ', pixel art, 8-bit style, retro gaming aesthetic' },
+    { name: 'Масляная живопись', prompt: ', oil painting, classical art style, brushstrokes visible' },
+    { name: 'Акварель', prompt: ', watercolor painting, soft brushstrokes, translucent colors' },
+    { name: 'Цифровая живопись', prompt: ', digital art, concept art style, clean lines' },
+    { name: 'Карандашный рисунок', prompt: ', pencil sketch, hand-drawn illustration, graphite shading' },
+    { name: 'Портрет', prompt: ', professional portrait photography, studio lighting, sharp focus' },
+    { name: 'Пейзаж', prompt: ', landscape photography, golden hour lighting, wide angle' },
+    { name: 'Макро', prompt: ', macro photography, extreme close-up, detailed textures' },
+    { name: 'Черно-белое', prompt: ', black and white photography, monochrome, high contrast' },
+    { name: 'HDR', prompt: ', HDR photography, high dynamic range, vibrant colors' },
+    { name: 'Винтаж', prompt: ', vintage photography, film grain, retro aesthetic' },
+    { name: 'Кинематографичный', prompt: ', cinematic lighting, movie still, dramatic composition' },
+    { name: 'Сюрреализм', prompt: ', surreal art, dreamlike atmosphere, impossible elements' },
+    { name: 'Минимализм', prompt: ', minimalist art, clean composition, simple background' },
+    { name: 'Готика', prompt: ', gothic art, dark atmosphere, mysterious mood' },
+    { name: 'Футуризм', prompt: ', futuristic style, sci-fi aesthetic, cyberpunk elements' }
+  ]
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
@@ -213,12 +232,13 @@ export function StudioChat({
 
     setIsGenerating(true)
     try {
-      // Добавляем соотношение сторон в промпт
-      const promptWithAspectRatio = `${prompt}. Соотношение сторон изображения - ${aspectRatio}`
+      // Добавляем стиль к промпту
+      const selectedStyle = artStyles.find(style => style.name === artStyle)
+      const promptWithStyle = `${prompt}${selectedStyle?.prompt || ''}`
       
       // Вызываем API для генерации
       const request = {
-        prompt: promptWithAspectRatio,
+        prompt: promptWithStyle,
         inputImageUrls: uploadedImages.length > 0 ? uploadedImages : [],
         numImages: numImages,
         outputFormat: outputFormat,
@@ -228,7 +248,7 @@ export function StudioChat({
       const response = await apiClient.generateImage(request)
       
       if (response.data) {
-        onGenerationComplete(response.data.imageUrls, promptWithAspectRatio)
+        onGenerationComplete(response.data.imageUrls, promptWithStyle)
         setPrompt("")
         setUploadedImages([])
         
@@ -237,7 +257,7 @@ export function StudioChat({
         
         toast({
           title: "Изображения созданы!",
-          description: `Создано ${response.data.imageUrls.length} ${getImageText(response.data.imageUrls.length)} в формате ${outputFormat} (${aspectRatio})`,
+          description: `Создано ${response.data.imageUrls.length} ${getImageText(response.data.imageUrls.length)} в формате ${outputFormat} (${artStyle})`,
         })
       } else {
         throw new Error(response.error || 'Ошибка генерации')
@@ -251,7 +271,7 @@ export function StudioChat({
     } finally {
       setIsGenerating(false)
     }
-  }, [prompt, numImages, outputFormat, onGenerationComplete, toast, aspectRatio, sessionId, uploadedImages, updateHistoryAfterGeneration])
+  }, [prompt, numImages, outputFormat, onGenerationComplete, toast, artStyle, sessionId, uploadedImages, updateHistoryAfterGeneration])
 
   const handleImageExpand = (imageUrl: string) => {
     setSelectedImageForModal(imageUrl)
@@ -434,7 +454,7 @@ export function StudioChat({
                       <div className="flex-1">
                         <Card className="p-3 bg-muted/50 dark:bg-muted/20">
                           <p className="text-sm leading-relaxed text-foreground">
-                            {message.prompt.replace(/\. Соотношение сторон изображения - \d+:\d+$/, '')}
+                            {message.prompt.replace(/, (photorealistic|anime style|pixel art|oil painting|watercolor painting|digital art|pencil sketch|professional portrait|landscape photography|macro photography|black and white|HDR photography|vintage photography|cinematic lighting|surreal art|minimalist art|gothic art|futuristic style).*$/, '')}
                           </p>
                           
                           {/* Миниатюры входных изображений */}
@@ -480,11 +500,6 @@ export function StudioChat({
                           
                           <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
                             <span>{formatDate(message.createdAt)}</span>
-                            {message.inputImageUrls && message.inputImageUrls.length > 0 && (
-                              <Badge variant="outline" className="text-xs">
-                                {getInputImageText(message.inputImageUrls.length)}
-                              </Badge>
-                            )}
                           </div>
                         </Card>
                       </div>
@@ -673,8 +688,8 @@ export function StudioChat({
                       />
                       
                       {/* Кнопки управления - справа в 2 ряда */}
-                      <div className="flex flex-col gap-0.5">
-                        {/* Первый ряд */}
+                      <div className="flex flex-col gap-1">
+                        {/* Первый ряд - 3 кнопки */}
                         <div className="flex items-center gap-1">
                           {/* Формат изображения */}
                           <Tooltip>
@@ -709,30 +724,6 @@ export function StudioChat({
                               <p>Количество изображений (нажмите для смены)</p>
                             </TooltipContent>
                           </Tooltip>
-                        </div>
-                        
-                        {/* Второй ряд */}
-                        <div className="flex items-center gap-1">
-                          {/* Соотношение сторон */}
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-7 w-7 sm:h-9 sm:w-14 p-0 text-xs sm:text-sm bg-muted/80 hover:bg-muted/95 border border-border/80"
-                                onClick={() => {
-                                  const currentIndex = aspectRatios.indexOf(aspectRatio)
-                                  const nextIndex = (currentIndex + 1) % aspectRatios.length
-                                  setAspectRatio(aspectRatios[nextIndex])
-                                }}
-                              >
-                                {aspectRatio}
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent className="z-[9998]">
-                              <p>Соотношение сторон (нажмите для смены)</p>
-                            </TooltipContent>
-                          </Tooltip>
                           
                           {/* Загрузка изображения */}
                           <input
@@ -747,7 +738,7 @@ export function StudioChat({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-7 w-7 sm:h-9 sm:w-12 p-0 bg-muted/80 hover:bg-muted/95 border border-border/80"
+                                className="h-7 w-7 sm:h-10 sm:w-12 p-0 bg-muted/80 hover:bg-muted/95 border border-border/80"
                                 onClick={() => fileInputRef.current?.click()}
                               >
                                 <ImageIcon className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -755,6 +746,29 @@ export function StudioChat({
                             </TooltipTrigger>
                             <TooltipContent className="z-[9998]">
                               <p>Загрузить изображение</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                        
+                        {/* Второй ряд - кнопка стиля (широкая) */}
+                        <div className="flex items-center">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-7 w-full sm:h-9 sm:w-full p-0 text-xs sm:text-sm bg-muted/80 hover:bg-muted/95 border border-border/80"
+                                onClick={() => {
+                                  const currentIndex = artStyles.findIndex(style => style.name === artStyle)
+                                  const nextIndex = (currentIndex + 1) % artStyles.length
+                                  setArtStyle(artStyles[nextIndex].name)
+                                }}
+                              >
+                                {artStyle}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent className="z-[9998]">
+                              <p>Стиль изображения (нажмите для смены)</p>
                             </TooltipContent>
                           </Tooltip>
                         </div>

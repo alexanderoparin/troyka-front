@@ -275,15 +275,10 @@ export function SessionHistory({
                   <div className="flex-1">
                     <Card className="p-3 bg-muted/50 dark:bg-muted/20">
                       <p className="text-sm">
-                        {message.prompt.replace(/\. Соотношение сторон изображения - \d+:\d+$/, '')}
+                        {message.prompt.replace(/, (photorealistic|anime style|pixel art|oil painting|watercolor painting|digital art|pencil sketch|professional portrait|landscape photography|macro photography|black and white|HDR photography|vintage photography|cinematic lighting|surreal art|minimalist art|gothic art|futuristic style).*$/, '')}
                       </p>
                       <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
                         <span>{formatDate(message.createdAt)}</span>
-                        {message.inputImageUrls && message.inputImageUrls.length > 0 && (
-                          <Badge variant="outline" className="text-xs">
-                            {getInputImageText(message.inputImageUrls.length)}
-                          </Badge>
-                        )}
                       </div>
                     </Card>
                   </div>
