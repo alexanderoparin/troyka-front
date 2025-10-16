@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Sparkles, Shield, ArrowRight, Star, Users, Clock, Target, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { useAuth } from '@/contexts/auth-context'
-import { apiClient } from '@/lib/api-client'
+import { AnimatedGallery } from '@/components/animated-gallery'
 export default function HomePage() {
   const { isAuthenticated } = useAuth()
 
@@ -69,32 +69,8 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right Side - Video and Prompt Example */}
-            <div className="flex flex-col items-center space-y-4 w-full lg:w-1/2">
-              {/* Prompt Example */}
-              <div className="w-full max-w-2xl">
-                <div className="bg-muted/50 dark:bg-muted/20 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-                  <p className="text-sm text-muted-foreground italic text-center">
-                    "Добавить эффект скорости, размытие движения, динамичная фотография"
-                  </p>
-                </div>
-              </div>
-              
-              {/* Video */}
-              <div className="w-full max-w-2xl">
-                <video 
-                  src={apiClient.getExampleFileUrl('yellow_car_2.mp4')}
-                  className="w-full h-auto rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700"
-                  muted
-                  loop
-                  playsInline
-                  autoPlay
-                  onError={(e) => {
-                    console.error('Video load error:', e);
-                  }}
-                />
-              </div>
-            </div>
+            {/* Right Side - Animated Gallery */}
+            <AnimatedGallery />
           </div>
         </div>
       </section>
