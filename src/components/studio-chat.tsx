@@ -588,7 +588,7 @@ export function StudioChat({
                       />
                       
                       {/* Опции генерации - адаптивные */}
-                      <div className="flex flex-col gap-0.5 sm:gap-1 sm:items-start items-center">
+                      <div className="flex flex-col sm:flex-row gap-1 sm:gap-2 sm:items-start items-center">
                         {/* Первый ряд */}
                         <div className="flex items-center gap-1 sm:gap-2">
                           {/* Формат изображения */}
@@ -680,7 +680,7 @@ export function StudioChat({
                         <TooltipTrigger asChild>
                           <Button
                             size="lg"
-                            className="h-8 w-10 sm:h-[80px] sm:w-[80px] p-0 bg-primary hover:bg-primary/90 text-primary-foreground"
+                            className="h-8 w-8 sm:h-[80px] sm:w-[80px] p-0 bg-primary hover:bg-primary/90 text-primary-foreground"
                             onClick={handleGenerate}
                             disabled={isGenerating || !prompt.trim()}
                           >
