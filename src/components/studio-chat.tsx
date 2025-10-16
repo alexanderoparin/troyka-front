@@ -46,7 +46,13 @@ export function StudioChat({
   className 
 }: StudioChatProps) {
   const { avatar } = useAuth()
-  const [prompt, setPrompt] = useState("")
+  const [prompt, setPrompt] = useState(() => {
+    // Загружаем промпт из localStorage только при инициализации
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('studio-prompt') || ""
+    }
+    return ""
+  })
   const [isGenerating, setIsGenerating] = useState(false)
   const [selectedImages, setSelectedImages] = useState<string[]>([])
   const [copiedImageUrl, setCopiedImageUrl] = useState<string | null>(null)
@@ -82,6 +88,14 @@ export function StudioChat({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
 
+  // Сохраняем промпт в localStorage при изменении
+  const handlePromptChange = (value: string) => {
+    setPrompt(value)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('studio-prompt', value)
+    }
+  }
+
   // Функция для правильного склонения слова "изображение"
   const getImageText = (count: number) => {
     if (count === 1) return 'изображение'
@@ -113,6 +127,15 @@ export function StudioChat({
       }
     }
   }, [history.length])
+
+  // Очищаем localStorage при размонтировании компонента (перезагрузка страницы)
+  useEffect(() => {
+    return () => {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('studio-prompt')
+      }
+    }
+  }, [])
 
   const handleFileUpload = useCallback(async (file: File) => {
     // Проверяем тип файла
@@ -249,7 +272,7 @@ export function StudioChat({
       
       if (response.data) {
         onGenerationComplete(response.data.imageUrls, promptWithStyle)
-        setPrompt("")
+        // НЕ очищаем промпт - он остается в поле ввода
         setUploadedImages([])
         
         // Обновляем историю после успешной генерации
@@ -674,7 +697,7 @@ export function StudioChat({
                       {/* Поле ввода - слева */}
                       <Textarea
                         value={prompt}
-                        onChange={(e) => setPrompt(e.target.value)}
+                        onChange={(e) => handlePromptChange(e.target.value)}
                         placeholder={isDragOver ? "Отпустите файл для загрузки..." : "Опишите изображение, которое хотите создать..."}
                         className="h-8 sm:h-[54px] resize-none text-xs sm:text-base flex-1 bg-muted/80 border border-border/80 focus:border-primary/80 focus:bg-muted/95"
                         onFocus={() => setIsFocused(true)}
