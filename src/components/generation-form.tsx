@@ -54,7 +54,7 @@ interface GenerationFormProps {
 export function GenerationForm({ onGenerationComplete, initialPrompt = "", initialImages = [], sessionId }: GenerationFormProps) {
   const [isGenerating, setIsGenerating] = useState(false)
   const [uploadedImages, setUploadedImages] = useState<string[]>(initialImages)
-  const [aspectRatio, setAspectRatio] = useState('1:1')
+  const [aspectRatio, setAspectRatio] = useState('3:4')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
   const { points, refreshPoints } = useAuth()
@@ -272,7 +272,7 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  const aspectRatios = ['1:1', '4:3', '4:5', '3:2', '2:3', '16:9', '9:16', '7.5:2']
+                  const aspectRatios = ['3:4', '1:1', '4:3', '4:5', '3:2', '2:3', '16:9', '9:16', '7.5:2']
                   const currentIndex = aspectRatios.indexOf(aspectRatio)
                   const nextIndex = (currentIndex + 1) % aspectRatios.length
                   setAspectRatio(aspectRatios[nextIndex])

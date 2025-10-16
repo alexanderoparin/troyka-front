@@ -103,7 +103,7 @@ export function StudioDialog({
       {/* Область сгенерированных изображений */}
       {generatedImages.length > 0 && (
         <div className="mb-6">
-          <div className="flex flex-wrap gap-2 mb-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4 w-full">
             {generatedImages.map((imageUrl, index) => (
               <div
                 key={index}
@@ -115,7 +115,7 @@ export function StudioDialog({
                 )}
                 onClick={() => handleImageSelect(imageUrl)}
               >
-                <div className="w-40 h-48 sm:w-48 sm:h-56 relative">
+                <div className="w-full aspect-[3/4] relative">
                   <Image
                     src={imageUrl}
                     alt={`Сгенерированное изображение ${index + 1}`}

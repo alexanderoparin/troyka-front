@@ -51,12 +51,12 @@ export function StudioChat({
   const [copiedImageUrl, setCopiedImageUrl] = useState<string | null>(null)
   const [numImages, setNumImages] = useState(2)
   const [outputFormat, setOutputFormat] = useState<'JPEG' | 'PNG'>('JPEG')
-  const [aspectRatio, setAspectRatio] = useState('1:1')
+  const [aspectRatio, setAspectRatio] = useState('3:4')
   const [uploadedImages, setUploadedImages] = useState<string[]>([])
   const [isFocused, setIsFocused] = useState(false)
   const [selectedImageForModal, setSelectedImageForModal] = useState<string | null>(null)
   
-  const aspectRatios = ['1:1', '4:3', '4:5', '3:2', '2:3', '16:9', '9:16', '7.5:2']
+  const aspectRatios = ['3:4', '1:1', '4:3', '4:5', '3:2', '2:3', '16:9', '9:16', '7.5:2']
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
@@ -369,11 +369,11 @@ export function StudioChat({
             </div>
           ) : (
             history.map((message) => (
-              <div key={message.id} className="mb-6">
+              <div key={message.id} className="mb-4">
                 {/* Промпт слева, изображения справа */}
-                <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
+                <div className="flex flex-col lg:flex-row gap-3 lg:gap-4">
                   {/* Левая часть - промпт */}
-                  <div className="flex-1 lg:max-w-xs">
+                  <div className="flex-1 lg:max-w-64">
                     <div className="flex gap-3">
                       <div className="flex-shrink-0 relative z-0">
                         {avatar ? (
@@ -393,7 +393,7 @@ export function StudioChat({
                         )}
                       </div>
                       <div className="flex-1">
-                        <Card className="p-4 bg-muted/50 dark:bg-muted/20">
+                        <Card className="p-3 bg-muted/50 dark:bg-muted/20">
                           <p className="text-sm leading-relaxed text-foreground">
                             {message.prompt.replace(/\. Соотношение сторон изображения - \d+:\d+$/, '')}
                           </p>
@@ -436,8 +436,8 @@ export function StudioChat({
                         </div>
                       </div>
                       <div className="flex-1">
-                        <Card className="p-4 bg-muted/50 dark:bg-muted/20">
-                          <div className="flex flex-wrap gap-2">
+                        <Card className="p-3 bg-muted/50 dark:bg-muted/20">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
                         {message.imageUrls.map((imageUrl, index) => (
                           <div
                             key={index}
@@ -449,7 +449,7 @@ export function StudioChat({
                             )}
                             onClick={() => handleImageSelect(imageUrl)}
                           >
-                            <div className="w-56 h-72 sm:w-80 sm:h-96 md:w-96 md:h-[28rem] lg:w-[32rem] lg:h-[36rem] relative">
+                            <div className="w-full aspect-[3/4] relative">
                               <Image
                                 src={imageUrl}
                                 alt={`Сгенерированное изображение ${index + 1}`}
