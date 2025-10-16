@@ -334,7 +334,7 @@ export function StudioChat({
       <div className={cn("h-full flex flex-col", className)} onPaste={handlePaste}>
       {/* История диалога */}
       <ScrollArea ref={scrollAreaRef} className="flex-1">
-        <div className="space-y-6 pb-32 p-6">
+        <div className="space-y-4 pb-40 p-3 sm:pb-32 sm:p-6">
           {/* Кнопка загрузки предыдущих сообщений */}
           {hasMore && (
             <div className="flex justify-center">
@@ -371,7 +371,7 @@ export function StudioChat({
             history.map((message) => (
               <div key={message.id} className="mb-6">
                 {/* Промпт слева, изображения справа */}
-                <div className="flex flex-col lg:flex-row gap-6">
+                <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
                   {/* Левая часть - промпт */}
                   <div className="flex-1 lg:max-w-xs">
                     <div className="flex gap-3">
@@ -449,7 +449,7 @@ export function StudioChat({
                             )}
                             onClick={() => handleImageSelect(imageUrl)}
                           >
-                            <div className="w-80 h-96 sm:w-96 sm:h-[28rem] md:w-[28rem] md:h-[32rem] lg:w-[32rem] lg:h-[36rem] relative">
+                            <div className="w-56 h-72 sm:w-80 sm:h-96 md:w-96 md:h-[28rem] lg:w-[32rem] lg:h-[36rem] relative">
                               <Image
                                 src={imageUrl}
                                 alt={`Сгенерированное изображение ${index + 1}`}
@@ -575,7 +575,7 @@ export function StudioChat({
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
                         placeholder="Опишите изображение, которое хотите создать..."
-                        className="h-[54px] resize-none text-base flex-1 bg-muted/80 border-2 border-border/80 focus:border-primary/80 focus:bg-muted/95"
+                        className="h-[48px] sm:h-[54px] resize-none text-sm sm:text-base flex-1 bg-muted/80 border-2 border-border/80 focus:border-primary/80 focus:bg-muted/95"
                         onFocus={() => setIsFocused(true)}
                         onBlur={() => setIsFocused(false)}
                         onKeyDown={(e) => {
@@ -595,7 +595,7 @@ export function StudioChat({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-8 w-12 sm:h-10 sm:w-14 p-0 text-xs sm:text-sm bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
+                                className="h-8 w-10 sm:h-10 sm:w-14 p-0 text-xs sm:text-sm bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
                                 onClick={() => setOutputFormat(prev => prev === 'JPEG' ? 'PNG' : 'JPEG')}
                               >
                                 {outputFormat}
@@ -612,7 +612,7 @@ export function StudioChat({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-8 w-10 sm:h-10 sm:w-12 p-0 text-xs sm:text-sm bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
+                                className="h-8 w-8 sm:h-10 sm:w-12 p-0 text-xs sm:text-sm bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
                                 onClick={() => setNumImages(prev => prev >= 4 ? 1 : prev + 1)}
                               >
                                 {numImages}
@@ -632,7 +632,7 @@ export function StudioChat({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-8 w-12 sm:h-9 sm:w-14 p-0 text-xs sm:text-sm bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
+                                className="h-8 w-10 sm:h-9 sm:w-14 p-0 text-xs sm:text-sm bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
                                 onClick={() => {
                                   const currentIndex = aspectRatios.indexOf(aspectRatio)
                                   const nextIndex = (currentIndex + 1) % aspectRatios.length
@@ -660,7 +660,7 @@ export function StudioChat({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-8 w-10 sm:h-9 sm:w-12 p-0 bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
+                                className="h-8 w-8 sm:h-9 sm:w-12 p-0 bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
                                 onClick={() => fileInputRef.current?.click()}
                               >
                                 <ImageIcon className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -678,7 +678,7 @@ export function StudioChat({
                           <TooltipTrigger asChild>
                             <Button
                               size="lg"
-                              className="h-12 w-full sm:h-[80px] sm:w-[80px] p-0 bg-primary hover:bg-primary/90 text-primary-foreground"
+                              className="h-10 w-full sm:h-[80px] sm:w-[80px] p-0 bg-primary hover:bg-primary/90 text-primary-foreground"
                               onClick={handleGenerate}
                               disabled={isGenerating || !prompt.trim()}
                             >
