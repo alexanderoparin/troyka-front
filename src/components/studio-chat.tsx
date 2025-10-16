@@ -441,13 +441,38 @@ export function StudioChat({
                           {message.inputImageUrls && message.inputImageUrls.length > 0 && (
                             <div className="mt-3 flex gap-2">
                               {message.inputImageUrls.map((imageUrl, index) => (
-                                <div key={index} className="relative w-8 h-8 rounded-lg overflow-hidden border border-border/50">
+                                <div 
+                                  key={index} 
+                                  className="relative w-20 h-20 rounded-lg overflow-hidden border border-border/50 cursor-pointer hover:border-primary/50 transition-colors group"
+                                  onClick={() => handleImageExpand(imageUrl)}
+                                >
                                   <Image
                                     src={imageUrl}
                                     alt={`Входное изображение ${index + 1}`}
                                     fill
                                     className="object-cover"
                                   />
+                                  {/* Кнопка редактирования в правом верхнем углу */}
+                                  <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          size="sm"
+                                          variant="secondary"
+                                          className="h-6 w-6 p-0 bg-black/50 hover:bg-black/70 text-white border-0"
+                                          onClick={(e) => {
+                                            e.stopPropagation()
+                                            handleImageSelect(imageUrl)
+                                          }}
+                                        >
+                                          <Pencil className="h-3 w-3" />
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent className="z-[9998]">
+                                        <p>Редактировать изображение</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </div>
                                 </div>
                               ))}
                             </div>
