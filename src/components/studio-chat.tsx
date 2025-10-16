@@ -518,9 +518,9 @@ export function StudioChat({
       </ScrollArea>
 
             {/* Плавающее окно ввода промпта */}
-            <div className="fixed bottom-4 left-0 right-0 z-50">
+            <div className="fixed bottom-2 left-0 right-0 z-50">
               <div className="flex justify-center px-2 sm:px-6">
-                <div className={`${isFocused ? 'bg-background/95' : 'bg-background/60'} backdrop-blur-md border-2 border-border/40 rounded-lg shadow-2xl px-2 pt-0 pb-0 w-full max-w-[700px] transition-all duration-200 ring-1 ring-black/5`}>
+                <div className={`${isFocused ? 'bg-background/95' : 'bg-background/60'} backdrop-blur-md border border-border/40 rounded-lg shadow-lg px-2 py-1 w-full max-w-[700px] transition-all duration-200`}>
           {/* Загруженные изображения */}
           {uploadedImages.length > 0 && (
             <div className="mb-1">
@@ -570,13 +570,13 @@ export function StudioChat({
 
                   {/* Поле ввода промпта */}
                   <div className="mb-0">
-                    <div className="flex flex-col sm:flex-row gap-2 sm:items-start items-center">
-                      {/* Поле ввода */}
+                    <div className="flex items-center gap-2">
+                      {/* Поле ввода - слева */}
                       <Textarea
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
                         placeholder="Опишите изображение, которое хотите создать..."
-                        className="h-10 sm:h-[54px] resize-none text-sm sm:text-base flex-1 bg-muted/80 border-2 border-border/80 focus:border-primary/80 focus:bg-muted/95"
+                        className="h-8 sm:h-[54px] resize-none text-xs sm:text-base flex-1 bg-muted/80 border border-border/80 focus:border-primary/80 focus:bg-muted/95"
                         onFocus={() => setIsFocused(true)}
                         onBlur={() => setIsFocused(false)}
                         onKeyDown={(e) => {
@@ -587,17 +587,17 @@ export function StudioChat({
                         }}
                       />
                       
-                      {/* Опции генерации - адаптивные */}
-                      <div className="flex flex-col sm:flex-row gap-0.5 sm:gap-2 sm:items-start items-center">
+                      {/* Кнопки управления - справа в 2 ряда */}
+                      <div className="flex flex-col gap-0.5">
                         {/* Первый ряд */}
-                        <div className="flex items-center gap-0.5 sm:gap-2">
+                        <div className="flex items-center gap-1">
                           {/* Формат изображения */}
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-8 w-8 sm:h-10 sm:w-14 p-0 text-xs sm:text-sm bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
+                                className="h-7 w-7 sm:h-10 sm:w-14 p-0 text-xs sm:text-sm bg-muted/80 hover:bg-muted/95 border border-border/80"
                                 onClick={() => setOutputFormat(prev => prev === 'JPEG' ? 'PNG' : 'JPEG')}
                               >
                                 {outputFormat}
@@ -614,7 +614,7 @@ export function StudioChat({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-8 w-8 sm:h-10 sm:w-12 p-0 text-xs sm:text-sm bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
+                                className="h-7 w-7 sm:h-10 sm:w-12 p-0 text-xs sm:text-sm bg-muted/80 hover:bg-muted/95 border border-border/80"
                                 onClick={() => setNumImages(prev => prev >= 4 ? 1 : prev + 1)}
                               >
                                 {numImages}
@@ -627,14 +627,14 @@ export function StudioChat({
                         </div>
                         
                         {/* Второй ряд */}
-                        <div className="flex items-center gap-0.5 sm:gap-2">
+                        <div className="flex items-center gap-1">
                           {/* Соотношение сторон */}
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-8 w-8 sm:h-9 sm:w-14 p-0 text-xs sm:text-sm bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
+                                className="h-7 w-7 sm:h-9 sm:w-14 p-0 text-xs sm:text-sm bg-muted/80 hover:bg-muted/95 border border-border/80"
                                 onClick={() => {
                                   const currentIndex = aspectRatios.indexOf(aspectRatio)
                                   const nextIndex = (currentIndex + 1) % aspectRatios.length
@@ -662,7 +662,7 @@ export function StudioChat({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-8 w-8 sm:h-9 sm:w-12 p-0 bg-muted/80 hover:bg-muted/95 border-2 border-border/80"
+                                className="h-7 w-7 sm:h-9 sm:w-12 p-0 bg-muted/80 hover:bg-muted/95 border border-border/80"
                                 onClick={() => fileInputRef.current?.click()}
                               >
                                 <ImageIcon className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -675,19 +675,19 @@ export function StudioChat({
                         </div>
                       </div>
 
-                      {/* Кнопка генерации - адаптивная */}
+                      {/* Кнопка генерации - отдельно справа */}
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Button
-                            size="lg"
-                            className="h-8 w-8 sm:h-[80px] sm:w-[80px] p-0 bg-primary hover:bg-primary/90 text-primary-foreground"
+                            size="sm"
+                            className="h-9 w-12 sm:h-[80px] sm:w-[80px] p-0 bg-primary hover:bg-primary/90 text-primary-foreground"
                             onClick={handleGenerate}
                             disabled={isGenerating || !prompt.trim()}
                           >
                             {isGenerating ? (
-                              <Loader2 className="h-4 w-4 sm:h-6 sm:w-6 animate-spin" />
+                              <Loader2 className="h-3 w-3 sm:h-6 sm:w-6 animate-spin" />
                             ) : (
-                              <Sparkles className="h-4 w-4 sm:h-6 sm:w-6" />
+                              <Sparkles className="h-3 w-3 sm:h-6 sm:w-6" />
                             )}
                           </Button>
                         </TooltipTrigger>
