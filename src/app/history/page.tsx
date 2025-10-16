@@ -156,7 +156,7 @@ export default function HistoryPage() {
                   </div>
                   <div className="p-4">
                     <p className="text-sm font-medium line-clamp-2 mb-2" title={item.prompt}>
-                      {item.prompt}
+                      {item.prompt.replace(/, (photorealistic|anime style|pixel art|oil painting|watercolor painting|digital art|pencil sketch|professional portrait|landscape photography|macro photography|black and white|HDR photography|vintage photography|cinematic lighting|surreal art|minimalist art|gothic art|futuristic style).*$/, '')}
                     </p>
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
                       <span>{formatDate(new Date(item.createdAt))}</span>
