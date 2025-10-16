@@ -449,7 +449,7 @@ export function StudioChat({
                             )}
                             onClick={() => handleImageSelect(imageUrl)}
                           >
-                            <div className="w-64 h-80 sm:w-80 sm:h-96 md:w-96 md:h-[28rem] relative">
+                            <div className="w-80 h-96 sm:w-96 sm:h-[28rem] md:w-[28rem] md:h-[32rem] lg:w-[32rem] lg:h-[36rem] relative">
                               <Image
                                 src={imageUrl}
                                 alt={`Сгенерированное изображение ${index + 1}`}
