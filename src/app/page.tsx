@@ -10,6 +10,16 @@ export default function HomePage() {
 
   return (
     <div className="space-y-8">
+      {/* Логотип */}
+      <div className="absolute top-4 left-4 z-10">
+        <Link href="/" className="flex items-center space-x-2">
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-sm">24</span>
+          </div>
+          <span className="text-xl font-bold gradient-text">24reshai</span>
+        </Link>
+      </div>
+
       {/* Hero Section - Compact Layout */}
       <section className="hero-section py-16 sm:py-24 px-4">
         <div className="max-w-none mx-auto w-full px-4">
@@ -23,11 +33,8 @@ export default function HomePage() {
               
               <div className="space-y-4 max-w-2xl">
                 <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
-                  <span className="gradient-text">24reshai</span>
-                </h1>
-                <h2 className="text-lg sm:text-xl md:text-2xl text-foreground font-semibold">
                   ИИ-платформа для реализации ваших идей
-                </h2>
+                </h1>
                 <p className="text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed">
                   От товаров до портретов, от интерьеров до еды — превращайте любые идеи в профессиональные изображения. 
                   Мощный ИИ создает студийное качество, реалистичные сцены и идеальные детали за секунды.
@@ -39,7 +46,7 @@ export default function HomePage() {
                 <Link href="/studio" className="w-full">
                   <button className="btn-ios-primary px-8 py-3 text-headline w-full flex items-center justify-center">
                     <Sparkles className="w-5 h-5 mr-3" />
-                    Начать бесплатно
+                    {isAuthenticated ? "Перейти в студию" : "Начать бесплатно"}
                     <ArrowRight className="w-5 h-5 ml-3" />
                   </button>
                 </Link>

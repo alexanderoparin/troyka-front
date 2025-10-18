@@ -123,7 +123,7 @@ export default function StudioPage() {
             {/* Заголовок с кнопкой закрытия */}
             <div className="p-4 border-b">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold">Сессии</h2>
+                <h2 className="text-sm font-semibold">Мои сессии</h2>
                 <Button
                   variant="ghost"
                   size="sm"

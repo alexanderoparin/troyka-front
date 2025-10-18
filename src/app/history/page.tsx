@@ -5,12 +5,9 @@ import { useAuth } from "@/contexts/auth-context"
 import { useImageHistory } from "@/hooks/use-image-history"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { 
-  History,
   Image as ImageIcon,
   AlertCircle,
-  ArrowLeft,
   Download,
   Maximize2,
   X
@@ -73,17 +70,9 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto">
+    <div className="space-y-8 w-full px-4 pt-20">
       {/* Header */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/account">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Назад к аккаунту
-            </Link>
-          </Button>
-        </div>
+      <div className="space-y-4 text-center">
         <h1 className="text-3xl font-bold">История генерации изображений</h1>
         <p className="text-muted-foreground">
           Все ваши созданные изображения
@@ -91,17 +80,6 @@ export default function HistoryPage() {
       </div>
 
       {/* History Content */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <History className="h-5 w-5" />
-            Созданные изображения
-          </CardTitle>
-          <CardDescription>
-            {imageHistory?.length || 0} изображений в истории
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
           {historyLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -116,7 +94,7 @@ export default function HistoryPage() {
           </Button>
         </div>
           ) : imageHistory && imageHistory.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 gap-4">
               {imageHistory.map((item, index) => (
                 <div key={index} className="group border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
                   <div className="relative aspect-square bg-muted">
@@ -178,8 +156,6 @@ export default function HistoryPage() {
           </Button>
         </div>
       )}
-        </CardContent>
-      </Card>
 
       {/* Модальное окно для просмотра изображения */}
       {selectedImageForModal && (

@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { Button } from "@/components/ui/button"
 import {
@@ -21,14 +22,25 @@ import { getPointsText } from "@/lib/grammar"
 
 export function Header() {
   const { user, isAuthenticated, isLoading, logout, points, avatar } = useAuth()
+  const pathname = usePathname()
 
   return (
-    <header className="absolute top-0 left-0 right-0 w-full" style={{ zIndex: 30 }}>
-      <div className="relative h-16 flex items-center justify-center px-4">
+    <header className="fixed top-0 left-0 right-0 w-full" style={{ zIndex: 30 }}>
+      <div className="relative h-16 flex items-center justify-between px-4">
+
+        {/* Логотип - Desktop Only */}
+        <div className={`hidden md:flex items-center space-x-2 ${pathname === "/studio" ? "opacity-0" : ""}`}>
+          <Link href="/" className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">24</span>
+            </div>
+            <span className="text-xl font-bold gradient-text">24reshai</span>
+          </Link>
+        </div>
 
         {/* Central Navigation Block - Desktop Only */}
-        <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-background/20 backdrop-blur-xl border border-border/20 shadow-lg dark:bg-background/30 dark:border-border/10 hover:bg-background/60 hover:border-border/30 dark:hover:bg-background/70 dark:hover:border-border/15 transition-all duration-300">
-          <Button asChild variant="ghost" size="sm" className="h-8 px-3">
+        <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 items-center gap-2 px-4 py-2 rounded-xl bg-background/20 backdrop-blur-xl border border-border/20 shadow-lg dark:bg-background/30 dark:border-border/10 hover:bg-background/60 hover:border-border/30 dark:hover:bg-background/70 dark:hover:border-border/15 transition-all duration-300">
+          <Button asChild variant={pathname === "/" ? "default" : "ghost"} size="sm" className="h-8 px-3">
             <Link href="/">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -47,7 +59,7 @@ export function Header() {
             </Link>
           </Button>
 
-          <Button asChild variant="ghost" size="sm" className="h-8 px-3">
+          <Button asChild variant={pathname === "/studio" ? "default" : "ghost"} size="sm" className="h-8 px-3">
             <Link href="/studio">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -74,7 +86,7 @@ export function Header() {
             </Link>
           </Button>
 
-          <Button asChild variant="ghost" size="sm" className="h-8 px-3">
+          <Button asChild variant={pathname === "/history" ? "default" : "ghost"} size="sm" className="h-8 px-3">
             <Link href="/history">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -94,7 +106,7 @@ export function Header() {
             </Link>
           </Button>
 
-          <Button asChild variant="ghost" size="sm" className="h-8 px-3">
+          <Button asChild variant={pathname === "/pricing" ? "default" : "ghost"} size="sm" className="h-8 px-3">
             <Link href="/pricing">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -115,6 +127,77 @@ export function Header() {
           </Button>
         </div>
 
+        {/* Right Floating Block - Desktop */}
+        <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-background/20 backdrop-blur-xl border border-border/20 shadow-lg dark:bg-background/30 dark:border-border/10 hover:bg-background/60 hover:border-border/30 dark:hover:bg-background/70 dark:hover:border-border/15 transition-all duration-300">
+          {/* User Info Display */}
+          {isAuthenticated && (
+            <div className="flex flex-col items-end text-sm">
+              <div className="font-medium text-foreground">
+                {user?.username || 'Пользователь'}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {getPointsText(points)}
+              </div>
+            </div>
+          )}
+
+          {/* Auth Section */}
+          {isLoading ? (
+            <div className="w-8 h-8 animate-pulse bg-muted rounded-full" />
+          ) : isAuthenticated ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0">
+                  <AvatarUpload 
+                    currentAvatar={avatar || undefined}
+                    userName={user?.username}
+                    size="sm"
+                    className="h-8 w-8"
+                  />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount style={{ zIndex: 100 }}>
+                <div className="flex flex-col space-y-1 leading-none p-2">
+                  {user?.username && (
+                    <p className="font-medium">{user.username}</p>
+                  )}
+                  {user?.email && (
+                    <p className="w-[200px] truncate text-sm text-muted-foreground">
+                      {user.email}
+                    </p>
+                  )}
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/account">
+                    <User className="mr-2 h-4 w-4" />
+                    Аккаунт
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/pricing">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Пополнить баланс
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => logout()}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Выйти
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Button asChild size="sm" className="text-sm px-4 py-2 h-8">
+                <Link href="/login">Войти</Link>
+              </Button>
+              <Button variant="outline" asChild size="sm" className="text-sm px-4 py-2 h-8">
+                <Link href="/register">Регистрация</Link>
+              </Button>
+            </div>
+          )}
+        </div>
 
         {/* Mobile - Only Avatar */}
         <div className="md:hidden absolute right-4 top-1/2 transform -translate-y-1/2" style={{ zIndex: 20 }}>
