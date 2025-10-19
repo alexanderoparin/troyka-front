@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useSearchParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -19,15 +19,39 @@ export default function VerifyEmailPage() {
   const [email, setEmail] = useState<string | null>(null)
   const [isVerifying, setIsVerifying] = useState(false)
   const [verificationResult, setVerificationResult] = useState<boolean | null>(null)
+  const [processedToken, setProcessedToken] = useState<string | null>(null)
+  const isProcessingRef = useRef(false)
 
   useEffect(() => {
+    const token = searchParams.get('token')
+    const emailParam = searchParams.get('email')
+    
+    console.log('useEffect triggered:', { token, emailParam, verificationResult, processedToken, isVerifying, isProcessingRef: isProcessingRef.current })
+    
     // Если уже обработали результат, не делаем повторные запросы
     if (verificationResult !== null) {
+      console.log('Already processed, skipping')
       return
     }
 
-    const token = searchParams.get('token')
-    const emailParam = searchParams.get('email')
+    // Если уже обрабатываем этот токен, не делаем повторные запросы
+    if (token && processedToken === token) {
+      console.log('Token already being processed, skipping')
+      return
+    }
+
+    // Дополнительная защита через useRef
+    if (isProcessingRef.current) {
+      console.log('Already processing (ref), skipping')
+      return
+    }
+
+    // Дополнительная защита через localStorage
+    const storageKey = `verification_${token}`
+    if (localStorage.getItem(storageKey)) {
+      console.log('Token already processed (localStorage), skipping')
+      return
+    }
     
     if (emailParam) {
       setEmail(emailParam)
@@ -47,21 +71,36 @@ export default function VerifyEmailPage() {
       return
     }
 
+    // Отмечаем токен как обрабатываемый СРАЗУ
+    isProcessingRef.current = true
+    localStorage.setItem(storageKey, 'processing')
+    setProcessedToken(token)
     verifyEmail(token)
-  }, [searchParams, verificationResult])
+  }, [searchParams]) // Убираем лишние зависимости
 
   const verifyEmail = async (token: string) => {
+    console.log('verifyEmail called with token:', token, 'isVerifying:', isVerifying, 'processedToken:', processedToken)
+    
     // Защита от повторных запросов
     if (isVerifying) {
+      console.log('Already verifying, skipping')
+      return
+    }
+
+    // Дополнительная защита - если токен уже обрабатывался
+    if (processedToken && processedToken !== token) {
+      console.log('Different token already processed, skipping')
       return
     }
 
     try {
+      console.log('Starting verification for token:', token)
       setIsVerifying(true)
       setIsLoading(true)
       const response = await apiClient.verifyEmail(token)
       
       if (response.data) {
+        console.log('Verification successful for token:', token)
         setIsVerified(true)
         setVerificationResult(true)
         toast({
@@ -69,6 +108,7 @@ export default function VerifyEmailPage() {
           description: "Ваш email адрес успешно подтвержден",
         })
       } else {
+        console.log('Verification failed for token:', token, 'error:', response.error)
         setError(response.error || 'Ошибка подтверждения email')
         setVerificationResult(false)
         toast({
@@ -78,6 +118,7 @@ export default function VerifyEmailPage() {
         })
       }
     } catch (error) {
+      console.log('Verification error for token:', token, 'error:', error)
       setError('Произошла ошибка при подтверждении email')
       setVerificationResult(false)
       toast({
@@ -86,8 +127,13 @@ export default function VerifyEmailPage() {
         variant: "destructive",
       })
     } finally {
+      console.log('Verification completed for token:', token)
       setIsVerifying(false)
       setIsLoading(false)
+      isProcessingRef.current = false
+      // Очищаем localStorage после завершения
+      const storageKey = `verification_${token}`
+      localStorage.removeItem(storageKey)
     }
   }
 
