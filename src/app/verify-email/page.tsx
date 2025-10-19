@@ -27,6 +27,12 @@ export default function VerifyEmailPage() {
     }
     
     if (!token) {
+      // Если нет токена, но есть email - это нормальная ситуация после регистрации
+      if (emailParam) {
+        setIsLoading(false)
+        return
+      }
+      // Если нет ни токена, ни email - это ошибка
       setError('Токен подтверждения не найден')
       setIsLoading(false)
       return
@@ -103,22 +109,26 @@ export default function VerifyEmailPage() {
               <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
             ) : isVerified ? (
               <CheckCircle className="w-8 h-8 text-green-600" />
-            ) : (
+            ) : error && error !== 'Токен подтверждения не найден' ? (
               <XCircle className="w-8 h-8 text-red-600" />
+            ) : (
+              <Mail className="w-8 h-8 text-blue-600" />
             )}
           </div>
           
           <CardTitle className="text-2xl">
             {isLoading ? 'Подтверждение email...' : 
              isVerified ? 'Email подтвержден!' : 
-             'Ошибка подтверждения'}
+             error && error !== 'Токен подтверждения не найден' ? 'Ошибка подтверждения' :
+             'Проверьте почту'}
           </CardTitle>
           
           <CardDescription>
             {isLoading ? 'Пожалуйста, подождите...' :
              isVerified ? 'Ваш email адрес успешно подтвержден' :
+             error && error !== 'Токен подтверждения не найден' ? 'Не удалось подтвердить email адрес' :
              email ? `Письмо с подтверждением отправлено на ${email}` :
-             'Не удалось подтвердить email адрес'}
+             'Письмо с подтверждением отправлено на ваш email'}
           </CardDescription>
         </CardHeader>
         
@@ -147,32 +157,45 @@ export default function VerifyEmailPage() {
                 </Button>
               </div>
             </div>
-          ) : error ? (
+          ) : error && error !== 'Токен подтверждения не найден' ? (
             <div className="space-y-4">
-              {error === 'Токен подтверждения не найден' ? (
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                  <div className="flex items-center gap-2 text-blue-800 dark:text-blue-200">
-                    <Mail className="w-5 h-5" />
-                    <span className="font-medium">Проверьте почту</span>
-                  </div>
-                  <p className="text-sm text-blue-700 dark:text-blue-300 mt-2">
-                    {email ? 
-                      `Письмо с подтверждением отправлено на ${email}. Перейдите по ссылке в письме для завершения регистрации.` :
-                      'Письмо с подтверждением отправлено на ваш email. Перейдите по ссылке в письме для завершения регистрации.'
-                    }
-                  </p>
+              <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
+                <div className="flex items-center gap-2 text-red-800 dark:text-red-200">
+                  <XCircle className="w-5 h-5" />
+                  <span className="font-medium">Ошибка подтверждения</span>
                 </div>
-              ) : (
-                <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
-                  <div className="flex items-center gap-2 text-red-800 dark:text-red-200">
-                    <XCircle className="w-5 h-5" />
-                    <span className="font-medium">Ошибка подтверждения</span>
-                  </div>
-                  <p className="text-sm text-red-700 dark:text-red-300 mt-2">
-                    {error}
-                  </p>
+                <p className="text-sm text-red-700 dark:text-red-300 mt-2">
+                  {error}
+                </p>
+              </div>
+              
+              <div className="space-y-2">
+                <Button onClick={handleResendEmail} className="w-full">
+                  <Mail className="w-4 h-4 mr-2" />
+                  Отправить письмо повторно
+                </Button>
+                <Button variant="outline" asChild className="w-full">
+                  <Link href="/register">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Вернуться к регистрации
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          ) : error === 'Токен подтверждения не найден' ? (
+            <div className="space-y-4">
+              <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                <div className="flex items-center gap-2 text-blue-800 dark:text-blue-200">
+                  <Mail className="w-5 h-5" />
+                  <span className="font-medium">Проверьте почту</span>
                 </div>
-              )}
+                <p className="text-sm text-blue-700 dark:text-blue-300 mt-2">
+                  {email ? 
+                    `Письмо с подтверждением отправлено на ${email}. Перейдите по ссылке в письме для завершения регистрации.` :
+                    'Письмо с подтверждением отправлено на ваш email. Перейдите по ссылке в письме для завершения регистрации.'
+                  }
+                </p>
+              </div>
               
               <div className="space-y-2">
                 <Button onClick={handleResendEmail} className="w-full">
