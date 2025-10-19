@@ -446,7 +446,6 @@ export function StudioChat({
         id="studio-file-input"
         type="file"
         accept="image/*"
-        capture="environment"
         onChange={handleFileInputChange}
         className="hidden"
       />
