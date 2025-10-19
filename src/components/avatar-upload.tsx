@@ -284,6 +284,7 @@ export function AvatarUpload({
         ref={fileInputRef}
         type="file"
         accept="image/*"
+        capture="environment"
         onChange={handleFileSelect}
         className="hidden"
       />

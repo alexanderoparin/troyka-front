@@ -148,6 +148,16 @@ export function StudioChat({
     }
   }, [])
 
+  // Проверяем, что input рендерится
+  useEffect(() => {
+    console.log('StudioChat mounted, fileInputRef:', fileInputRef.current)
+  }, [])
+
+  // Проверяем ref после каждого рендера
+  useEffect(() => {
+    console.log('After render, fileInputRef:', fileInputRef.current)
+  })
+
   const handleFileUpload = useCallback(async (file: File) => {
     // Проверяем тип файла
     if (!file.type.startsWith('image/')) {
@@ -191,8 +201,13 @@ export function StudioChat({
   }, [toast])
 
   const handleFileInputChange = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('File input changed:', event.target.files)
     const file = event.target.files?.[0]
-    if (!file) return
+    if (!file) {
+      console.log('No file selected')
+      return
+    }
+    console.log('Selected file:', file.name, file.type, file.size)
     await handleFileUpload(file)
   }, [handleFileUpload])
 
@@ -425,6 +440,16 @@ export function StudioChat({
   return (
     <TooltipProvider>
       <div className={cn("h-full flex flex-col", className)} onPaste={handlePaste}>
+      {/* Скрытый input для загрузки файлов */}
+      <input
+        ref={fileInputRef}
+        id="studio-file-input"
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={handleFileInputChange}
+        className="hidden"
+      />
       {/* История диалога */}
       <ScrollArea ref={scrollAreaRef} className="flex-1">
         <div className="space-y-4 pb-40 p-3 sm:pb-32 sm:p-6">
@@ -779,16 +804,26 @@ export function StudioChat({
                             
                             <DropdownMenuSeparator />
                             
-                            {/* Загрузка изображения */}
-                            <input
-                              ref={fileInputRef}
-                              type="file"
-                              accept="image/*"
-                              onChange={handleFileInputChange}
-                              className="hidden"
-                            />
+                            {/* Загрузка изображения - input перенесен наверх */}
                             <DropdownMenuItem
-                              onClick={() => fileInputRef.current?.click()}
+                              onClick={() => {
+                                console.log('Dropdown upload clicked')
+                                console.log('fileInputRef.current:', fileInputRef.current)
+                                
+                                // Пробуем через ref
+                                if (fileInputRef.current) {
+                                  fileInputRef.current.click()
+                                } else {
+                                  // Fallback через querySelector
+                                  const input = document.getElementById('studio-file-input') as HTMLInputElement
+                                  console.log('Fallback input found:', input)
+                                  if (input) {
+                                    input.click()
+                                  } else {
+                                    console.error('No file input found!')
+                                  }
+                                }
+                              }}
                               className="flex items-center gap-2"
                             >
                               <ImageIcon className="h-4 w-4" />
@@ -876,21 +911,31 @@ export function StudioChat({
                             </TooltipContent>
                           </Tooltip>
                           
-                          {/* Загрузка изображения */}
-                          <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFileInputChange}
-                            className="hidden"
-                          />
+                          {/* Загрузка изображения - input перенесен наверх */}
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Button
                                 variant="outline"
                                 size="sm"
                                 className="h-10 w-12 p-0 bg-muted/80 hover:bg-muted/95 border border-border/80"
-                                onClick={() => fileInputRef.current?.click()}
+                                onClick={() => {
+                                  console.log('Upload button clicked')
+                                  console.log('fileInputRef.current:', fileInputRef.current)
+                                  
+                                  // Пробуем через ref
+                                  if (fileInputRef.current) {
+                                    fileInputRef.current.click()
+                                  } else {
+                                    // Fallback через querySelector
+                                    const input = document.getElementById('studio-file-input') as HTMLInputElement
+                                    console.log('Fallback input found:', input)
+                                    if (input) {
+                                      input.click()
+                                    } else {
+                                      console.error('No file input found!')
+                                    }
+                                  }
+                                }}
                               >
                                 <ImageIcon className="h-4 w-4" />
                               </Button>

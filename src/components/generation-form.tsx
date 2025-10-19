@@ -326,6 +326,7 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
                 <input
                   type="file"
                   accept="image/*"
+                  capture="environment"
                   onChange={handleFileSelect}
                   className="hidden"
                   ref={fileInputRef}
