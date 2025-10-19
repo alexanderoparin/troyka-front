@@ -46,6 +46,7 @@ interface StudioSessionsProps {
   currentSessionId?: number
   onSessionSelect: (sessionId: number) => void
   onNewSession: () => void
+  onHideSessions?: () => void
   className?: string
 }
 
@@ -53,6 +54,7 @@ export function StudioSessions({
   currentSessionId,
   onSessionSelect,
   onNewSession,
+  onHideSessions,
   className
 }: StudioSessionsProps) {
   const [page, setPage] = useState(0)
@@ -211,7 +213,16 @@ export function StudioSessions({
         <div className="p-1 border-b border-border/20">
           <div className="flex justify-center">
             <button
-              onClick={() => setIsCreateDialogOpen(true)}
+              onClick={() => {
+                console.log('Plus button clicked, onHideSessions:', onHideSessions)
+                // Скрываем блок с сессиями при нажатии на плюсик
+                if (onHideSessions) {
+                  console.log('Calling onHideSessions')
+                  onHideSessions()
+                } else {
+                  console.log('onHideSessions is not provided')
+                }
+              }}
               disabled={isCreating}
               className="aspect-square w-full max-w-[48px] rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center bg-primary/10 hover:bg-primary/20"
             >

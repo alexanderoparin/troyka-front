@@ -10,8 +10,11 @@ import { AlertCircle, User, Eye, Menu } from "lucide-react"
 import { getPointsText } from "@/lib/grammar"
 import Link from "next/link"
 import { useState, useCallback, useEffect } from "react"
-import { useDefaultSession } from "@/hooks/use-sessions-list"
+import { useDefaultSession, useSessionsList } from "@/hooks/use-sessions-list"
 import { useToast } from "@/components/ui/use-toast"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 export default function StudioPage() {
   const { user, isAuthenticated, isEmailVerified, points } = useAuth()
@@ -20,9 +23,16 @@ export default function StudioPage() {
   // Состояние сессий
   const [currentSessionId, setCurrentSessionId] = useState<number | null>(null)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isSessionsVisible, setIsSessionsVisible] = useState(true)
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [newSessionName, setNewSessionName] = useState("")
+  const [isSessionsManagementOpen, setIsSessionsManagementOpen] = useState(false)
   
   // Получаем дефолтную сессию
   const { defaultSession, isLoading: isLoadingDefaultSession } = useDefaultSession()
+  
+  // Хук для работы с сессиями
+  const { createSession, isCreating } = useSessionsList(0, 20)
 
   // Устанавливаем дефолтную сессию при загрузке
   useEffect(() => {
@@ -47,6 +57,64 @@ export default function StudioPage() {
   // Обработчик создания новой сессии
   const handleNewSession = useCallback(() => {
     // Логика создания новой сессии
+  }, [])
+
+  // Обработчик открытия диалога создания сессии
+  const handleOpenCreateDialog = useCallback(() => {
+    setIsCreateDialogOpen(true)
+  }, [])
+
+  // Обработчик создания сессии
+  const handleCreateSession = useCallback(() => {
+    if (!newSessionName.trim()) {
+      toast({
+        title: "Ошибка",
+        description: "Введите название сессии",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Создаем сессию через API
+    createSession(
+      { name: newSessionName.trim() },
+      {
+        onSuccess: (result) => {
+          if (result?.data?.id) {
+            setIsCreateDialogOpen(false)
+            setNewSessionName("")
+            
+            // Переключаемся на новую сессию
+            setCurrentSessionId(result.data.id)
+            
+            toast({
+              title: "Сессия создана",
+              description: `Сессия "${newSessionName.trim()}" успешно создана`,
+            })
+          } else {
+            toast({
+              title: "Ошибка",
+              description: "Не удалось получить ID созданной сессии",
+              variant: "destructive",
+            })
+          }
+        },
+        onError: (error) => {
+          toast({
+            title: "Ошибка",
+            description: "Не удалось создать сессию",
+            variant: "destructive",
+          })
+        }
+      }
+    )
+  }, [newSessionName, toast, createSession])
+
+  // Обработчик скрытия блока с сессиями
+  const handleHideSessions = useCallback(() => {
+    console.log('handleHideSessions called, setting isSessionsVisible to false')
+    setIsSessionsVisible(false)
+    setIsCreateDialogOpen(true) // Открываем диалог создания сессии
   }, [])
 
   // Если пользователь не авторизован
@@ -133,6 +201,19 @@ export default function StudioPage() {
                   <Menu className="h-4 w-4" />
                 </Button>
               </div>
+              <div className="mt-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setIsSessionsManagementOpen(true)
+                    setIsMobileMenuOpen(false)
+                  }}
+                  className="w-full text-xs"
+                >
+                  Управление сессиями
+                </Button>
+              </div>
             </div>
             
             
@@ -149,6 +230,10 @@ export default function StudioPage() {
                     handleNewSession()
                     setIsMobileMenuOpen(false)
                   }}
+                  onHideSessions={() => {
+                    handleHideSessions()
+                    setIsMobileMenuOpen(false)
+                  }}
                   className="h-full"
                 />
               </div>
@@ -158,14 +243,17 @@ export default function StudioPage() {
       )}
 
       {/* Левая панель - Сессии (скрыта на мобильных) */}
-      <div className="hidden md:block w-16 border-r bg-muted/5 flex flex-col">
-        <StudioSessions
-          currentSessionId={currentSessionId || undefined}
-          onSessionSelect={handleSessionSelect}
-          onNewSession={handleNewSession}
-          className="h-full"
-        />
-      </div>
+      {isSessionsVisible && (
+        <div className="hidden md:block w-16 border-r bg-muted/5 flex flex-col">
+          <StudioSessions
+            currentSessionId={currentSessionId || undefined}
+            onSessionSelect={handleSessionSelect}
+            onNewSession={handleNewSession}
+            onHideSessions={handleHideSessions}
+            className="h-full"
+          />
+        </div>
+      )}
 
       {/* Центральная область - Диалог */}
       <div className="flex-1 flex flex-col">
@@ -181,12 +269,106 @@ export default function StudioPage() {
           </Button>
         </div>
         
+        {/* Кнопка показа сессий (только на десктопе, когда сессии скрыты) */}
+        {!isSessionsVisible && (
+          <div className="hidden md:block absolute top-4 left-4" style={{ zIndex: 50 }}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsSessionsVisible(true)}
+              className="h-10 w-10 p-0 bg-background/90 backdrop-blur-sm border-2"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+          </div>
+        )}
+        
         <StudioChat
           sessionId={currentSessionId || undefined}
           onGenerationComplete={handleGenerationComplete}
           className="h-full"
         />
       </div>
+
+      {/* Диалог создания сессии */}
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Создать новую сессию</DialogTitle>
+            <DialogDescription>
+              Создайте новую сессию для организации ваших генераций
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="sessionName">Название сессии</Label>
+              <Input
+                id="sessionName"
+                value={newSessionName}
+                onChange={(e) => setNewSessionName(e.target.value)}
+                placeholder="Введите название сессии"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleCreateSession()
+                  }
+                }}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsCreateDialogOpen(false)}
+            >
+              Отмена
+            </Button>
+            <Button
+              onClick={handleCreateSession}
+              disabled={!newSessionName.trim() || isCreating}
+            >
+              {isCreating ? "Создание..." : "Создать"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Модальное окно управления сессиями */}
+      <Dialog open={isSessionsManagementOpen} onOpenChange={setIsSessionsManagementOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle>Управление сессиями</DialogTitle>
+            <DialogDescription>
+              Переименуйте или удалите ваши сессии
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto">
+            <StudioSessions
+              currentSessionId={currentSessionId || undefined}
+              onSessionSelect={(sessionId) => {
+                setCurrentSessionId(sessionId)
+                setIsSessionsManagementOpen(false)
+              }}
+              onNewSession={() => {
+                setIsSessionsManagementOpen(false)
+                setIsCreateDialogOpen(true)
+              }}
+              onHideSessions={() => {
+                // В модальном окне не скрываем, просто закрываем
+                setIsSessionsManagementOpen(false)
+              }}
+              className="h-full"
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsSessionsManagementOpen(false)}
+            >
+              Закрыть
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
