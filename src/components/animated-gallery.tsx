@@ -59,14 +59,16 @@ export function AnimatedGallery({ className }: AnimatedGalleryProps) {
             isVisible ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          <img
-            src={apiClient.getExampleFileUrl(currentGif.gif)}
-            alt={`Пример генерации ${currentIndex + 1}`}
-            className="w-full h-auto max-h-80 object-cover rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700"
-            onError={(e) => {
-              console.error('GIF load error:', e);
-            }}
-          />
+          <div className="w-full h-80 bg-muted rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <img
+              src={apiClient.getExampleFileUrl(currentGif.gif)}
+              alt={`Пример генерации ${currentIndex + 1}`}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                console.error('GIF load error:', e);
+              }}
+            />
+          </div>
         </div>
         
         {/* Индикаторы */}
