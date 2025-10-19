@@ -18,11 +18,11 @@ export default function PricingPage() {
     <div className="space-y-12 relative">
       {/* Логотип для мобильной версии */}
       <div className="md:hidden fixed top-4 left-4 z-50">
-        <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">24</span>
+        <Link href="/" className="flex items-center gap-2 px-3 py-2 rounded-xl bg-background/20 backdrop-blur-xl border border-border/20 shadow-lg dark:bg-background/30 dark:border-border/10 hover:bg-background/60 hover:border-border/30 dark:hover:bg-background/70 dark:hover:border-border/15 transition-all duration-300">
+          <div className="w-6 h-6 bg-primary rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-xs">24</span>
           </div>
-          <span className="text-xl font-bold gradient-text">24reshai</span>
+          <span className="text-lg font-bold gradient-text">24reshai</span>
         </Link>
       </div>
 
