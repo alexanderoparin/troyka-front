@@ -103,6 +103,7 @@ export default function VerifyEmailPage() {
         console.log('Verification successful for token:', token)
         setIsVerified(true)
         setVerificationResult(true)
+        setIsLoading(false) // Убираем загрузку при успехе
         toast({
           title: "Email подтвержден!",
           description: "Ваш email адрес успешно подтвержден",
@@ -111,6 +112,7 @@ export default function VerifyEmailPage() {
         console.log('Verification failed for token:', token, 'error:', response.error)
         setError(response.error || 'Ошибка подтверждения email')
         setVerificationResult(false)
+        setIsLoading(false) // Убираем загрузку при ошибке
         toast({
           title: "Ошибка подтверждения",
           description: response.error || 'Не удалось подтвердить email',
@@ -121,6 +123,7 @@ export default function VerifyEmailPage() {
       console.log('Verification error for token:', token, 'error:', error)
       setError('Произошла ошибка при подтверждении email')
       setVerificationResult(false)
+      setIsLoading(false) // Убираем загрузку при ошибке
       toast({
         title: "Ошибка",
         description: "Произошла непредвиденная ошибка",
@@ -129,7 +132,6 @@ export default function VerifyEmailPage() {
     } finally {
       console.log('Verification completed for token:', token)
       setIsVerifying(false)
-      setIsLoading(false)
       isProcessingRef.current = false
       // Очищаем localStorage после завершения
       const storageKey = `verification_${token}`
