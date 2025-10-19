@@ -17,8 +17,15 @@ export default function VerifyEmailPage() {
   const [isVerified, setIsVerified] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [email, setEmail] = useState<string | null>(null)
+  const [isVerifying, setIsVerifying] = useState(false)
+  const [verificationResult, setVerificationResult] = useState<boolean | null>(null)
 
   useEffect(() => {
+    // Если уже обработали результат, не делаем повторные запросы
+    if (verificationResult !== null) {
+      return
+    }
+
     const token = searchParams.get('token')
     const emailParam = searchParams.get('email')
     
@@ -30,30 +37,40 @@ export default function VerifyEmailPage() {
       // Если нет токена, но есть email - это нормальная ситуация после регистрации
       if (emailParam) {
         setIsLoading(false)
+        setVerificationResult(false)
         return
       }
       // Если нет ни токена, ни email - это ошибка
       setError('Токен подтверждения не найден')
       setIsLoading(false)
+      setVerificationResult(false)
       return
     }
 
     verifyEmail(token)
-  }, [searchParams])
+  }, [searchParams, verificationResult])
 
   const verifyEmail = async (token: string) => {
+    // Защита от повторных запросов
+    if (isVerifying) {
+      return
+    }
+
     try {
+      setIsVerifying(true)
       setIsLoading(true)
       const response = await apiClient.verifyEmail(token)
       
       if (response.data) {
         setIsVerified(true)
+        setVerificationResult(true)
         toast({
           title: "Email подтвержден!",
           description: "Ваш email адрес успешно подтвержден",
         })
       } else {
         setError(response.error || 'Ошибка подтверждения email')
+        setVerificationResult(false)
         toast({
           title: "Ошибка подтверждения",
           description: response.error || 'Не удалось подтвердить email',
@@ -62,12 +79,14 @@ export default function VerifyEmailPage() {
       }
     } catch (error) {
       setError('Произошла ошибка при подтверждении email')
+      setVerificationResult(false)
       toast({
         title: "Ошибка",
         description: "Произошла непредвиденная ошибка",
         variant: "destructive",
       })
     } finally {
+      setIsVerifying(false)
       setIsLoading(false)
     }
   }
