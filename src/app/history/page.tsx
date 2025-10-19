@@ -70,9 +70,19 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="space-y-8 w-full px-4 pt-20">
+    <div className="space-y-8 w-full px-4 relative">
+      {/* Логотип для мобильной версии */}
+      <div className="md:hidden fixed top-4 left-4 z-50">
+        <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-sm">24</span>
+          </div>
+          <span className="text-xl font-bold gradient-text">24reshai</span>
+        </Link>
+      </div>
+
       {/* Header */}
-      <div className="space-y-4 text-center">
+      <div className="space-y-4 text-center pt-20">
         <h1 className="text-3xl font-bold">История генерации изображений</h1>
         <p className="text-muted-foreground">
           Все ваши созданные изображения

@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { AvatarUpload } from "@/components/avatar-upload"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { 
   User, 
   LogOut, 
@@ -129,6 +130,9 @@ export function Header() {
 
         {/* Right Floating Block - Desktop */}
         <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-background/20 backdrop-blur-xl border border-border/20 shadow-lg dark:bg-background/30 dark:border-border/10 hover:bg-background/60 hover:border-border/30 dark:hover:bg-background/70 dark:hover:border-border/15 transition-all duration-300">
+          {/* Theme Toggle */}
+          <ThemeToggle />
+
           {/* User Info Display */}
           {isAuthenticated && (
             <div className="flex flex-col items-end text-sm">
@@ -200,7 +204,7 @@ export function Header() {
         </div>
 
         {/* Mobile - Only Avatar */}
-        <div className="md:hidden absolute right-4 top-1/2 transform -translate-y-1/2 -translate-y-3" style={{ zIndex: 20 }}>
+        <div className="md:hidden absolute right-4 top-1/2 transform -translate-y-1/2 -translate-y-4" style={{ zIndex: 20 }}>
           {isLoading ? (
             <div className="w-10 h-10 animate-pulse bg-muted rounded-full" />
           ) : isAuthenticated ? (
@@ -343,6 +347,13 @@ export function Header() {
                     <Plus className="mr-2 h-4 w-4" />
                     Пополнить баланс
                   </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <div className="flex items-center justify-between w-full">
+                    <span>Тема</span>
+                    <ThemeToggle />
+                  </div>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => logout()}>

@@ -8,15 +8,26 @@ import { PricingCard } from "@/components/pricing-card"
 import { usePricingPlans } from "@/hooks/use-pricing-plans"
 import { useAuth } from "@/contexts/auth-context"
 import { getPointsText } from "@/lib/grammar"
+import Link from "next/link"
 
 export default function PricingPage() {
   const { data: plans = [], isLoading, error } = usePricingPlans()
   const { isAuthenticated, points } = useAuth()
 
   return (
-    <div className="space-y-12 pt-20">
+    <div className="space-y-12 relative">
+      {/* Логотип для мобильной версии */}
+      <div className="md:hidden fixed top-4 left-4 z-50">
+        <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-sm">24</span>
+          </div>
+          <span className="text-xl font-bold gradient-text">24reshai</span>
+        </Link>
+      </div>
+
       {/* Header */}
-      <div className="text-center space-y-6">
+      <div className="text-center space-y-6 pt-20">
         <Badge variant="secondary" className="mb-4 text-callout bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-700 px-4 py-2 rounded-full">
           <Sparkles className="w-4 h-4 mr-2" />
           Простые и честные цены
