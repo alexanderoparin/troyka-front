@@ -94,7 +94,7 @@ export default function HistoryPage() {
           </Button>
         </div>
           ) : imageHistory && imageHistory.length > 0 ? (
-            <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
               {imageHistory.map((item, index) => (
                 <div key={index} className="group border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
                   <div className="relative aspect-square bg-muted">
