@@ -26,13 +26,16 @@ export default function StudioPage() {
   const [isSessionsVisible, setIsSessionsVisible] = useState(true)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [newSessionName, setNewSessionName] = useState("")
-  const [isSessionsManagementOpen, setIsSessionsManagementOpen] = useState(false)
+  const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [selectedSession, setSelectedSession] = useState<any>(null)
+  const [renameSessionName, setRenameSessionName] = useState("")
   
   // Получаем дефолтную сессию
   const { defaultSession, isLoading: isLoadingDefaultSession } = useDefaultSession()
   
   // Хук для работы с сессиями
-  const { createSession, isCreating } = useSessionsList(0, 20)
+  const { createSession, isCreating, renameSession, deleteSession, isRenaming, isDeleting } = useSessionsList(0, 20)
 
   // Устанавливаем дефолтную сессию при загрузке
   useEffect(() => {
@@ -116,6 +119,78 @@ export default function StudioPage() {
     setIsSessionsVisible(false)
     setIsCreateDialogOpen(true) // Открываем диалог создания сессии
   }, [])
+
+  // Обработчики для переименования и удаления сессий
+  const handleOpenRenameDialog = useCallback((session: any) => {
+    console.log('Opening rename dialog for session:', session.name)
+    setSelectedSession(session)
+    setRenameSessionName(session.name)
+    setIsRenameDialogOpen(true)
+  }, [])
+
+  const handleOpenDeleteDialog = useCallback((session: any) => {
+    console.log('Opening delete dialog for session:', session.name)
+    setSelectedSession(session)
+    setIsDeleteDialogOpen(true)
+  }, [])
+
+  const handleRenameSession = useCallback(() => {
+    if (!selectedSession || !renameSessionName.trim()) {
+      toast({
+        title: "Ошибка",
+        description: "Введите название сессии",
+        variant: "destructive",
+      })
+      return
+    }
+
+    renameSession(
+      { sessionId: selectedSession.id, request: { name: renameSessionName.trim() } },
+      {
+        onSuccess: () => {
+          setIsRenameDialogOpen(false)
+          setRenameSessionName("")
+          setSelectedSession(null)
+          toast({
+            title: "Сессия переименована",
+            description: `Сессия переименована в "${renameSessionName.trim()}"`,
+          })
+        },
+        onError: (error) => {
+          toast({
+            title: "Ошибка",
+            description: "Не удалось переименовать сессию",
+            variant: "destructive",
+          })
+        }
+      }
+    )
+  }, [selectedSession, renameSessionName, toast, renameSession])
+
+  const handleDeleteSession = useCallback(() => {
+    if (!selectedSession) return
+
+    deleteSession(
+      selectedSession.id,
+      {
+        onSuccess: () => {
+          setIsDeleteDialogOpen(false)
+          setSelectedSession(null)
+          toast({
+            title: "Сессия удалена",
+            description: `Сессия "${selectedSession.name}" удалена`,
+          })
+        },
+        onError: (error) => {
+          toast({
+            title: "Ошибка",
+            description: "Не удалось удалить сессию",
+            variant: "destructive",
+          })
+        }
+      }
+    )
+  }, [selectedSession, toast, deleteSession])
 
   // Если пользователь не авторизован
   if (!isAuthenticated) {
@@ -201,19 +276,6 @@ export default function StudioPage() {
                   <Menu className="h-4 w-4" />
                 </Button>
               </div>
-              <div className="mt-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setIsSessionsManagementOpen(true)
-                    setIsMobileMenuOpen(false)
-                  }}
-                  className="w-full text-xs"
-                >
-                  Управление сессиями
-                </Button>
-              </div>
             </div>
             
             
@@ -234,7 +296,10 @@ export default function StudioPage() {
                     handleHideSessions()
                     setIsMobileMenuOpen(false)
                   }}
+                  onRenameSession={handleOpenRenameDialog}
+                  onDeleteSession={handleOpenDeleteDialog}
                   className="h-full"
+                  isMobile={true}
                 />
               </div>
             </div>
@@ -250,6 +315,8 @@ export default function StudioPage() {
             onSessionSelect={handleSessionSelect}
             onNewSession={handleNewSession}
             onHideSessions={handleHideSessions}
+            onRenameSession={handleOpenRenameDialog}
+            onDeleteSession={handleOpenDeleteDialog}
             className="h-full"
           />
         </div>
@@ -332,43 +399,76 @@ export default function StudioPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Модальное окно управления сессиями */}
-      <Dialog open={isSessionsManagementOpen} onOpenChange={setIsSessionsManagementOpen}>
-        <DialogContent className="max-w-2xl max-h-[80vh]">
+      {/* Диалог переименования */}
+      <Dialog open={isRenameDialogOpen} onOpenChange={setIsRenameDialogOpen}>
+        <DialogContent className="z-[10000]">
           <DialogHeader>
-            <DialogTitle>Управление сессиями</DialogTitle>
+            <DialogTitle>Переименовать сессию</DialogTitle>
             <DialogDescription>
-              Переименуйте или удалите ваши сессии
+              Измените название сессии
             </DialogDescription>
           </DialogHeader>
-          <div className="flex-1 overflow-y-auto">
-            <StudioSessions
-              currentSessionId={currentSessionId || undefined}
-              onSessionSelect={(sessionId) => {
-                setCurrentSessionId(sessionId)
-                setIsSessionsManagementOpen(false)
-              }}
-              onNewSession={() => {
-                setIsSessionsManagementOpen(false)
-                setIsCreateDialogOpen(true)
-              }}
-              onHideSessions={() => {
-                // В модальном окне не скрываем, просто закрываем
-                setIsSessionsManagementOpen(false)
-              }}
-              className="h-full"
-            />
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="renameSessionName">Название сессии</Label>
+              <Input
+                id="renameSessionName"
+                value={renameSessionName}
+                onChange={(e) => setRenameSessionName(e.target.value)}
+                placeholder="Введите новое название"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleRenameSession()
+                  }
+                }}
+              />
+            </div>
           </div>
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setIsSessionsManagementOpen(false)}
+              onClick={() => setIsRenameDialogOpen(false)}
             >
-              Закрыть
+              Отмена
+            </Button>
+            <Button
+              onClick={handleRenameSession}
+              disabled={isRenaming || !renameSessionName.trim()}
+            >
+              {isRenaming ? "Сохранение..." : "Сохранить"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Диалог удаления */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="z-[10000]">
+          <DialogHeader>
+            <DialogTitle>Удалить сессию</DialogTitle>
+            <DialogDescription>
+              Вы уверены, что хотите удалить сессию "{selectedSession?.name}"? 
+              Это действие нельзя отменить. Все изображения и история этой сессии будут удалены.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+            >
+              Отмена
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteSession}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Удаление..." : "Удалить"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
     </div>
   )
 }

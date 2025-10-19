@@ -47,7 +47,10 @@ interface StudioSessionsProps {
   onSessionSelect: (sessionId: number) => void
   onNewSession: () => void
   onHideSessions?: () => void
+  onRenameSession?: (session: any) => void
+  onDeleteSession?: (session: any) => void
   className?: string
+  isMobile?: boolean
 }
 
 export function StudioSessions({
@@ -55,7 +58,10 @@ export function StudioSessions({
   onSessionSelect,
   onNewSession,
   onHideSessions,
-  className
+  onRenameSession,
+  onDeleteSession,
+  className,
+  isMobile = false
 }: StudioSessionsProps) {
   const [page, setPage] = useState(0)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
@@ -159,14 +165,24 @@ export function StudioSessions({
   }
 
   const openRenameDialog = (session: Session) => {
-    setSelectedSession(session)
-    setRenameSessionName(session.name)
-    setIsRenameDialogOpen(true)
+    console.log('Opening rename dialog for session:', session.name)
+    if (onRenameSession) {
+      onRenameSession(session)
+    } else {
+      setSelectedSession(session)
+      setRenameSessionName(session.name)
+      setIsRenameDialogOpen(true)
+    }
   }
 
   const openDeleteDialog = (session: Session) => {
-    setSelectedSession(session)
-    setIsDeleteDialogOpen(true)
+    console.log('Opening delete dialog for session:', session.name)
+    if (onDeleteSession) {
+      onDeleteSession(session)
+    } else {
+      setSelectedSession(session)
+      setIsDeleteDialogOpen(true)
+    }
   }
 
   const formatDate = (dateString: string) => {
@@ -268,16 +284,56 @@ export function StudioSessions({
                             </div>
                           )}
                           
-                          {/* Overlay с действиями - только при hover */}
-                          <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
-                            <div className="flex justify-end">
+                          {/* Overlay с действиями - только при hover на десктопе, скрыт на мобилке */}
+                          {!isMobile && (
+                            <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
+                              <div className="flex justify-end">
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-5 w-5 p-0 text-white hover:bg-white/20 rounded-full"
+                                      onClick={(e) => {
+                                        console.log('Three dots clicked on desktop')
+                                        e.stopPropagation()
+                                      }}
+                                    >
+                                      <MoreVertical className="h-3 w-3" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end" className="z-[10000]">
+                                    <DropdownMenuItem onClick={() => openRenameDialog(session)}>
+                                      <Edit3 className="h-4 w-4 mr-2" />
+                                      Переименовать
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem 
+                                      onClick={() => openDeleteDialog(session)}
+                                      className="text-red-600"
+                                    >
+                                      <Trash2 className="h-4 w-4 mr-2" />
+                                      Удалить
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Кнопка с тремя точками для мобилки - всегда видимая */}
+                          {isMobile && (
+                            <div className="absolute top-1 right-1">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="h-5 w-5 p-0 text-white hover:bg-white/20 rounded-full"
-                                    onClick={(e) => e.stopPropagation()}
+                                    className="h-6 w-6 p-0 bg-black/50 hover:bg-black/70 text-white rounded-full"
+                                    onClick={(e) => {
+                                      console.log('Mobile three dots clicked')
+                                      e.stopPropagation()
+                                    }}
                                   >
                                     <MoreVertical className="h-3 w-3" />
                                   </Button>
@@ -298,8 +354,7 @@ export function StudioSessions({
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </div>
-                            
-                          </div>
+                          )}
 
                           {/* Индикатор активной сессии */}
                           {currentSessionId === session.id && (
@@ -359,7 +414,7 @@ export function StudioSessions({
 
       {/* Диалог создания сессии */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent>
+        <DialogContent className="z-[10000]">
           <DialogHeader>
             <DialogTitle>Создать новую сессию</DialogTitle>
             <DialogDescription>
@@ -401,7 +456,7 @@ export function StudioSessions({
 
       {/* Диалог переименования */}
       <Dialog open={isRenameDialogOpen} onOpenChange={setIsRenameDialogOpen}>
-        <DialogContent>
+        <DialogContent className="z-[10000]">
           <DialogHeader>
             <DialogTitle>Переименовать сессию</DialogTitle>
             <DialogDescription>
@@ -443,7 +498,7 @@ export function StudioSessions({
 
       {/* Диалог удаления */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
+        <DialogContent className="z-[10000]">
           <DialogHeader>
             <DialogTitle>Удалить сессию</DialogTitle>
             <DialogDescription>
