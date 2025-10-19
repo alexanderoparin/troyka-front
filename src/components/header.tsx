@@ -200,7 +200,7 @@ export function Header() {
         </div>
 
         {/* Mobile - Only Avatar */}
-        <div className="md:hidden absolute right-4 top-1/2 transform -translate-y-1/2" style={{ zIndex: 20 }}>
+        <div className="md:hidden absolute right-4 top-1/2 transform -translate-y-1/2 -translate-y-3" style={{ zIndex: 20 }}>
           {isLoading ? (
             <div className="w-10 h-10 animate-pulse bg-muted rounded-full" />
           ) : isAuthenticated ? (
