@@ -76,6 +76,26 @@ export function StudioChat({
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isEditingMode, setIsEditingMode] = useState(false)
   
+  // Очищаем промпт и изображения при смене сессии
+  useEffect(() => {
+    setPrompt("")
+    setUploadedImages([])
+    setSelectedImages([])
+    setIsEditingMode(false)
+    // Очищаем localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('studio-prompt')
+    }
+  }, [sessionId])
+
+  // Очищаем промпт и изображения при обновлении страницы (монтирование компонента)
+  useEffect(() => {
+    // Очищаем localStorage при загрузке страницы
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('studio-prompt')
+    }
+  }, [])
+  
   const artStyles = [
     { name: 'Реалистичный', prompt: ', photorealistic, high quality, detailed, professional photography' },
     { name: 'Аниме', prompt: ', anime style, manga art, vibrant colors, Japanese animation' },
