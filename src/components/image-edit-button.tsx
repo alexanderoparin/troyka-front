@@ -95,6 +95,7 @@ export function ImageEditButton({
         toast({
           title: "Изображение отредактировано!",
           description: `Списано ${getPointsText(requiredPoints)}. Баланс обновится через секунду`,
+          duration: 1500,
         });
         
         if (onImageEdited) {

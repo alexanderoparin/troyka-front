@@ -336,6 +336,7 @@ export function StudioChat({
         toast({
           title: "Изображения созданы!",
           description: `Создано ${response.data.imageUrls.length} ${getImageText(response.data.imageUrls.length)} в формате ${outputFormat} (${artStyle})`,
+          duration: 1500,
         })
       } else {
         throw new Error(response.error || 'Ошибка генерации')

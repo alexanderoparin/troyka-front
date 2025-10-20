@@ -162,6 +162,7 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
         toast({
           title: "Изображение создано!",
           description: `Списано ${getPointsText(requiredPoints)}. Баланс обновится через секунду`,
+          duration: 1500,
         })
         // Очищаем форму после успешной генерации
         setValue("prompt", "")
