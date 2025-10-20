@@ -327,7 +327,7 @@ export function StudioChat({
           setSelectedImages(response.data.imageUrls)
         } else {
           // В обычном режиме очищаем загруженные изображения
-          setUploadedImages([])
+        setUploadedImages([])
         }
         
         // Обновляем историю после успешной генерации
@@ -361,11 +361,11 @@ export function StudioChat({
           duration: 20000,
         })
       } else {
-        toast({
-          title: "Ошибка генерации",
-          description: "Не удалось создать изображения",
-          variant: "destructive",
-        })
+      toast({
+        title: "Ошибка генерации",
+        description: "Не удалось создать изображения",
+        variant: "destructive",
+      })
       }
     } finally {
       setIsGenerating(false)
@@ -655,17 +655,17 @@ export function StudioChat({
                               <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
                                 <Tooltip>
                                   <TooltipTrigger asChild>
-                                    <Button
-                                      size="sm"
-                                      variant="secondary"
+                                <Button
+                                  size="sm"
+                                  variant="secondary"
                                       className="h-7 w-7 p-0 bg-black/50 hover:bg-black/70 text-white border-0"
-                                      onClick={(e) => {
-                                        e.stopPropagation()
+                                  onClick={(e) => {
+                                    e.stopPropagation()
                                         handleImageSelect(imageUrl)
-                                      }}
-                                    >
+                                  }}
+                                >
                                       <Pencil className="h-3 w-3" />
-                                    </Button>
+                                </Button>
                                   </TooltipTrigger>
                                   <TooltipContent className="z-[140]">
                                     <p>Редактировать изображение</p>
@@ -673,17 +673,17 @@ export function StudioChat({
                                 </Tooltip>
                                 <Tooltip>
                                   <TooltipTrigger asChild>
-                                    <Button
-                                      size="sm"
-                                      variant="secondary"
+                                <Button
+                                  size="sm"
+                                  variant="secondary"
                                       className="h-7 w-7 p-0 bg-black/50 hover:bg-black/70 text-white border-0"
-                                      onClick={(e) => {
-                                        e.stopPropagation()
-                                        handleImageDownload(imageUrl)
-                                      }}
-                                    >
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleImageDownload(imageUrl)
+                                  }}
+                                >
                                       <Download className="h-3 w-3" />
-                                    </Button>
+                                </Button>
                                   </TooltipTrigger>
                                   <TooltipContent className="z-[140]">
                                     <p>Скачать изображение</p>
@@ -815,24 +815,26 @@ export function StudioChat({
                         }}
                       />
                       
-                      {/* Кнопки управления - вертикально */}
+                      {/* Кнопки управления и генерации */}
+                      <div className="flex items-end gap-1">
+                        {/* Слева колонка: настройки + загрузка */}
                       <div className="flex flex-col gap-1">
-                        {/* Кнопка настроек - сверху */}
-                        <DropdownMenu open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-10 w-10 p-0 bg-muted/80 hover:bg-muted/95 border border-border/80"
-                            >
-                              <Settings className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent className="w-56 z-[150]" align="end">
-                            <DropdownMenuLabel>Настройки генерации</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
+                          {/* Кнопка настроек */}
+                          <DropdownMenu open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-10 w-10 p-0 bg-muted/80 hover:bg-muted/95 border border-border/80"
+                              >
+                                <Settings className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-56 z-[150]" align="end">
+                              <DropdownMenuLabel>Настройки генерации</DropdownMenuLabel>
+                              <DropdownMenuSeparator />
                             
-                            {/* Формат изображения */}
+                          {/* Формат изображения */}
                             <DropdownMenuItem
                               onClick={(e) => {
                                 e.preventDefault()
@@ -870,49 +872,48 @@ export function StudioChat({
                               <span className="text-muted-foreground text-xs">{artStyle}</span>
                             </DropdownMenuItem>
                             
-                            <DropdownMenuSeparator />
                             
-                            {/* Загрузка изображения - input перенесен наверх */}
-                            <DropdownMenuItem
-                              onClick={() => {
-                                console.log('Dropdown upload clicked')
-                                console.log('fileInputRef.current:', fileInputRef.current)
-                                
-                                // Пробуем через ref
-                                if (fileInputRef.current) {
-                                  fileInputRef.current.click()
-                                } else {
-                                  // Fallback через querySelector
-                                  const input = document.getElementById('studio-file-input') as HTMLInputElement
-                                  console.log('Fallback input found:', input)
-                                  if (input) {
-                                    input.click()
-                                  } else {
-                                    console.error('No file input found!')
-                                  }
-                                }
-                              }}
-                              className="flex items-center gap-2"
-                            >
-                              <ImageIcon className="h-4 w-4" />
-                              <span>Загрузить изображение</span>
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
 
-                        {/* Кнопка генерации - снизу */}
+                          {/* Кнопка загрузки изображения */}
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-10 w-10 p-0 bg-muted/80 hover:bg-muted/95 border border-border/80"
+                                onClick={() => {
+                                  if (fileInputRef.current) {
+                                    fileInputRef.current.click()
+                                  } else {
+                                    const input = document.getElementById('studio-file-input') as HTMLInputElement
+                                    if (input) input.click()
+                                  }
+                                }}
+                              >
+                                <ImageIcon className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent className="z-[9998]">
+                              <p>Загрузить</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+
+                        {/* Справа большая кнопка генерации */}
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
-                              size="sm"
-                              className="h-10 w-10 p-0 bg-primary hover:bg-primary/90 text-primary-foreground"
+                              size="lg"
+                              className="h-[84px] w-14 p-0 bg-primary hover:bg-primary/90 text-primary-foreground"
                               onClick={handleGenerate}
                               disabled={isGenerating || !prompt.trim()}
                             >
                               {isGenerating ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
+                                <Loader2 className="h-5 w-5 animate-spin" />
                               ) : (
-                                <Sparkles className="h-4 w-4" />
+                                <Sparkles className="h-5 w-5" />
                               )}
                             </Button>
                           </TooltipTrigger>
@@ -978,7 +979,7 @@ export function StudioChat({
                               <p>Количество изображений (нажмите для смены)</p>
                             </TooltipContent>
                           </Tooltip>
-                          
+                        
                           {/* Загрузка изображения - input перенесен наверх */}
                           <Tooltip>
                             <TooltipTrigger asChild>
@@ -1033,31 +1034,31 @@ export function StudioChat({
                             </TooltipTrigger>
                             <TooltipContent className="z-[140]">
                               <p>Стиль изображения (нажмите для смены)</p>
-                            </TooltipContent>
+                          </TooltipContent>
                           </Tooltip>
                         </div>
                       </div>
 
                       {/* Кнопка генерации - отдельно справа */}
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
                             size="sm"
                             className="h-[80px] w-[80px] p-0 bg-primary hover:bg-primary/90 text-primary-foreground"
-                            onClick={handleGenerate}
-                            disabled={isGenerating || !prompt.trim()}
-                          >
-                            {isGenerating ? (
+                              onClick={handleGenerate}
+                              disabled={isGenerating || !prompt.trim()}
+                            >
+                              {isGenerating ? (
                               <Loader2 className="h-6 w-6 animate-spin" />
-                            ) : (
+                              ) : (
                               <Sparkles className="h-6 w-6" />
-                            )}
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent className="z-[9998]">
-                          <p>{isGenerating ? "Генерация изображений..." : "Генерировать изображения"}</p>
-                        </TooltipContent>
-                      </Tooltip>
+                              )}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent className="z-[9998]">
+                            <p>{isGenerating ? "Генерация изображений..." : "Генерировать изображения"}</p>
+                          </TooltipContent>
+                        </Tooltip>
                     </div>
                   </div>
 
