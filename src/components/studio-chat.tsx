@@ -341,11 +341,31 @@ export function StudioChat({
         throw new Error(response.error || 'Ошибка генерации')
       }
     } catch (error) {
-      toast({
-        title: "Ошибка генерации",
-        description: "Не удалось создать изображения",
-        variant: "destructive",
-      })
+      const message = (error as any)?.message as string | undefined
+      const notEnoughPoints = message?.toLowerCase().includes("недостаточно поинтов")
+
+      if (notEnoughPoints) {
+        toast({
+          title: "Недостаточно поинтов",
+          description: "Для генерации не хватает поинтов. Купите пакет, чтобы продолжить.",
+          action: (
+            <a
+              href="/pricing"
+              className="ml-2 inline-flex h-12 items-center justify-center rounded-md bg-primary px-4 text-base font-medium text-primary-foreground hover:opacity-90"
+            >
+              Купить поинты
+            </a>
+          ),
+          variant: "default",
+          duration: 20000,
+        })
+      } else {
+        toast({
+          title: "Ошибка генерации",
+          description: "Не удалось создать изображения",
+          variant: "destructive",
+        })
+      }
     } finally {
       setIsGenerating(false)
     }

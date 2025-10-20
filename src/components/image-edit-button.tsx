@@ -108,11 +108,31 @@ export function ImageEditButton({
       }
       
     } catch (error: any) {
-      toast({
-        title: "Ошибка редактирования",
-        description: error.message || "Не удалось отредактировать изображение",
-        variant: "destructive",
-      });
+      const message = error?.message as string | undefined
+      const notEnoughPoints = message?.toLowerCase().includes("недостаточно поинтов")
+
+      if (notEnoughPoints) {
+        toast({
+          title: "Недостаточно поинтов",
+          description: `Требуется ${getPointsText(requiredPoints)}, у вас ${getPointsText(points)}. Купите поинты, чтобы продолжить`,
+          action: (
+            <a
+              href="/pricing"
+              className="ml-2 inline-flex h-12 items-center justify-center rounded-md bg-primary px-4 text-base font-medium text-primary-foreground hover:opacity-90"
+            >
+              Купить поинты
+            </a>
+          ),
+          variant: "default",
+          duration: 20000,
+        })
+      } else {
+        toast({
+          title: "Ошибка редактирования",
+          description: error.message || "Не удалось отредактировать изображение",
+          variant: "destructive",
+        })
+      }
     } finally {
       setIsEditing(false);
     }
