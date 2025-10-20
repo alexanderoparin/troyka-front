@@ -220,7 +220,7 @@ export function StudioChat({
       // Загружаем файл на сервер
       const response = await apiClient.uploadFile(file)
       if (response.data) {
-        setUploadedImages(prev => [...prev, response.data])
+        setUploadedImages(prev => [...prev, response.data!])
         toast({
           title: "Изображение загружено",
           description: "Изображение готово для использования",
