@@ -277,6 +277,10 @@ export function StudioSessions({
                               alt={session.name}
                               fill
                               className="object-cover"
+                              sizes="64px"
+                              onError={(e) => {
+                                console.error('Session image load error:', session.lastImageUrl, e);
+                              }}
                             />
                           ) : (
                             <div className="w-full h-full bg-muted flex items-center justify-center">

@@ -74,6 +74,7 @@ export function StudioChat({
   const [selectedImageForModal, setSelectedImageForModal] = useState<string | null>(null)
   const [isDragOver, setIsDragOver] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [isEditingMode, setIsEditingMode] = useState(false)
   
   const artStyles = [
     { name: 'Реалистичный', prompt: ', photorealistic, high quality, detailed, professional photography' },
@@ -299,7 +300,11 @@ export function StudioChat({
       if (response.data) {
         onGenerationComplete(response.data.imageUrls, promptWithStyle)
         // НЕ очищаем промпт - он остается в поле ввода
-        setUploadedImages([])
+        
+        // В режиме редактирования НЕ очищаем загруженные изображения
+        if (!isEditingMode) {
+          setUploadedImages([])
+        }
         
         // Обновляем историю после успешной генерации
         updateHistoryAfterGeneration()
@@ -320,7 +325,7 @@ export function StudioChat({
     } finally {
       setIsGenerating(false)
     }
-  }, [prompt, numImages, outputFormat, onGenerationComplete, toast, artStyle, sessionId, uploadedImages, updateHistoryAfterGeneration])
+  }, [prompt, numImages, outputFormat, onGenerationComplete, toast, artStyle, sessionId, uploadedImages, updateHistoryAfterGeneration, isEditingMode])
 
   const handleImageExpand = (imageUrl: string) => {
     setSelectedImageForModal(imageUrl)
@@ -357,10 +362,17 @@ export function StudioChat({
       // Удаляем изображение из выбора и из загруженных
       setSelectedImages(prev => prev.filter(url => url !== imageUrl))
       setUploadedImages(prev => prev.filter(url => url !== imageUrl))
+      // Если больше нет выбранных изображений, выходим из режима редактирования
+      if (selectedImages.length === 1) {
+        setIsEditingMode(false)
+        setUploadedImages([])
+      }
     } else if (selectedImages.length < 4) {
       // Добавляем изображение в выбор и сразу в загруженные для редактирования
       setSelectedImages(prev => [...prev, imageUrl])
       setUploadedImages(prev => [...prev, imageUrl])
+      // Включаем режим редактирования
+      setIsEditingMode(true)
     } else {
       toast({
         title: "Максимум изображений",
@@ -686,6 +698,18 @@ export function StudioChat({
                 <Badge variant="secondary">
                   {uploadedImages.length} {getImageText(uploadedImages.length)} выбрано для редактирования
                 </Badge>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setUploadedImages([])
+                    setSelectedImages([])
+                    setIsEditingMode(false)
+                  }}
+                  className="h-6 px-2 text-xs"
+                >
+                  Очистить
+                </Button>
                 {/* Миниатюры изображений справа от текста */}
                 <div className="flex gap-1">
                   {uploadedImages.map((imageUrl, index) => (
@@ -734,7 +758,7 @@ export function StudioChat({
                       <Textarea
                         value={prompt}
                         onChange={(e) => handlePromptChange(e.target.value)}
-                        placeholder={isDragOver ? "Отпустите файл для загрузки..." : "Опишите изображение, которое хотите создать..."}
+                        placeholder={isDragOver ? "Отпустите файл для загрузки..." : isEditingMode ? "Опишите изменения для выбранного изображения..." : "Опишите изображение, которое хотите создать..."}
                         className="h-12 resize-none text-sm flex-1 bg-muted/80 border border-border/80 focus:border-primary/80 focus:bg-muted/95"
                         onFocus={() => setIsFocused(true)}
                         onBlur={() => setIsFocused(false)}
@@ -860,7 +884,7 @@ export function StudioChat({
                       <Textarea
                         value={prompt}
                         onChange={(e) => handlePromptChange(e.target.value)}
-                        placeholder={isDragOver ? "Отпустите файл для загрузки..." : "Опишите изображение, которое хотите создать..."}
+                        placeholder={isDragOver ? "Отпустите файл для загрузки..." : isEditingMode ? "Опишите изменения для выбранного изображения..." : "Опишите изображение, которое хотите создать..."}
                         className="h-[54px] resize-none text-base flex-1 bg-muted/80 border border-border/80 focus:border-primary/80 focus:bg-muted/95"
                         onFocus={() => setIsFocused(true)}
                         onBlur={() => setIsFocused(false)}

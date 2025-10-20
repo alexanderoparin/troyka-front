@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from "react"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -48,6 +49,7 @@ export function SessionHistory({
   onImagesSelect,
   className 
 }: SessionHistoryProps) {
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set())
   const [selectedImages, setSelectedImages] = useState<string[]>([])
   const [copiedImageUrl, setCopiedImageUrl] = useState<string | null>(null)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
@@ -303,11 +305,26 @@ export function SessionHistory({
                             )}
                             onClick={() => handleImageClick(imageUrl)}
                           >
-                            <img
-                              src={imageUrl}
-                              alt={`Сгенерированное изображение ${index + 1}`}
-                              className="w-36 h-44 sm:w-40 sm:h-48 object-cover"
-                            />
+                            <div className="w-36 h-44 sm:w-40 sm:h-48 bg-muted flex items-center justify-center rounded-lg relative">
+                              {!imageErrors.has(imageUrl) ? (
+                                <Image
+                                  src={imageUrl}
+                                  alt={`Сгенерированное изображение ${index + 1}`}
+                                  width={160}
+                                  height={192}
+                                  className="w-full h-full object-cover rounded-lg"
+                                  sizes="(max-width: 640px) 144px, 160px"
+                                  onError={() => {
+                                    console.error('Image load error:', imageUrl);
+                                    setImageErrors(prev => new Set(prev).add(imageUrl));
+                                  }}
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center rounded-lg">
+                                  <ImageIcon className="h-8 w-8 text-muted-foreground" />
+                                </div>
+                              )}
+                            </div>
                             
                             {/* Overlay с действиями */}
                             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
