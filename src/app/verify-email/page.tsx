@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
@@ -11,7 +11,7 @@ import { apiClient } from "@/lib/api-client"
 
 export default function VerifyEmailPage() {
   const searchParams = useSearchParams()
-  // const router = useRouter()
+  const router = useRouter()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(true)
   const [isVerified, setIsVerified] = useState(false)
@@ -21,6 +21,16 @@ export default function VerifyEmailPage() {
   const [verificationResult, setVerificationResult] = useState<boolean | null>(null)
   const [processedToken, setProcessedToken] = useState<string | null>(null)
   const isProcessingRef = useRef(false)
+
+  // Авто-редирект в студию после успешной верификации
+  useEffect(() => {
+    if (isVerified) {
+      const timer = setTimeout(() => {
+        router.push('/studio')
+      }, 2500)
+      return () => clearTimeout(timer)
+    }
+  }, [isVerified, router])
 
   useEffect(() => {
     const token = searchParams.get('token')
@@ -48,8 +58,14 @@ export default function VerifyEmailPage() {
 
     // Дополнительная защита через localStorage
     const storageKey = `verification_${token}`
-    if (localStorage.getItem(storageKey)) {
+    const stored = token ? localStorage.getItem(storageKey) : null
+    if (stored) {
       console.log('Token already processed (localStorage), skipping')
+      // Считаем, что в предыдущей попытке подтверждение уже прошло или обрабатывается;
+      // в любом случае прекращаем спиннер на UI
+      setIsLoading(false)
+      setVerificationResult(true)
+      setIsVerified(true)
       return
     }
     
@@ -104,6 +120,8 @@ export default function VerifyEmailPage() {
         setIsVerified(true)
         setVerificationResult(true)
         setIsLoading(false) // Убираем загрузку при успехе
+        // Сохраняем факт успешного подтверждения, чтобы не показывать спиннер при повторном маунте
+        try { localStorage.setItem(`verification_${token}`, 'done') } catch {}
         toast({
           title: "Email подтвержден!",
           description: "Ваш email адрес успешно подтвержден",
@@ -133,9 +151,7 @@ export default function VerifyEmailPage() {
       console.log('Verification completed for token:', token)
       setIsVerifying(false)
       isProcessingRef.current = false
-      // Очищаем localStorage после завершения
-      const storageKey = `verification_${token}`
-      localStorage.removeItem(storageKey)
+      // Не удаляем ключ 'done', чтобы избежать повторного спиннера при F5
     }
   }
 
