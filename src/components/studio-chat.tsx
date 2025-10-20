@@ -206,11 +206,21 @@ export function StudioChat({
       return
     }
 
+    // Проверяем лимит изображений (максимум 4)
+    if (uploadedImages.length >= 4) {
+      toast({
+        title: "Максимум изображений",
+        description: "Можно загрузить не более 4 изображений",
+        variant: "destructive",
+      })
+      return
+    }
+
     try {
       // Загружаем файл на сервер
       const response = await apiClient.uploadFile(file)
       if (response.data) {
-        setUploadedImages([response.data])
+        setUploadedImages(prev => [...prev, response.data])
         toast({
           title: "Изображение загружено",
           description: "Изображение готово для использования",
@@ -225,7 +235,7 @@ export function StudioChat({
         variant: "destructive",
       })
     }
-  }, [toast])
+  }, [toast, uploadedImages.length])
 
   const handleFileInputChange = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log('File input changed:', event.target.files)
@@ -746,56 +756,48 @@ export function StudioChat({
           {uploadedImages.length > 0 && (
             <div className="mb-1">
               <div className="flex items-center gap-2 mb-1">
-                <Badge variant="secondary">
-                  {uploadedImages.length} {getImageText(uploadedImages.length)} прикреплено для редактирования
-                </Badge>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    setUploadedImages([])
-                    setSelectedImages([])
-                    setIsEditingMode(false)
-                  }}
-                  className="h-6 px-2 text-xs"
-                >
-                  Очистить
-                </Button>
-                {/* Миниатюры изображений справа от текста */}
-                <div className="flex gap-1">
-                  {uploadedImages.map((imageUrl, index) => (
-                    <div key={index} className="relative w-6 h-6 rounded overflow-hidden border group">
-                      <Image
-                        src={imageUrl}
-                        alt={`Загруженное изображение ${index + 1}`}
-                        fill
-                        className="object-cover"
-                      />
-                      <Button
-                        onClick={() => {
-                          const imageUrl = uploadedImages[index]
-                          setUploadedImages(prev => prev.filter((_, i) => i !== index))
-                          setSelectedImages(prev => prev.filter(url => url !== imageUrl))
-                        }}
-                        size="sm"
-                        variant="destructive"
-                        className="absolute -top-1 -right-1 h-3 w-3 p-0 opacity-0 group-hover:opacity-100 transition-opacity text-xs"
-                      >
-                        ×
-                      </Button>
-                    </div>
-                  ))}
+                {/* Компактный блок с миниатюрами */}
+                <div className="flex items-center gap-2 bg-muted/50 rounded-lg px-2 py-1">
+                  {/* Миниатюры изображений */}
+                  <div className="flex gap-1">
+                    {uploadedImages.map((imageUrl, index) => (
+                      <div key={index} className="relative w-6 h-6 rounded overflow-hidden border group">
+                        <Image
+                          src={imageUrl}
+                          alt={`Прикрепленное изображение ${index + 1}`}
+                          fill
+                          className="object-cover"
+                        />
+                        <Button
+                          onClick={() => {
+                            setUploadedImages(prev => prev.filter((_, i) => i !== index))
+                            setSelectedImages(prev => prev.filter(url => url !== imageUrl))
+                            if (uploadedImages.length === 1) {
+                              setIsEditingMode(false)
+                            }
+                          }}
+                          size="sm"
+                          variant="ghost"
+                          className="absolute -top-1 -right-1 h-3 w-3 p-0 opacity-0 group-hover:opacity-100 transition-opacity text-xs bg-red-500 hover:bg-red-600 text-white"
+                        >
+                          ×
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      setUploadedImages([])
+                      setSelectedImages([])
+                      setIsEditingMode(false)
+                    }}
+                    className="h-5 w-5 p-0 text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
                 </div>
-                <Button 
-                  onClick={() => {
-                    setUploadedImages([])
-                    setSelectedImages([])
-                  }} 
-                  size="sm" 
-                  variant="outline"
-                >
-                  Удалить все
-                </Button>
               </div>
             </div>
           )}
