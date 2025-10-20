@@ -14,7 +14,7 @@ interface AnimatedGalleryProps {
     },
     {
       gif: 'juxtapose-gif-2.gif',
-      prompt: 'Сделай фотографию этого свитера в горах с красивым осенним видом и туманом , кадр снизу (положение камеры) девушка в белой юбке и сапогах'
+      prompt: 'Сделай фотографию этого свитера в горах с красивым осенним туманом , кадр снизу (положение камеры) девушка в белой юбке и сапогах'
     },
     {
       gif: 'juxtapose-gif-3.gif',
@@ -45,7 +45,7 @@ export function AnimatedGallery({ className }: AnimatedGalleryProps) {
     <div className={`flex flex-col items-center space-y-4 w-full lg:w-1/2 ${className}`}>
       {/* Prompt Example */}
       <div className="w-full max-w-xl">
-        <div className="bg-muted/50 dark:bg-muted/20 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+        <div className="bg-muted/50 dark:bg-muted/20 rounded-xl p-4 border border-gray-200 dark:border-gray-700 h-24 md:h-20 flex items-center justify-center">
           <p className="text-sm text-muted-foreground italic text-center transition-opacity duration-300">
             "{currentGif.prompt}"
           </p>
