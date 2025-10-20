@@ -66,7 +66,13 @@ export function StudioChat({
   const [isGenerating, setIsGenerating] = useState(false)
   const [selectedImages, setSelectedImages] = useState<string[]>([])
   const [copiedImageUrl, setCopiedImageUrl] = useState<string | null>(null)
-  const [numImages, setNumImages] = useState(2)
+  const [numImages, setNumImages] = useState(() => {
+    if (typeof window !== 'undefined') {
+      // Мобильным устройствам (ширина < 640px) по умолчанию ставим 1 изображение
+      return window.innerWidth < 640 ? 1 : 2
+    }
+    return 2
+  })
   const [outputFormat, setOutputFormat] = useState<'JPEG' | 'PNG'>('JPEG')
   const [artStyle, setArtStyle] = useState('Реалистичный')
   const [uploadedImages, setUploadedImages] = useState<string[]>([])
