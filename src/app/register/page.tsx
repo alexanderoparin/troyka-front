@@ -21,8 +21,7 @@ const registerSchema = z.object({
     .min(8, "Пароль должен содержать минимум 8 символов")
     .regex(/[a-zа-я]/, "Пароль должен содержать строчные буквы")
     .regex(/[A-ZА-Я]/, "Пароль должен содержать заглавные буквы")
-    .regex(/\d/, "Пароль должен содержать цифры")
-    .regex(/[@$!%*?&]/, "Пароль должен содержать специальные символы (@$!%*?&)"),
+    .regex(/\d/, "Пароль должен содержать цифры"),
 })
 
 type RegisterFormData = z.infer<typeof registerSchema>
@@ -153,7 +152,7 @@ export default function RegisterPage() {
                   </Button>
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  Пароль должен содержать минимум 8 символов, включая заглавные и строчные буквы, цифры и специальные символы (@$!%*?&)
+                  Пароль должен содержать минимум 8 символов, включая заглавные и строчные буквы и цифры
                 </div>
                 {errors.password && (
                   <p className="text-sm text-destructive">{errors.password.message}</p>

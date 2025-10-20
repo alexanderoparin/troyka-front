@@ -19,8 +19,7 @@ const resetPasswordSchema = z.object({
     .min(8, "Пароль должен содержать минимум 8 символов")
     .regex(/[a-zа-я]/, "Пароль должен содержать строчные буквы")
     .regex(/[A-ZА-Я]/, "Пароль должен содержать заглавные буквы")
-    .regex(/\d/, "Пароль должен содержать цифры")
-    .regex(/[@$!%*?&]/, "Пароль должен содержать специальные символы (@$!%*?&)"),
+    .regex(/\d/, "Пароль должен содержать цифры"),
   confirmPassword: z.string().min(8, "Подтверждение пароля обязательно"),
 }).refine((data) => data.newPassword === data.confirmPassword, {
   message: "Пароли не совпадают",
@@ -200,7 +199,7 @@ export default function ResetPasswordPage() {
           <CardHeader>
             <CardTitle>Установить новый пароль</CardTitle>
             <CardDescription>
-              Пароль должен содержать минимум 8 символов, включая заглавные и строчные буквы, цифры и специальные символы
+              Пароль должен содержать минимум 8 символов, включая заглавные и строчные буквы и цифры
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -232,7 +231,7 @@ export default function ResetPasswordPage() {
                   </Button>
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  Пароль должен содержать минимум 8 символов, включая заглавные и строчные буквы, цифры и специальные символы (@$!%*?&)
+                  Пароль должен содержать минимум 8 символов, включая заглавные и строчные буквы и цифры
                 </div>
                 {errors.newPassword && (
                   <p className="text-sm text-destructive">{errors.newPassword.message}</p>
