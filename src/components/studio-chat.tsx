@@ -301,8 +301,12 @@ export function StudioChat({
         onGenerationComplete(response.data.imageUrls, promptWithStyle)
         // НЕ очищаем промпт - он остается в поле ввода
         
-        // В режиме редактирования НЕ очищаем загруженные изображения
-        if (!isEditingMode) {
+        // В режиме редактирования прикрепляем НОВЫЕ сгенерированные изображения
+        if (isEditingMode) {
+          setUploadedImages(response.data.imageUrls)
+          setSelectedImages(response.data.imageUrls)
+        } else {
+          // В обычном режиме очищаем загруженные изображения
           setUploadedImages([])
         }
         
@@ -696,7 +700,7 @@ export function StudioChat({
             <div className="mb-1">
               <div className="flex items-center gap-2 mb-1">
                 <Badge variant="secondary">
-                  {uploadedImages.length} {getImageText(uploadedImages.length)} выбрано для редактирования
+                  {uploadedImages.length} {getImageText(uploadedImages.length)} прикреплено для редактирования
                 </Badge>
                 <Button
                   size="sm"
@@ -758,7 +762,7 @@ export function StudioChat({
                       <Textarea
                         value={prompt}
                         onChange={(e) => handlePromptChange(e.target.value)}
-                        placeholder={isDragOver ? "Отпустите файл для загрузки..." : isEditingMode ? "Опишите изменения для выбранного изображения..." : "Опишите изображение, которое хотите создать..."}
+                        placeholder={isDragOver ? "Отпустите файл для загрузки..." : isEditingMode ? "Опишите изменения для прикрепленного изображения..." : "Опишите изображение, которое хотите создать..."}
                         className="h-12 resize-none text-sm flex-1 bg-muted/80 border border-border/80 focus:border-primary/80 focus:bg-muted/95"
                         onFocus={() => setIsFocused(true)}
                         onBlur={() => setIsFocused(false)}
@@ -884,7 +888,7 @@ export function StudioChat({
                       <Textarea
                         value={prompt}
                         onChange={(e) => handlePromptChange(e.target.value)}
-                        placeholder={isDragOver ? "Отпустите файл для загрузки..." : isEditingMode ? "Опишите изменения для выбранного изображения..." : "Опишите изображение, которое хотите создать..."}
+                        placeholder={isDragOver ? "Отпустите файл для загрузки..." : isEditingMode ? "Опишите изменения для прикрепленного изображения..." : "Опишите изображение, которое хотите создать..."}
                         className="h-[54px] resize-none text-base flex-1 bg-muted/80 border border-border/80 focus:border-primary/80 focus:bg-muted/95"
                         onFocus={() => setIsFocused(true)}
                         onBlur={() => setIsFocused(false)}
