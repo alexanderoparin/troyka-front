@@ -67,10 +67,7 @@ export default function AccountPage() {
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
-      {/* Email Verification Banner */}
-      {isAuthenticated && user && !isEmailVerified() && (
-        <EmailVerificationBanner email={user.email} />
-      )}
+      {/* Баннер подтверждения email убран: подтверждение необязательно */}
 
       {/* Header */}
       <div className="space-y-4">
@@ -129,10 +126,15 @@ export default function AccountPage() {
                       Подтвержден
                     </Badge>
                   ) : (
-                    <Badge variant="destructive" className="bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400 flex items-center gap-1 w-fit">
-                      <AlertTriangle className="w-3 h-3" />
-                      Не подтвержден
-                    </Badge>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Badge variant="destructive" className="bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400 flex items-center gap-1 w-fit">
+                        <AlertTriangle className="w-3 h-3" />
+                        Не подтвержден
+                      </Badge>
+                      <Button variant="outline" size="sm" asChild>
+                        <Link href="/verify-email">Подтвердить</Link>
+                      </Button>
+                    </div>
                   )}
                 </div>
                 <div>

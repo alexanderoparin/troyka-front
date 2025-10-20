@@ -50,9 +50,9 @@ export default function RegisterPage() {
       if (result.success) {
         toast({
           title: "Регистрация успешна!",
-          description: "Проверьте почту для подтверждения email",
+          description: "Можете сразу пользоваться студией. Письмо подтверждения отправлено на почту (необязательно).",
         })
-        router.push("/verify-email?email=" + encodeURIComponent(data.email))
+        router.push("/studio")
       } else {
         toast({
           title: "Ошибка регистрации",

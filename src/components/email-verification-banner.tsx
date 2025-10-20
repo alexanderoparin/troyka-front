@@ -67,7 +67,7 @@ export function EmailVerificationBanner({ email, onDismiss }: EmailVerificationB
             Подтвердите ваш email адрес
           </p>
           <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
-            Для использования всех функций необходимо подтвердить email <strong>{email}</strong>
+            Подтверждение email <strong>{email}</strong> необязательно. Это поможет восстановить доступ к аккаунту.
           </p>
         </div>
         <div className="flex items-center gap-2 ml-4 flex-shrink-0">
@@ -78,7 +78,7 @@ export function EmailVerificationBanner({ email, onDismiss }: EmailVerificationB
             className="border-amber-300 text-amber-700 hover:bg-amber-100 dark:border-amber-700 dark:text-amber-300 dark:hover:bg-amber-900/50"
           >
             <Mail className="w-4 h-4 mr-2" />
-            Подтвердить
+            Подтвердить (необязательно)
           </Button>
           <Button
             variant="ghost"

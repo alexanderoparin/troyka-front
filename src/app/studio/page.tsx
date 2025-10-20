@@ -219,27 +219,7 @@ export default function StudioPage() {
     )
   }
 
-  // Если email не подтвержден
-  if (!isEmailVerified) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
-        <div className="container mx-auto px-4 py-8">
-          <EmailVerificationBanner email={user?.email || ""} />
-          <div className="text-center space-y-6 py-16">
-            <div className="w-20 h-20 mx-auto rounded-full bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center">
-              <AlertCircle className="h-10 w-10 text-orange-600 dark:text-orange-400" />
-            </div>
-            <div className="space-y-2">
-              <h1 className="text-3xl font-bold">Подтвердите email</h1>
-              <p className="text-muted-foreground text-lg">
-                Для доступа к студии необходимо подтвердить email адрес
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  // Ранее блокировали доступ без подтверждения email. По новой политике — доступ открыт.
 
   // Загрузка дефолтной сессии
   if (isLoadingDefaultSession) {
