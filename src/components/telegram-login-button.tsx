@@ -28,7 +28,7 @@ interface TelegramUser {
 
 declare global {
   interface Window {
-    onTelegramAuth: (user: TelegramUser) => void
+    onTelegramAuth?: (user: TelegramUser) => void
   }
 }
 
@@ -96,7 +96,9 @@ export const TelegramLoginButton = ({
       if (containerRef.current) {
         containerRef.current.innerHTML = ''
       }
-      delete window.onTelegramAuth
+      if (window.onTelegramAuth) {
+        delete window.onTelegramAuth
+      }
     }
   }, [botName, buttonSize, cornerRadius, requestAccess, usePic, lang, widgetVersion, onAuthCallback])
 
