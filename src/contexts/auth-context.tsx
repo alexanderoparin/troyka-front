@@ -1,7 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import { apiClient, LoginRequest, RegisterRequest, UserInfo, TelegramLoginRequest, TelegramLinkRequest } from '@/lib/api-client'
+import { apiClient, LoginRequest, RegisterRequest, UserInfo, TelegramAuthRequest } from '@/lib/api-client'
 
 interface AuthState {
   user: UserInfo | null
@@ -14,8 +14,8 @@ interface AuthState {
 interface AuthContextType extends AuthState {
   login: (credentials: LoginRequest) => Promise<{ success: boolean; error: string | null }>
   register: (userData: RegisterRequest) => Promise<{ success: boolean; error: string | null }>
-  loginWithTelegram: (telegramData: TelegramLoginRequest) => Promise<{ success: boolean; error: string | null }>
-  linkTelegram: (telegramData: TelegramLinkRequest) => Promise<{ success: boolean; error: string | null }>
+  loginWithTelegram: (telegramData: TelegramAuthRequest) => Promise<{ success: boolean; error: string | null }>
+  linkTelegram: (telegramData: TelegramAuthRequest) => Promise<{ success: boolean; error: string | null }>
   unlinkTelegram: () => Promise<{ success: boolean; error: string | null }>
   logout: () => void
   refreshPoints: () => Promise<void>
@@ -250,7 +250,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return state.user?.emailVerified === true
   }, [state.user?.emailVerified])
 
-  const loginWithTelegram = useCallback(async (telegramData: TelegramLoginRequest) => {
+  const loginWithTelegram = useCallback(async (telegramData: TelegramAuthRequest) => {
     setState(prev => ({ ...prev, isLoading: true }))
     
     const response = await apiClient.loginWithTelegram(telegramData)
@@ -296,7 +296,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { success: false, error: response.error || 'Ошибка входа через Telegram' }
   }, [])
 
-  const linkTelegram = useCallback(async (telegramData: TelegramLinkRequest) => {
+  const linkTelegram = useCallback(async (telegramData: TelegramAuthRequest) => {
     const response = await apiClient.linkTelegram(telegramData)
     
     if (response.data) {

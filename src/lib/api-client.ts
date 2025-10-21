@@ -158,17 +158,7 @@ export interface ContactResponse {
 }
 
 // Telegram OAuth interfaces
-export interface TelegramLoginRequest {
-  id: number;
-  first_name: string;
-  last_name?: string;
-  username?: string;
-  photo_url?: string;
-  auth_date: number;
-  hash: string;
-}
-
-export interface TelegramLinkRequest {
+export interface TelegramAuthRequest {
   id: number;
   first_name: string;
   last_name?: string;
@@ -781,7 +771,7 @@ class ApiClient {
   }
 
   // Telegram OAuth methods
-  async loginWithTelegram(telegramData: TelegramLoginRequest): Promise<ApiResponse<AuthResponse>> {
+  async loginWithTelegram(telegramData: TelegramAuthRequest): Promise<ApiResponse<AuthResponse>> {
     const response = await this.request<AuthResponse>('/api/auth/telegram/login', {
       method: 'POST',
       body: JSON.stringify(telegramData),
@@ -794,7 +784,7 @@ class ApiClient {
     return response;
   }
 
-  async linkTelegram(telegramData: TelegramLinkRequest): Promise<ApiResponse<{ message: string }>> {
+  async linkTelegram(telegramData: TelegramAuthRequest): Promise<ApiResponse<{ message: string }>> {
     return this.request<{ message: string }>('/api/users/me/telegram/link', {
       method: 'POST',
       body: JSON.stringify(telegramData),
