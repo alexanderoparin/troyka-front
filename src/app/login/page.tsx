@@ -199,12 +199,12 @@ export default function LoginPage() {
                 </div>
               </div>
               
-              <div className="mt-4">
+              <div className="mt-4 flex justify-center">
                 <TelegramLoginButton
                   onAuthCallback={handleTelegramAuth}
                   botName={process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME || "reshai24_bot"}
                   buttonSize="large"
-                  className="w-full"
+                  className="w-full max-w-[280px]"
                 />
               </div>
             </div>

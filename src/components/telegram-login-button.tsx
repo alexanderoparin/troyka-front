@@ -104,7 +104,7 @@ export const TelegramLoginButton = ({
 
   return (
     <div className={className}>
-      <div ref={containerRef} className="w-full" />
+      <div ref={containerRef} className="w-full flex justify-center" />
     </div>
   )
 }
