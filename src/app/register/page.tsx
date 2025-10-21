@@ -13,6 +13,8 @@ import { useToast } from "@/components/ui/use-toast"
 import { useAuth } from "@/contexts/auth-context"
 import { Sparkles, ArrowLeft, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
+import { TelegramLoginButton } from "@/components/telegram-login-button"
+import { Separator } from "@/components/ui/separator"
 
 const registerSchema = z.object({
   username: z.string().min(3, "Логин должен содержать минимум 3 символа"),
@@ -29,7 +31,7 @@ type RegisterFormData = z.infer<typeof registerSchema>
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
-  const { register: registerUser } = useAuth()
+  const { register: registerUser, loginWithTelegram } = useAuth()
   const router = useRouter()
   const { toast } = useToast()
 
@@ -57,6 +59,36 @@ export default function RegisterPage() {
         toast({
           title: "Ошибка регистрации",
           description: result.error || "Не удалось создать аккаунт",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: "Произошла непредвиденная ошибка",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleTelegramAuth = async (user: any) => {
+    setIsLoading(true)
+    
+    try {
+      const result = await loginWithTelegram(user)
+      
+      if (result.success) {
+        toast({
+          title: "Успешная регистрация через Telegram!",
+          description: "Добро пожаловать в 24reshai! Вы получили 6 поинтов при регистрации.",
+        })
+        router.push("/studio")
+      } else {
+        toast({
+          title: "Ошибка регистрации через Telegram",
+          description: result.error || "Не удалось зарегистрироваться через Telegram",
           variant: "destructive",
         })
       }
@@ -174,6 +206,29 @@ export default function RegisterPage() {
                 )}
               </Button>
             </form>
+
+            {/* Telegram Registration */}
+            <div className="mt-6">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <Separator className="w-full" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">
+                    или
+                  </span>
+                </div>
+              </div>
+              
+              <div className="mt-4">
+                <TelegramLoginButton
+                  onAuthCallback={handleTelegramAuth}
+                  botName={process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME || "reshai24_bot"}
+                  buttonSize="large"
+                  className="w-full"
+                />
+              </div>
+            </div>
 
             <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">

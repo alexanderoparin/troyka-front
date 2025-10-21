@@ -13,6 +13,8 @@ import { useToast } from "@/components/ui/use-toast"
 import { useAuth } from "@/contexts/auth-context"
 import { Sparkles, ArrowLeft, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
+import { TelegramLoginButton } from "@/components/telegram-login-button"
+import { Separator } from "@/components/ui/separator"
 
 const loginSchema = z.object({
   username: z.string().min(3, "Логин должен содержать минимум 3 символа"),
@@ -24,7 +26,7 @@ type LoginFormData = z.infer<typeof loginSchema>
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
-  const { login } = useAuth()
+  const { login, loginWithTelegram } = useAuth()
   const router = useRouter()
   const { toast } = useToast()
 
@@ -52,6 +54,37 @@ export default function LoginPage() {
         toast({
           title: "Ошибка входа",
           description: result.error || "Неверные учетные данные",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: "Произошла непредвиденная ошибка",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleTelegramAuth = async (user: any) => {
+    console.log('Telegram auth received:', user)
+    setIsLoading(true)
+    
+    try {
+      const result = await loginWithTelegram(user)
+      
+      if (result.success) {
+        toast({
+          title: "Успешный вход через Telegram!",
+          description: "Добро пожаловать в 24reshai",
+        })
+        router.push("/studio")
+      } else {
+        toast({
+          title: "Ошибка входа через Telegram",
+          description: result.error || "Не удалось войти через Telegram",
           variant: "destructive",
         })
       }
@@ -152,6 +185,29 @@ export default function LoginPage() {
                 )}
               </Button>
             </form>
+
+            {/* Telegram Login */}
+            <div className="mt-6">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <Separator className="w-full" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">
+                    или
+                  </span>
+                </div>
+              </div>
+              
+              <div className="mt-4">
+                <TelegramLoginButton
+                  onAuthCallback={handleTelegramAuth}
+                  botName={process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME || "reshai24_bot"}
+                  buttonSize="large"
+                  className="w-full"
+                />
+              </div>
+            </div>
 
             <div className="mt-6 text-center space-y-2">
               <p className="text-sm text-muted-foreground">

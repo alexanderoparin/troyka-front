@@ -1,7 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import { apiClient, LoginRequest, RegisterRequest, UserInfo } from '@/lib/api-client'
+import { apiClient, LoginRequest, RegisterRequest, UserInfo, TelegramLoginRequest, TelegramLinkRequest } from '@/lib/api-client'
 
 interface AuthState {
   user: UserInfo | null
@@ -14,6 +14,9 @@ interface AuthState {
 interface AuthContextType extends AuthState {
   login: (credentials: LoginRequest) => Promise<{ success: boolean; error: string | null }>
   register: (userData: RegisterRequest) => Promise<{ success: boolean; error: string | null }>
+  loginWithTelegram: (telegramData: TelegramLoginRequest) => Promise<{ success: boolean; error: string | null }>
+  linkTelegram: (telegramData: TelegramLinkRequest) => Promise<{ success: boolean; error: string | null }>
+  unlinkTelegram: () => Promise<{ success: boolean; error: string | null }>
   logout: () => void
   refreshPoints: () => Promise<void>
   refreshUserInfo: () => Promise<void>
@@ -247,11 +250,84 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return state.user?.emailVerified === true
   }, [state.user?.emailVerified])
 
+  const loginWithTelegram = useCallback(async (telegramData: TelegramLoginRequest) => {
+    setState(prev => ({ ...prev, isLoading: true }))
+    
+    const response = await apiClient.loginWithTelegram(telegramData)
+    
+    if (response.data) {
+      try {
+        const [userInfoResponse, pointsResponse, avatarResponse] = await Promise.all([
+          apiClient.getUserInfo(),
+          apiClient.getUserPoints(),
+          apiClient.getUserAvatar()
+        ])
+        
+        if (userInfoResponse.data) {
+          setState({
+            user: userInfoResponse.data,
+            isAuthenticated: true,
+            isLoading: false,
+            points: pointsResponse.data || 0,
+            avatar: avatarResponse.data || null,
+          })
+          return { success: true, error: null }
+        }
+      } catch (error) {
+        console.error('Ошибка получения данных пользователя после Telegram входа:', error)
+        setState(prev => ({
+          ...prev,
+          isAuthenticated: false,
+          isLoading: false,
+          points: 0,
+          avatar: null,
+        }))
+        return { success: false, error: 'Ошибка получения данных пользователя' }
+      }
+    }
+    
+    setState(prev => ({
+      ...prev,
+      isAuthenticated: false,
+      isLoading: false,
+      points: 0,
+      avatar: null,
+    }))
+    return { success: false, error: response.error || 'Ошибка входа через Telegram' }
+  }, [])
+
+  const linkTelegram = useCallback(async (telegramData: TelegramLinkRequest) => {
+    const response = await apiClient.linkTelegram(telegramData)
+    
+    if (response.data) {
+      // Обновляем информацию о пользователе после привязки
+      await refreshUserInfo()
+      return { success: true, error: null }
+    }
+    
+    return { success: false, error: response.error || 'Ошибка привязки Telegram' }
+  }, [refreshUserInfo])
+
+  const unlinkTelegram = useCallback(async () => {
+    const response = await apiClient.unlinkTelegram()
+    
+    if (response.data) {
+      // Обновляем информацию о пользователе после отвязки
+      await refreshUserInfo()
+      return { success: true, error: null }
+    }
+    
+    return { success: false, error: response.error || 'Ошибка отвязки Telegram' }
+  }, [refreshUserInfo])
+
   return (
     <AuthContext.Provider value={{
       ...state,
       login,
       register,
+      loginWithTelegram,
+      linkTelegram,
+      unlinkTelegram,
       logout,
       refreshPoints,
       refreshUserInfo,
