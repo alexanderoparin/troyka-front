@@ -66,8 +66,9 @@ export default function AccountPage() {
     return roles[role] || role
   }
 
+
   return (
-    <div className="space-y-6 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 lg:pt-24">
+    <div className="space-y-6 w-full px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 lg:pt-24">
       {/* Баннер подтверждения email убран: подтверждение необязательно */}
 
       {/* Header */}
@@ -78,11 +79,11 @@ export default function AccountPage() {
         </p>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
+      <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
         {/* Left Column - Profile Info */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6 flex flex-col">
           {/* Profile Card */}
-          <Card>
+          <Card className="flex-1">
             <CardHeader className="pb-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-4">
@@ -109,7 +110,21 @@ export default function AccountPage() {
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold">{user.username}</h3>
-                    <p className="text-sm text-muted-foreground">{user.email || 'Email не указан'}</p>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                      </svg>
+                      <span>{user.email || 'Email не указан'}</span>
+                    </div>
+                    {/* Telegram Info */}
+                    {user.telegramId && (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.568 8.16l-1.61 7.59c-.12.54-.44.68-.9.42l-2.49-1.84-1.2 1.16c-.13.13-.24.24-.49.24l.18-2.56 4.64-4.19c.2-.18-.04-.28-.31-.1l-5.74 3.61-2.47-.77c-.54-.17-.55-.54.11-.8l9.71-3.74c.45-.17.84.11.7.8z"/>
+                        </svg>
+                        <span>@{user.telegramUsername}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
@@ -120,38 +135,25 @@ export default function AccountPage() {
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Telegram Info */}
-              {user.telegramId && (
-                <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                  <div className="flex items-center gap-2 text-green-800 dark:text-green-400">
-                    <CheckCircle className="w-4 h-4" />
-                    <span className="font-medium">Telegram подключен</span>
-                  </div>
-                  <p className="text-sm text-green-700 dark:text-green-300 mt-1">
-                    @{user.telegramUsername} • {user.telegramFirstName}
-                  </p>
-                </div>
-              )}
-
+            <CardContent className="space-y-8">
               {/* Profile Details */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                <div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
+                <div className="space-y-2">
                   <p className="text-muted-foreground">Роль</p>
-                  <Badge variant="secondary">
+                  <Badge variant="secondary" className="text-sm px-3 py-1">
                     {getRoleDisplayName(user.role)}
                   </Badge>
                 </div>
-                <div>
+                <div className="space-y-2">
                   <p className="text-muted-foreground">Статус email</p>
                   {isEmailVerified() ? (
-                    <Badge variant="default" className="bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400 flex items-center gap-1 w-fit">
+                    <Badge variant="default" className="bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400 flex items-center gap-1 w-fit text-sm px-3 py-1">
                       <CheckCircle className="w-3 h-3" />
                       Подтвержден
                     </Badge>
                   ) : (
                     <div className="flex items-center gap-2 flex-wrap">
-                      <Badge variant="destructive" className="bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400 flex items-center gap-1 w-fit">
+                      <Badge variant="destructive" className="bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400 flex items-center gap-1 w-fit text-sm px-3 py-1">
                         <AlertTriangle className="w-3 h-3" />
                         Не подтвержден
                       </Badge>
@@ -161,15 +163,15 @@ export default function AccountPage() {
                     </div>
                   )}
                 </div>
-                <div>
+                <div className="space-y-2">
                   <p className="text-muted-foreground">Дата регистрации</p>
-                  <p className="font-medium">
+                  <p className="font-medium text-base">
                     {formatDate(user.createdAt)}
                   </p>
                 </div>
-                <div>
+                <div className="space-y-2">
                   <p className="text-muted-foreground">Баланс</p>
-                  <p className="font-medium text-lg">
+                  <p className="font-medium text-xl">
                     {points || 0} поинтов
                   </p>
                 </div>
@@ -179,55 +181,54 @@ export default function AccountPage() {
         </div>
 
         {/* Right Column - Quick Actions */}
-        <div className="space-y-4 sm:space-y-6">
-          <Card>
+        <div className="space-y-4 sm:space-y-6 flex flex-col">
+          <Card className="flex-1">
             <CardHeader className="pb-4">
               <CardTitle className="text-lg sm:text-xl">Быстрые действия</CardTitle>
-              <CardDescription className="text-sm">
-                Основные функции и навигация
-              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <Button variant="outline" className="w-full justify-start" asChild>
-                <Link href="/studio">
-                  <ImageIcon className="w-4 h-4 mr-2" />
-                  Создать изображение
-                </Link>
-              </Button>
-              
-              <Button variant="outline" className="w-full justify-start" asChild>
-                <Link href="/history">
-                  <History className="w-4 h-4 mr-2" />
-                  История генерации
-                </Link>
-              </Button>
-              
-              <Button variant="outline" className="w-full justify-start" asChild>
-                <Link href="/payment-history">
-                  <CreditCard className="w-4 h-4 mr-2" />
-                  История платежей
-                </Link>
-              </Button>
-              
-              <Button variant="outline" className="w-full justify-start" asChild>
-                <Link href="/pricing">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Пополнить баланс
-                </Link>
-              </Button>
+            <CardContent className="space-y-3 p-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                <Button variant="outline" className="w-full justify-start h-12 px-4 py-3" asChild>
+                  <Link href="/studio">
+                    <ImageIcon className="w-4 h-4 mr-2" />
+                    <span className="text-sm">Создать изображение</span>
+                  </Link>
+                </Button>
+                
+                <Button variant="outline" className="w-full justify-start h-12 px-4 py-3" asChild>
+                  <Link href="/history">
+                    <History className="w-4 h-4 mr-2" />
+                    <span className="text-sm">История генерации</span>
+                  </Link>
+                </Button>
+                
+                <Button variant="outline" className="w-full justify-start h-12 px-4 py-3" asChild>
+                  <Link href="/payment-history">
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    <span className="text-sm">История платежей</span>
+                  </Link>
+                </Button>
+                
+                <Button variant="outline" className="w-full justify-start h-12 px-4 py-3" asChild>
+                  <Link href="/pricing">
+                    <Plus className="w-4 h-4 mr-2" />
+                    <span className="text-sm">Пополнить баланс</span>
+                  </Link>
+                </Button>
+              </div>
               
               <Separator />
               
               <Button 
                 variant="ghost" 
-                className="w-full justify-start text-destructive hover:text-destructive"
+                className="w-full justify-start text-destructive hover:text-destructive h-12 px-4 py-3"
                 onClick={() => {
                   logout()
                   router.push('/')
                 }}
               >
                 <LogOut className="w-4 h-4 mr-2" />
-                Выйти из аккаунта
+                <span className="text-sm">Выйти из аккаунта</span>
               </Button>
             </CardContent>
           </Card>
