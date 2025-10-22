@@ -90,7 +90,7 @@ export default function PaymentHistoryPage() {
   }
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto">
+    <div className="space-y-8 max-w-6xl mx-auto pt-12 sm:pt-16 lg:pt-20">
       {/* Header */}
       <div className="space-y-4">
         <div className="flex items-center gap-4">

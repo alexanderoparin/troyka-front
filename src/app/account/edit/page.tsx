@@ -43,7 +43,7 @@ export default function AccountEditPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 lg:pt-20">
+    <div className="space-y-6 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 lg:pt-24">
       {/* Back Button */}
       <div className="flex items-center gap-2">
           <button 
