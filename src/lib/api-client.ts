@@ -171,6 +171,7 @@ export interface TelegramAuthRequest {
   photo_url?: string;
   auth_date: number;
   hash: string;
+  email?: string;
 }
 
 // Добавляем интерфейсы для платежей
