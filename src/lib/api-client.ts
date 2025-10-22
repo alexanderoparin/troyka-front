@@ -326,6 +326,19 @@ class ApiClient {
     this.removeToken();
   }
 
+  async logoutWithServer(): Promise<ApiResponse<{ message: string; status: string }>> {
+    const response = await this.request<{ message: string; status: string }>('/api/auth/logout', {
+      method: 'POST',
+    });
+    
+    // Удаляем токен после успешного logout на сервере
+    if (response.data) {
+      this.removeToken();
+    }
+    
+    return response;
+  }
+
   async verifyEmail(token: string): Promise<ApiResponse<{ message: string }>> {
     return this.request<{ message: string }>(`/api/auth/verify-email?token=${token}`, {
       method: 'GET',

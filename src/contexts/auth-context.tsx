@@ -17,7 +17,7 @@ interface AuthContextType extends AuthState {
   loginWithTelegram: (telegramData: TelegramAuthRequest) => Promise<{ success: boolean; error: string | null }>
   linkTelegram: (telegramData: TelegramAuthRequest) => Promise<{ success: boolean; error: string | null }>
   unlinkTelegram: () => Promise<{ success: boolean; error: string | null }>
-  logout: () => void
+  logout: () => Promise<void>
   refreshPoints: () => Promise<void>
   refreshUserInfo: () => Promise<void>
   isEmailVerified: () => boolean
@@ -36,10 +36,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Флаг для предотвращения дублирования запросов в Strict Mode
   const [hasInitialized, setHasInitialized] = useState(false)
+  // Флаг для предотвращения запросов во время logout
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   // Проверяем аутентификацию при загрузке
   useEffect(() => {
-    if (hasInitialized) return // Предотвращаем повторные вызовы
+    if (hasInitialized || isLoggingOut) return // Предотвращаем повторные вызовы и запросы во время logout
     
     const checkAuth = async () => {
       if (apiClient.isAuthenticated()) {
@@ -198,7 +200,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { success: false, error: response.error || 'Неизвестная ошибка' }
   }, [])
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    setIsLoggingOut(true) // Устанавливаем флаг logout
+    
+    try {
+      // Сначала пытаемся сделать logout на сервере
+      await apiClient.logoutWithServer()
+    } catch (error) {
+      // Если сервер недоступен, все равно делаем локальный logout
+      console.warn('Ошибка при logout на сервере:', error)
+    }
+    
+    // Локальный logout (удаление токена и очистка состояния)
     apiClient.logout()
     setState({
       user: null,
@@ -207,10 +220,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       points: 0,
       avatar: null,
     })
+    
+    // Сбрасываем флаг через небольшую задержку
+    setTimeout(() => setIsLoggingOut(false), 1000)
   }, [])
 
   const refreshPoints = useCallback(async () => {
-    if (state.isAuthenticated) {
+    if (state.isAuthenticated && !isLoggingOut) {
       try {
         const response = await apiClient.getUserPoints()
         if (response.data !== undefined) {
@@ -224,10 +240,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.error('Ошибка обновления поинтов:', error)
       }
     }
-  }, [state.isAuthenticated])
+  }, [state.isAuthenticated, isLoggingOut])
 
   const refreshUserInfo = useCallback(async () => {
-    if (state.isAuthenticated) {
+    if (state.isAuthenticated && !isLoggingOut) {
       try {
         const [userResponse, avatarResponse] = await Promise.all([
           apiClient.getUserInfo(),
@@ -244,7 +260,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.error('Ошибка обновления информации о пользователе:', error)
       }
     }
-  }, [state.isAuthenticated])
+  }, [state.isAuthenticated, isLoggingOut])
 
   const isEmailVerified = useCallback(() => {
     return state.user?.emailVerified === true
