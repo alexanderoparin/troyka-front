@@ -114,6 +114,11 @@ export interface UserInfo {
   avatar?: string;
   createdAt?: string;
   emailVerified?: boolean;
+  telegramId?: number;
+  telegramUsername?: string;
+  telegramFirstName?: string;
+  telegramPhotoUrl?: string;
+  telegramNotificationsEnabled?: boolean;
 }
 
 export interface ImageGenerationHistory {
