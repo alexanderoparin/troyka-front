@@ -25,7 +25,7 @@ export function TelegramLink({ user, onUpdate }: TelegramLinkProps) {
   const [isLinking, setIsLinking] = useState(false)
   const [isUnlinking, setIsUnlinking] = useState(false)
   const { toast } = useToast()
-  const { refreshUserInfo } = useAuth()
+  const { refreshUserInfo, refreshPoints } = useAuth()
 
   const isTelegramLinked = !!user.telegramId
 
