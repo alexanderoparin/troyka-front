@@ -166,23 +166,6 @@ export function TelegramLink({ user, onUpdate }: TelegramLinkProps) {
               </Badge>
             </div>
 
-            {/* Информация о привязке */}
-            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-              <div className="flex items-start gap-2">
-                <MessageCircle className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5" />
-                <div className="text-sm">
-                  <p className="font-medium text-blue-900 dark:text-blue-100">
-                    Преимущества привязки Telegram
-                  </p>
-                  <ul className="text-blue-700 dark:text-blue-300 mt-1 space-y-1">
-                    <li>• Быстрый вход через Telegram</li>
-                    <li>• Уведомления о готовности изображений</li>
-                    <li>• Синхронизация аватара</li>
-                    <li>• Общая история генераций</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
 
             {/* Кнопка привязки */}
             <div className="flex justify-center">

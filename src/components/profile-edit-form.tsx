@@ -4,7 +4,6 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/components/ui/use-toast"
 import { apiClient } from "@/lib/api-client"
 import { useAuth } from "@/contexts/auth-context"
@@ -93,31 +92,7 @@ export function ProfileEditForm({ user, onUpdate }: ProfileEditFormProps) {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5" />
-              Редактирование профиля
-            </CardTitle>
-            <CardDescription>
-              Измените имя пользователя и email адрес
-            </CardDescription>
-          </div>
-          {!isEditing && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsEditing(true)}
-            >
-              <Edit className="h-4 w-4 mr-2" />
-              Редактировать
-            </Button>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="username">Имя пользователя</Label>
           {isEditing ? (
@@ -155,8 +130,22 @@ export function ProfileEditForm({ user, onUpdate }: ProfileEditFormProps) {
           )}
         </div>
 
+        {!isEditing && (
+          <div className="pt-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsEditing(true)}
+              className="w-full"
+            >
+              <Edit className="h-4 w-4 mr-2" />
+              Редактировать
+            </Button>
+          </div>
+        )}
+
         {isEditing && (
-          <div className="flex gap-2 pt-4">
+          <div className="flex flex-col sm:flex-row gap-2 pt-4">
             <Button
               onClick={handleSave}
               disabled={isLoading}
@@ -173,13 +162,13 @@ export function ProfileEditForm({ user, onUpdate }: ProfileEditFormProps) {
               variant="outline"
               onClick={handleCancel}
               disabled={isLoading}
+              className="flex-1 sm:flex-none"
             >
               <X className="h-4 w-4 mr-2" />
               Отмена
             </Button>
           </div>
         )}
-      </CardContent>
-    </Card>
+    </div>
   )
 }

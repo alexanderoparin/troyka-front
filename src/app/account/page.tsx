@@ -7,9 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { EmailVerificationBanner } from "@/components/email-verification-banner"
-import { ProfileEditForm } from "@/components/profile-edit-form"
-import { TelegramAvatar } from "@/components/telegram-avatar"
-import { TelegramLink } from "@/components/telegram-link"
 import { 
   User, 
   LogOut,
@@ -19,13 +16,15 @@ import {
   Plus,
   AlertCircle,
   CheckCircle,
-  AlertTriangle
+  AlertTriangle,
+  Edit,
+  Settings
 } from "lucide-react"
 import { formatDate } from "@/lib/utils"
 import Link from "next/link"
 
 export default function AccountPage() {
-  const { user, isAuthenticated, isLoading, logout, avatar, isEmailVerified } = useAuth()
+  const { user, isAuthenticated, isLoading, logout, avatar, isEmailVerified, points } = useAuth()
   const router = useRouter()
 
   if (isLoading) {
@@ -68,55 +67,73 @@ export default function AccountPage() {
   }
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto">
+    <div className="space-y-6 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Баннер подтверждения email убран: подтверждение необязательно */}
 
       {/* Header */}
-      <div className="space-y-4">
-        <h1 className="text-3xl font-bold">Мой аккаунт</h1>
-        <p className="text-muted-foreground">
+      <div className="space-y-2 sm:space-y-4">
+        <h1 className="text-2xl sm:text-3xl font-bold">Мой аккаунт</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
           Управляйте настройками аккаунта
         </p>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-8 items-stretch">
+      <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
         {/* Left Column - Profile Info */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Telegram Avatar Component */}
-          <TelegramAvatar 
-            userName={user.username}
-            size="lg"
-          />
-
-          {/* Profile Edit Form */}
-          <ProfileEditForm 
-            user={{
-              username: user.username,
-              email: user.email || ''
-            }}
-          />
-
-          {/* Telegram Link Component */}
-          <TelegramLink 
-            user={{
-              telegramId: user.telegramId,
-              telegramUsername: user.telegramUsername,
-              telegramFirstName: user.telegramFirstName,
-              telegramPhotoUrl: user.telegramPhotoUrl,
-              email: user.email
-            }}
-          />
-
-          {/* Additional Profile Info */}
+          {/* Profile Card */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
-                Дополнительная информация
-              </CardTitle>
+            <CardHeader className="pb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                  <User className="h-4 w-4 sm:h-5 sm:w-5" />
+                  Информация об аккаунте
+                </CardTitle>
+                <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
+                  <Link href="/account/edit">
+                    <Edit className="w-4 h-4 mr-2" />
+                    Редактировать
+                  </Link>
+                </Button>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 text-sm">
+            <CardContent className="space-y-6">
+              {/* Avatar */}
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                  {user.telegramPhotoUrl ? (
+                    <img 
+                      src={user.telegramPhotoUrl} 
+                      alt={user.username}
+                      className="w-16 h-16 rounded-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-2xl font-bold text-primary">
+                      {user.username.charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold">{user.username}</h3>
+                  <p className="text-muted-foreground">{user.email || 'Email не указан'}</p>
+                </div>
+              </div>
+
+              {/* Telegram Info */}
+              {user.telegramId && (
+                <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                  <div className="flex items-center gap-2 text-green-800 dark:text-green-400">
+                    <CheckCircle className="w-4 h-4" />
+                    <span className="font-medium">Telegram подключен</span>
+                  </div>
+                  <p className="text-sm text-green-700 dark:text-green-300 mt-1">
+                    @{user.telegramUsername} • {user.telegramFirstName}
+                  </p>
+                </div>
+              )}
+
+              {/* Profile Details */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="text-muted-foreground">Роль</p>
                   <Badge variant="secondary">
@@ -148,17 +165,23 @@ export default function AccountPage() {
                     {formatDate(user.createdAt)}
                   </p>
                 </div>
+                <div>
+                  <p className="text-muted-foreground">Баланс</p>
+                  <p className="font-medium text-lg">
+                    {points || 0} поинтов
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Right Column - Quick Actions */}
-        <div className="space-y-6">
-          <Card className="h-full">
-            <CardHeader>
-              <CardTitle>Быстрые действия</CardTitle>
-              <CardDescription>
+        <div className="space-y-4 sm:space-y-6">
+          <Card>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg sm:text-xl">Быстрые действия</CardTitle>
+              <CardDescription className="text-sm">
                 Основные функции и навигация
               </CardDescription>
             </CardHeader>
@@ -206,7 +229,6 @@ export default function AccountPage() {
               </Button>
             </CardContent>
           </Card>
-
         </div>
       </div>
     </div>
