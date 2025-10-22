@@ -169,6 +169,11 @@ export default function PaymentHistoryPage() {
                         </span>
                       )}
                     </div>
+                    {payment.isTest && (
+                      <Badge variant="outline" className="text-xs px-2 py-0.5 border-orange-300 text-orange-600 dark:border-orange-600 dark:text-orange-400">
+                        Тест
+                      </Badge>
+                    )}
                   </div>
                 </div>
               ))}

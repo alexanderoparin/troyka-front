@@ -196,6 +196,7 @@ export interface PaymentHistory {
   creditsAmount: number;
   paidAt: string | null;
   createdAt: string;
+  isTest?: boolean;
 }
 
 class ApiClient {
