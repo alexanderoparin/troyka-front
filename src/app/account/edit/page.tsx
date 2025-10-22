@@ -43,26 +43,30 @@ export default function AccountEditPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="p-2"
-            onClick={() => router.push('/account')}
+    <div className="space-y-6 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 lg:pt-20">
+      {/* Back Button */}
+      <div className="flex items-center gap-2">
+          <button 
+            type="button"
+            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              console.log('Кнопка назад нажата')
+              window.location.href = '/account'
+            }}
           >
             <ArrowLeft className="w-4 h-4" />
-            <span className="hidden sm:inline ml-2">Назад к аккаунту</span>
-          </Button>
-        </div>
-        <div className="space-y-2">
-          <h1 className="text-2xl sm:text-3xl font-bold">Редактирование аккаунта</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
-            Измените информацию о своем аккаунте
-          </p>
-        </div>
+            <span>Назад к аккаунту</span>
+          </button>
+      </div>
+
+      {/* Header */}
+      <div className="space-y-2">
+        <h1 className="text-2xl sm:text-3xl font-bold">Редактирование аккаунта</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
+          Измените информацию о своем аккаунте
+        </p>
       </div>
 
       <div className="space-y-4 sm:space-y-6">
