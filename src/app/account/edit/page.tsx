@@ -86,9 +86,6 @@ export default function AccountEditPage() {
         <Card>
           <CardHeader className="pb-4">
             <CardTitle className="text-lg sm:text-xl">Telegram</CardTitle>
-            <CardDescription className="text-sm">
-              Подключите или отключите Telegram аккаунт
-            </CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
             <TelegramLink 

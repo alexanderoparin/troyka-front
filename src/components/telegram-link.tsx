@@ -99,45 +99,33 @@ export function TelegramLink({ user, onUpdate }: TelegramLinkProps) {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <MessageCircle className="h-5 w-5" />
-          Привязка Telegram
-        </CardTitle>
-        <CardDescription>
-          Свяжите ваш аккаунт с Telegram для удобного доступа и уведомлений
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="space-y-4">
         {isTelegramLinked ? (
           <div className="space-y-4">
             {/* Статус привязки */}
             <div className="flex items-center gap-2">
-              <Badge variant="default" className="bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400 flex items-center gap-1">
+              <Badge variant="default" className="bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400 flex items-center gap-1">
                 <CheckCircle className="w-3 h-3" />
                 Telegram привязан
               </Badge>
             </div>
 
             {/* Информация о привязанном аккаунте */}
-            <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-              <div className="flex items-center gap-3">
-                {user.telegramPhotoUrl && (
-                  <img 
-                    src={user.telegramPhotoUrl} 
-                    alt="Telegram аватар" 
-                    className="w-10 h-10 rounded-full"
-                  />
-                )}
-                <div>
-                  <p className="font-medium text-green-900 dark:text-green-100">
-                    {user.telegramFirstName || 'Пользователь Telegram'}
-                  </p>
-                  <p className="text-sm text-green-700 dark:text-green-300">
-                    @{user.telegramUsername || 'username'}
-                  </p>
-                </div>
+            <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
+              {user.telegramPhotoUrl && (
+                <img 
+                  src={user.telegramPhotoUrl} 
+                  alt="Telegram аватар" 
+                  className="w-10 h-10 rounded-full"
+                />
+              )}
+              <div>
+                <p className="font-medium text-foreground">
+                  {user.telegramFirstName || 'Пользователь Telegram'}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  @{user.telegramUsername || 'username'}
+                </p>
               </div>
             </div>
 
@@ -188,7 +176,6 @@ export function TelegramLink({ user, onUpdate }: TelegramLinkProps) {
             )}
           </div>
         )}
-      </CardContent>
-    </Card>
+    </div>
   )
 }
