@@ -102,7 +102,8 @@ export default function AccountPage() {
               telegramId: user.telegramId,
               telegramUsername: user.telegramUsername,
               telegramFirstName: user.telegramFirstName,
-              telegramPhotoUrl: user.telegramPhotoUrl
+              telegramPhotoUrl: user.telegramPhotoUrl,
+              email: user.email
             }}
           />
 

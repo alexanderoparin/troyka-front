@@ -16,6 +16,7 @@ interface TelegramLinkProps {
     telegramUsername?: string
     telegramFirstName?: string
     telegramPhotoUrl?: string
+    email?: string
   }
   onUpdate?: () => void
 }
