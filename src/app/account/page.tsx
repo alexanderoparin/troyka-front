@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator"
 import { EmailVerificationBanner } from "@/components/email-verification-banner"
 import { ProfileEditForm } from "@/components/profile-edit-form"
 import { TelegramAvatar } from "@/components/telegram-avatar"
+import { TelegramLink } from "@/components/telegram-link"
 import { 
   User, 
   LogOut,
@@ -92,6 +93,16 @@ export default function AccountPage() {
             user={{
               username: user.username,
               email: user.email || ''
+            }}
+          />
+
+          {/* Telegram Link Component */}
+          <TelegramLink 
+            user={{
+              telegramId: user.telegramId,
+              telegramUsername: user.telegramUsername,
+              telegramFirstName: user.telegramFirstName,
+              telegramPhotoUrl: user.telegramPhotoUrl
             }}
           />
 
