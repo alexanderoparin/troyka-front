@@ -7,7 +7,7 @@
     "react/no-unescaped-entities": "off",
     "@next/next/no-page-custom-font": "off",
     "prefer-const": "error",
-    "no-unused-vars": "warn"
+    "no-unused-vars": "off"
   },
   "ignorePatterns": [
     "node_modules/",

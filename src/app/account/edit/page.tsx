@@ -8,7 +8,8 @@ import { ProfileEditForm } from "@/components/profile-edit-form"
 import { TelegramLink } from "@/components/telegram-link"
 import { 
   ArrowLeft,
-  AlertCircle
+  AlertCircle,
+  User
 } from "lucide-react"
 
 export default function AccountEditPage() {
