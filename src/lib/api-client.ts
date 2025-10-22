@@ -250,7 +250,17 @@ class ApiClient {
 
       clearTimeout(timeoutId);
 
-      const data = await response.json();
+      // Проверяем Content-Type для определения типа ответа
+      const contentType = response.headers.get('content-type');
+      let data;
+      
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        // Если не JSON, читаем как текст
+        const text = await response.text();
+        data = { message: text };
+      }
 
       if (!response.ok) {
         return {

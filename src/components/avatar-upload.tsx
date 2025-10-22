@@ -14,6 +14,7 @@ interface AvatarUploadProps {
   onAvatarChange?: (newAvatarUrl: string) => void
   size?: "sm" | "md" | "lg"
   className?: string
+  telegramPhotoUrl?: string
 }
 
 export function AvatarUpload({ 
@@ -21,7 +22,8 @@ export function AvatarUpload({
   userName,
   onAvatarChange, 
   size = "md",
-  className = "" 
+  className = "",
+  telegramPhotoUrl
 }: AvatarUploadProps) {
   const [isUploading, setIsUploading] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -239,7 +241,7 @@ export function AvatarUpload({
         onClick={handleAvatarClick}
       >
         <AvatarImage 
-          src={previewUrl || currentAvatar || undefined} 
+          src={previewUrl || telegramPhotoUrl || currentAvatar || undefined} 
           alt="Аватар пользователя"
         />
         <AvatarFallback className="text-xs font-medium">

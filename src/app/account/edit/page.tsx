@@ -13,8 +13,13 @@ import {
 } from "lucide-react"
 
 export default function AccountEditPage() {
-  const { user, isAuthenticated, isLoading } = useAuth()
+  const { user, isAuthenticated, isLoading, refreshUserInfo, refreshPoints } = useAuth()
   const router = useRouter()
+
+  const handleTelegramUpdate = async () => {
+    await refreshUserInfo()
+    await refreshPoints()
+  }
 
   if (isLoading) {
     return (
@@ -96,6 +101,7 @@ export default function AccountEditPage() {
                 telegramPhotoUrl: user.telegramPhotoUrl,
                 email: user.email
               }}
+              onUpdate={handleTelegramUpdate}
             />
           </CardContent>
         </Card>

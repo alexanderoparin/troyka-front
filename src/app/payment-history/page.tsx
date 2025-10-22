@@ -19,7 +19,7 @@ import { formatDate } from "@/lib/utils"
 import Link from "next/link"
 
 export default function PaymentHistoryPage() {
-  const { isAuthenticated, isLoading } = useAuth()
+  const { isAuthenticated, isLoading, user, avatar } = useAuth()
   const { history: paymentHistory, isLoading: historyLoading, error: historyError, refetch } = usePaymentHistory()
   const router = useRouter()
 
@@ -101,10 +101,33 @@ export default function PaymentHistoryPage() {
             </Link>
           </Button>
         </div>
-        <h1 className="text-3xl font-bold">История платежей</h1>
-        <p className="text-muted-foreground">
-          Все ваши платежи и пополнения баланса
-        </p>
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+            {user?.telegramPhotoUrl ? (
+              <img 
+                src={user.telegramPhotoUrl} 
+                alt={user.username}
+                className="w-12 h-12 rounded-full object-cover"
+              />
+            ) : avatar ? (
+              <img 
+                src={avatar} 
+                alt={user?.username}
+                className="w-12 h-12 rounded-full object-cover"
+              />
+            ) : (
+              <span className="text-xl font-bold text-primary">
+                {user?.username?.charAt(0).toUpperCase()}
+              </span>
+            )}
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold">История платежей</h1>
+            <p className="text-muted-foreground">
+              Все ваши платежи и пополнения баланса
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Payment History Content */}

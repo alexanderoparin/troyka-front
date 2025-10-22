@@ -51,6 +51,7 @@ export function TelegramLink({ user, onUpdate }: TelegramLinkProps) {
         
         // Обновляем информацию о пользователе
         await refreshUserInfo()
+        await refreshPoints()
         onUpdate?.()
       } else {
         throw new Error(response.error || 'Ошибка привязки Telegram')
@@ -83,6 +84,7 @@ export function TelegramLink({ user, onUpdate }: TelegramLinkProps) {
         
         // Обновляем информацию о пользователе
         await refreshUserInfo()
+        await refreshPoints()
         onUpdate?.()
       } else {
         throw new Error(response.error || 'Ошибка отвязки Telegram')

@@ -157,6 +157,7 @@ export function Header() {
                     userName={user?.username}
                     size="sm"
                     className="h-8 w-8"
+                    telegramPhotoUrl={user?.telegramPhotoUrl}
                   />
                 </Button>
               </DropdownMenuTrigger>
@@ -216,6 +217,7 @@ export function Header() {
                     userName={user?.username}
                     size="sm"
                     className="h-10 w-10"
+                    telegramPhotoUrl={user?.telegramPhotoUrl}
                   />
                 </Button>
               </DropdownMenuTrigger>
