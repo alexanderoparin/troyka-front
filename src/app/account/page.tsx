@@ -67,7 +67,7 @@ export default function AccountPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="space-y-6 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 lg:pt-24">
       {/* Баннер подтверждения email убран: подтверждение необязательно */}
 
       {/* Header */}
@@ -85,10 +85,33 @@ export default function AccountPage() {
           <Card>
             <CardHeader className="pb-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-                  <User className="h-4 w-4 sm:h-5 sm:w-5" />
-                  Информация об аккаунте
-                </CardTitle>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                    {user.telegramPhotoUrl ? (
+                      <img 
+                        src={user.telegramPhotoUrl} 
+                        alt={user.username}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                    ) : (
+                      avatar ? (
+                        <img 
+                          src={avatar} 
+                          alt={user.username}
+                          className="w-12 h-12 rounded-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-lg font-bold text-primary">
+                          {user.username.charAt(0).toUpperCase()}
+                        </span>
+                      )
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold">{user.username}</h3>
+                    <p className="text-sm text-muted-foreground">{user.email || 'Email не указан'}</p>
+                  </div>
+                </div>
                 <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
                   <Link href="/account/edit">
                     <Edit className="w-4 h-4 mr-2" />
@@ -98,27 +121,6 @@ export default function AccountPage() {
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Avatar */}
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                  {user.telegramPhotoUrl ? (
-                    <img 
-                      src={user.telegramPhotoUrl} 
-                      alt={user.username}
-                      className="w-16 h-16 rounded-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-2xl font-bold text-primary">
-                      {user.username.charAt(0).toUpperCase()}
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold">{user.username}</h3>
-                  <p className="text-muted-foreground">{user.email || 'Email не указан'}</p>
-                </div>
-              </div>
-
               {/* Telegram Info */}
               {user.telegramId && (
                 <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
