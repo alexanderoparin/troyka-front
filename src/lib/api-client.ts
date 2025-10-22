@@ -810,6 +810,22 @@ class ApiClient {
     });
   }
 
+  // Update username
+  async updateUsername(username: string): Promise<ApiResponse<{ message: string }>> {
+    return this.request<{ message: string }>('/api/users/me/username', {
+      method: 'PUT',
+      body: JSON.stringify({ username }),
+    });
+  }
+
+  // Update email
+  async updateEmail(email: string): Promise<ApiResponse<{ message: string }>> {
+    return this.request<{ message: string }>('/api/users/me/email', {
+      method: 'PUT',
+      body: JSON.stringify({ email }),
+    });
+  }
+
 }
 
 // Экспортируем singleton instance

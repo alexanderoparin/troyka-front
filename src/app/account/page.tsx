@@ -7,6 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { EmailVerificationBanner } from "@/components/email-verification-banner"
+import { ProfileEditForm } from "@/components/profile-edit-form"
+import { TelegramAvatar } from "@/components/telegram-avatar"
 import { 
   User, 
   LogOut,
@@ -18,7 +20,6 @@ import {
   CheckCircle,
   AlertTriangle
 } from "lucide-react"
-import { AvatarUpload } from "@/components/avatar-upload"
 import { formatDate } from "@/lib/utils"
 import Link from "next/link"
 
@@ -80,43 +81,35 @@ export default function AccountPage() {
       <div className="grid lg:grid-cols-3 gap-8 items-stretch">
         {/* Left Column - Profile Info */}
         <div className="lg:col-span-2 space-y-6">
-          <Card className="h-full">
+          {/* Telegram Avatar Component */}
+          <TelegramAvatar 
+            userName={user.username}
+            size="lg"
+          />
+
+          {/* Profile Edit Form */}
+          <ProfileEditForm 
+            user={{
+              username: user.username,
+              email: user.email || ''
+            }}
+          />
+
+          {/* Additional Profile Info */}
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="h-5 w-5" />
-                Информация о профиле
+                Дополнительная информация
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center gap-3">
-                <AvatarUpload 
-                  currentAvatar={avatar || undefined}
-                  userName={user?.username}
-                  size="md"
-                />
-                <div>
-                  <p className="font-medium">
-                    {user.username}
-                  </p>
-                </div>
-              </div>
-              
-              <Separator />
-              
               <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-muted-foreground">Имя пользователя</p>
-                  <p className="font-medium">{user.username}</p>
-                </div>
                 <div>
                   <p className="text-muted-foreground">Роль</p>
                   <Badge variant="secondary">
                     {getRoleDisplayName(user.role)}
                   </Badge>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Email</p>
-                  <p className="font-medium">{user.email}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Статус email</p>
