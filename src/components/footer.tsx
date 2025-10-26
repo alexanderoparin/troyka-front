@@ -22,12 +22,6 @@ export default function Footer() {
               Контакты
             </Link>
             <Link 
-              href="/legal" 
-              className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-200"
-            >
-              Пользовательское соглашение
-            </Link>
-            <Link 
               href="/pricing" 
               className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-200"
             >
@@ -40,7 +34,7 @@ export default function Footer() {
         <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              © 2025 24reshai. Все права защищены.
+              © 2025 24reshai.ru. Все права защищены.
             </p>
             <div className="flex space-x-4">
               <Link 

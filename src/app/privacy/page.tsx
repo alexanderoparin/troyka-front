@@ -1,9 +1,28 @@
+"use client"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Shield } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Shield, ArrowLeft } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export default function PrivacyPage() {
+  const router = useRouter()
+
   return (
-    <div className="space-y-8 max-w-4xl mx-auto">
+    <div className="space-y-8 max-w-4xl mx-auto pt-8 md:pt-16 px-4">
+      {/* Кнопка "Назад" - видима на мобильных */}
+      <div className="md:hidden mb-4">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => router.push("/")}
+          className="gap-2"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Назад на главную</span>
+        </Button>
+      </div>
+      
       <div className="text-center space-y-4">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Политика конфиденциальности</h1>
         <p className="text-muted-foreground text-gray-600 dark:text-gray-300">
