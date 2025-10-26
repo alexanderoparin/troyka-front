@@ -162,6 +162,12 @@ export interface ContactResponse {
   messageId?: string;
 }
 
+// Art Style interfaces
+export interface ArtStyle {
+  name: string;
+  prompt: string;
+}
+
 // Telegram OAuth interfaces
 export interface TelegramAuthRequest {
   id: number;
@@ -883,6 +889,11 @@ class ApiClient {
       method: 'PUT',
       body: JSON.stringify({ email }),
     });
+  }
+
+  // Get all art styles
+  async getArtStyles(): Promise<ApiResponse<ArtStyle[]>> {
+    return this.request<ArtStyle[]>('/api/art-styles');
   }
 
 }

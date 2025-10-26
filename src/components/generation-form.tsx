@@ -22,24 +22,24 @@ const generationSchema = z.object({
 type GenerationFormData = z.infer<typeof generationSchema>
 
 const ART_STYLES = [
-  { name: 'Реалистичный', prompt: ', photorealistic, high quality, detailed, professional photography' },
-  { name: 'Аниме', prompt: ', anime style, manga art, vibrant colors, Japanese animation' },
-  { name: 'Пиксель-арт', prompt: ', pixel art, 8-bit style, retro gaming aesthetic' },
-  { name: 'Масляная живопись', prompt: ', oil painting, classical art style, brushstrokes visible' },
-  { name: 'Акварель', prompt: ', watercolor painting, soft brushstrokes, translucent colors' },
-  { name: 'Цифровая живопись', prompt: ', digital art, concept art style, clean lines' },
-  { name: 'Карандашный рисунок', prompt: ', pencil sketch, hand-drawn illustration, graphite shading' },
-  { name: 'Портрет', prompt: ', professional portrait photography, studio lighting, sharp focus' },
-  { name: 'Пейзаж', prompt: ', landscape photography, golden hour lighting, wide angle' },
-  { name: 'Макро', prompt: ', macro photography, extreme close-up, detailed textures' },
-  { name: 'Черно-белое', prompt: ', black and white photography, monochrome, high contrast' },
-  { name: 'HDR', prompt: ', HDR photography, high dynamic range, vibrant colors' },
-  { name: 'Винтаж', prompt: ', vintage photography, film grain, retro aesthetic' },
-  { name: 'Кинематографичный', prompt: ', cinematic lighting, movie still, dramatic composition' },
-  { name: 'Сюрреализм', prompt: ', surreal art, dreamlike atmosphere, impossible elements' },
-  { name: 'Минимализм', prompt: ', minimalist art, clean composition, simple background' },
-  { name: 'Готика', prompt: ', gothic art, dark atmosphere, mysterious mood' },
-  { name: 'Футуризм', prompt: ', futuristic style, sci-fi aesthetic, cyberpunk elements' }
+  { name: 'Реалистичный', prompt: 'photorealistic, high quality, detailed, professional photography' },
+  { name: 'Аниме', prompt: 'anime style, manga art, vibrant colors, Japanese animation' },
+  { name: 'Пиксель-арт', prompt: 'pixel art, 8-bit style, retro gaming aesthetic' },
+  { name: 'Масляная живопись', prompt: 'oil painting, classical art style, brushstrokes visible' },
+  { name: 'Акварель', prompt: 'watercolor painting, soft brushstrokes, translucent colors' },
+  { name: 'Цифровая живопись', prompt: 'digital art, concept art style, clean lines' },
+  { name: 'Карандашный рисунок', prompt: 'pencil sketch, hand-drawn illustration, graphite shading' },
+  { name: 'Портрет', prompt: 'professional portrait photography, studio lighting, sharp focus' },
+  { name: 'Пейзаж', prompt: 'landscape photography, golden hour lighting, wide angle' },
+  { name: 'Макро', prompt: 'macro photography, extreme close-up, detailed textures' },
+  { name: 'Черно-белое', prompt: 'black and white photography, monochrome, high contrast' },
+  { name: 'HDR', prompt: 'HDR photography, high dynamic range, vibrant colors' },
+  { name: 'Винтаж', prompt: 'vintage photography, film grain, retro aesthetic' },
+  { name: 'Кинематографичный', prompt: 'cinematic lighting, movie still, dramatic composition' },
+  { name: 'Сюрреализм', prompt: 'surreal art, dreamlike atmosphere, impossible elements' },
+  { name: 'Минимализм', prompt: 'minimalist art, clean composition, simple background' },
+  { name: 'Готика', prompt: 'gothic art, dark atmosphere, mysterious mood' },
+  { name: 'Футуризм', prompt: 'futuristic style, sci-fi aesthetic, cyberpunk elements' }
 ]
 
 interface GenerationFormProps {
@@ -111,7 +111,9 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
     try {
       // Добавляем стиль к промпту
       const selectedStyle = ART_STYLES.find(style => style.name === artStyle)
-      const promptWithStyle = `${data.prompt}${selectedStyle?.prompt || ''}`
+      const promptWithStyle = selectedStyle?.prompt 
+        ? `${data.prompt}, ${selectedStyle.prompt}` 
+        : data.prompt
       
       // Обрабатываем загруженные изображения - загружаем blob URL'ы на сервер
       let processedImageUrls: string[] = []
