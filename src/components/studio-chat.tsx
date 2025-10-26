@@ -68,13 +68,28 @@ export function StudioChat({
   const [copiedImageUrl, setCopiedImageUrl] = useState<string | null>(null)
   const [numImages, setNumImages] = useState(() => {
     if (typeof window !== 'undefined') {
+      // Сохраняем выбор пользователя в localStorage
+      const saved = localStorage.getItem('studio-numImages')
+      if (saved) return parseInt(saved)
       // Мобильным устройствам (ширина < 640px) по умолчанию ставим 1 изображение
       return window.innerWidth < 640 ? 1 : 2
     }
     return 2
   })
-  const [outputFormat, setOutputFormat] = useState<'JPEG' | 'PNG'>('JPEG')
-  const [artStyle, setArtStyle] = useState('Реалистичный')
+  const [outputFormat, setOutputFormat] = useState<'JPEG' | 'PNG'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('studio-outputFormat')
+      return (saved as 'JPEG' | 'PNG') || 'JPEG'
+    }
+    return 'JPEG'
+  })
+  const [artStyle, setArtStyle] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('studio-artStyle')
+      return saved || 'Реалистичный'
+    }
+    return 'Реалистичный'
+  })
   const [uploadedImages, setUploadedImages] = useState<string[]>([])
   const [isFocused, setIsFocused] = useState(false)
   const [selectedImageForModal, setSelectedImageForModal] = useState<string | null>(null)
@@ -101,6 +116,25 @@ export function StudioChat({
       localStorage.removeItem('studio-prompt')
     }
   }, [])
+  
+  // Сохраняем настройки в localStorage при изменении
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('studio-numImages', numImages.toString())
+    }
+  }, [numImages])
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('studio-outputFormat', outputFormat)
+    }
+  }, [outputFormat])
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('studio-artStyle', artStyle)
+    }
+  }, [artStyle])
   
   const artStyles = [
     { name: 'Реалистичный', prompt: ', photorealistic, high quality, detailed, professional photography' },
@@ -955,38 +989,44 @@ export function StudioChat({
                         {/* Первый ряд - 3 кнопки */}
                         <div className="flex items-center gap-1">
                           {/* Формат изображения */}
-                          <Tooltip>
-                            <TooltipTrigger asChild>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
                               <Button
                                 variant="outline"
                                 size="sm"
                                 className="h-10 w-14 p-0 text-sm bg-muted/80 hover:bg-muted/95 border border-border/80"
-                                onClick={() => setOutputFormat(prev => prev === 'JPEG' ? 'PNG' : 'JPEG')}
                               >
                                 {outputFormat}
                               </Button>
-                            </TooltipTrigger>
-                            <TooltipContent className="z-[140]">
-                              <p>Формат изображения (нажмите для смены)</p>
-                            </TooltipContent>
-                          </Tooltip>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-32 z-[150]" align="start">
+                              <DropdownMenuItem onClick={() => setOutputFormat('JPEG')}>
+                                JPEG
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => setOutputFormat('PNG')}>
+                                PNG
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                           
                           {/* Количество изображений */}
-                          <Tooltip>
-                            <TooltipTrigger asChild>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
                               <Button
                                 variant="outline"
                                 size="sm"
                                 className="h-10 w-12 p-0 text-sm bg-muted/80 hover:bg-muted/95 border border-border/80"
-                                onClick={() => setNumImages(prev => prev >= 4 ? 1 : prev + 1)}
                               >
                                 {numImages}
                               </Button>
-                            </TooltipTrigger>
-                            <TooltipContent className="z-[140]">
-                              <p>Количество изображений (нажмите для смены)</p>
-                            </TooltipContent>
-                          </Tooltip>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-32 z-[150]" align="start">
+                              <DropdownMenuItem onClick={() => setNumImages(1)}>1</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => setNumImages(2)}>2</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => setNumImages(3)}>3</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => setNumImages(4)}>4</DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         
                           {/* Загрузка изображения - input перенесен наверх */}
                           <Tooltip>
@@ -1025,25 +1065,27 @@ export function StudioChat({
                         
                         {/* Второй ряд - кнопка стиля (широкая) */}
                         <div className="flex items-center">
-                          <Tooltip>
-                            <TooltipTrigger asChild>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
                               <Button
                                 variant="outline"
                                 size="sm"
                                 className="h-9 w-full p-0 text-sm bg-muted/80 hover:bg-muted/95 border border-border/80"
-                                onClick={() => {
-                                  const currentIndex = artStyles.findIndex(style => style.name === artStyle)
-                                  const nextIndex = (currentIndex + 1) % artStyles.length
-                                  setArtStyle(artStyles[nextIndex].name)
-                                }}
                               >
                                 {artStyle}
                               </Button>
-                            </TooltipTrigger>
-                            <TooltipContent className="z-[140]">
-                              <p>Стиль изображения (нажмите для смены)</p>
-                          </TooltipContent>
-                          </Tooltip>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-56 z-[150]" align="start">
+                              {artStyles.map((style) => (
+                                <DropdownMenuItem 
+                                  key={style.name}
+                                  onClick={() => setArtStyle(style.name)}
+                                >
+                                  {style.name}
+                                </DropdownMenuItem>
+                              ))}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </div>
 
