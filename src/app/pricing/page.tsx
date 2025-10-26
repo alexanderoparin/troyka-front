@@ -120,7 +120,7 @@ export default function PricingPage() {
                 </li>
               <li className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-green-500" />
-                <span className="text-body text-foreground">Высокое разрешение 3:4</span>
+                <span className="text-body text-foreground">Профессиональное качество</span>
                 </li>
               <li className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-green-500" />

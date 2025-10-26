@@ -124,7 +124,7 @@ export default function HomePage() {
             </div>
             <h3 className="text-title-3 text-foreground mb-3">Мгновенная генерация</h3>
             <p className="text-body text-muted-foreground mb-6">
-              От идеи до готового изображения за 5-10 секунд
+              От идеи до готового изображения всего за 5-10 секунд
             </p>
             <ul className="space-y-3 text-callout text-muted-foreground">
               <li className="flex items-center gap-3">
@@ -137,7 +137,7 @@ export default function HomePage() {
               </li>
               <li className="flex items-center gap-3">
                 <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-                Высокое разрешение 3:4
+                Профессиональное качество
               </li>
             </ul>
           </div>
