@@ -61,10 +61,12 @@ export default function HomePage() {
 
               {/* Features */}
               <div className="space-y-2 text-sm sm:text-base text-muted-foreground text-center">
-                <div className="flex items-center justify-center gap-2">
-                  <Star className="w-3 h-3 text-yellow-500" />
-                  <span>Получите 6 поинтов за регистрацию</span>
-                </div>
+                {!isAuthenticated && (
+                  <div className="flex items-center justify-center gap-2">
+                    <Star className="w-3 h-3 text-yellow-500" />
+                    <span>Получите 6 поинтов за регистрацию</span>
+                  </div>
+                )}
                 <div className="flex items-center justify-center gap-2">
                   <Users className="w-3 h-3 text-green-500" />
                   <span>3 поинта = 1 генерация</span>
