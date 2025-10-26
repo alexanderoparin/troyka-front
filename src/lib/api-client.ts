@@ -634,8 +634,12 @@ class ApiClient {
 
   // Get file URL
   getFileUrl(filename: string): string {
-    // Если filename уже полный URL, возвращаем как есть
+    // Если filename уже полный URL, проверяем нужно ли проксирование
     if (filename.startsWith('http://') || filename.startsWith('https://')) {
+      // Проксируем изображения от FAL AI через наш сервер
+      if (this.isFalMediaUrl(filename)) {
+        return this.proxyFalMediaUrl(filename);
+      }
       return filename;
     }
     // Если filename начинается с /files/, используем напрямую (для аватаров и других файлов)
@@ -644,6 +648,44 @@ class ApiClient {
     }
     // Иначе добавляем /files/ к filename
     return `${this.baseUrl}/files/${filename}`;
+  }
+
+  /**
+   * Проверить, является ли URL изображением от FAL AI.
+   */
+  private isFalMediaUrl(url: string): boolean {
+    return url.includes('v3.fal.media') || url.includes('v3b.fal.media');
+  }
+
+  /**
+   * Проксировать URL изображения от FAL AI через наш сервер.
+   * Преобразует: https://v3.fal.media/files/kangaroo/file.jpg
+   *           -> https://24reshai.ru/images/v1/kangaroo/file.jpg
+   * Преобразует: https://v3b.fal.media/files/b/lion/file.jpg
+   *           -> https://24reshai.ru/images/v2/b/lion/file.jpg
+   */
+  public proxyFalMediaUrl(url: string): string {
+    try {
+      const urlObj = new URL(url);
+      
+      // Определяем версию API по домену
+      let apiVersion = 'v1';
+      if (urlObj.hostname === 'v3b.fal.media') {
+        apiVersion = 'v2';
+      }
+      
+      // Извлекаем путь к файлу после /files/
+      const filesIndex = urlObj.pathname.indexOf('/files/');
+      if (filesIndex !== -1) {
+        const filePath = urlObj.pathname.substring(filesIndex + '/files/'.length);
+        return `${this.baseUrl}/api/images/${apiVersion}/${filePath}`;
+      }
+      
+      return url; // Возвращаем оригинал если не удалось распарсить
+    } catch (error) {
+      console.error('Error proxying FAL media URL:', error);
+      return url;
+    }
   }
 
   // Get example file URL

@@ -29,13 +29,21 @@ export default function HistoryPage() {
   }
 
   // Функция для скачивания изображения
-  const handleImageDownload = (imageUrl: string) => {
-    const link = document.createElement('a')
-    link.href = imageUrl
-    link.download = `generated-image-${Date.now()}.jpg`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+  const handleImageDownload = async (imageUrl: string) => {
+    try {
+      const response = await fetch(imageUrl)
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `generated-image-${Date.now()}.jpg`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Ошибка при скачивании изображения:', error)
+    }
   }
 
   if (isLoading) {

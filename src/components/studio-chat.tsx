@@ -428,7 +428,9 @@ export function StudioChat({
 
   const handleImageDownload = async (imageUrl: string) => {
     try {
-      const response = await fetch(imageUrl)
+      // Проксируем URL для корректного скачивания в браузерах
+      const proxiedUrl = apiClient.proxyFalMediaUrl(imageUrl)
+      const response = await fetch(proxiedUrl)
       const blob = await response.blob()
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')

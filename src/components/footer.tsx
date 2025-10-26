@@ -25,7 +25,7 @@ export default function Footer() {
               href="/legal" 
               className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-200"
             >
-              Правовая информация
+              Пользовательское соглашение
             </Link>
             <Link 
               href="/pricing" 
@@ -48,12 +48,6 @@ export default function Footer() {
                 className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200"
               >
                 Политика конфиденциальности
-              </Link>
-              <Link 
-                href="/legal" 
-                className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200"
-              >
-                Пользовательское соглашение
               </Link>
             </div>
           </div>
