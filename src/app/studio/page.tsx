@@ -39,10 +39,11 @@ export default function StudioPage() {
 
   // Устанавливаем дефолтную сессию при загрузке
   useEffect(() => {
-    if (defaultSession && !currentSessionId) {
+    if (defaultSession) {
+      // Всегда устанавливаем дефолтную сессию, если она загружена
       setCurrentSessionId(defaultSession.id)
     }
-  }, [defaultSession, currentSessionId])
+  }, [defaultSession])
 
   // Обработчик завершения генерации
   const handleGenerationComplete = useCallback((images: string[]) => {
