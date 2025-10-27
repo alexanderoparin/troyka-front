@@ -13,6 +13,8 @@ import { useToast } from "@/components/ui/use-toast"
 import { useAuth } from "@/contexts/auth-context"
 import { Sparkles, ArrowLeft, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
+import { config } from "@/lib/config"
+import { getPointsText } from "@/lib/grammar"
 import { TelegramLoginButton } from "@/components/telegram-login-button"
 import { Separator } from "@/components/ui/separator"
 
@@ -82,7 +84,7 @@ export default function RegisterPage() {
       if (result.success) {
         toast({
           title: "Успешная регистрация через Telegram!",
-          description: "Добро пожаловать в 24reshai! Вы получили 6 поинтов при регистрации.",
+          description: `Добро пожаловать в 24reshai! Вы получили ${getPointsText(config.REGISTRATION_POINTS)} при регистрации.`,
         })
         router.push("/studio")
       } else {

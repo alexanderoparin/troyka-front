@@ -19,6 +19,7 @@ interface AuthContextType extends AuthState {
   unlinkTelegram: () => Promise<{ success: boolean; error: string | null }>
   logout: () => Promise<void>
   refreshPoints: () => Promise<void>
+  setBalance: (newBalance: number) => void
   refreshUserInfo: () => Promise<void>
   isEmailVerified: () => boolean
 }
@@ -225,6 +226,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setTimeout(() => setIsLoggingOut(false), 1000)
   }, [])
 
+  const setBalance = useCallback((newBalance: number) => {
+    setState(prev => ({
+      ...prev,
+      points: newBalance,
+    }))
+  }, [])
+
   const refreshPoints = useCallback(async () => {
     if (state.isAuthenticated && !isLoggingOut) {
       try {
@@ -346,6 +354,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       unlinkTelegram,
       logout,
       refreshPoints,
+      setBalance,
       refreshUserInfo,
       isEmailVerified,
     }}>

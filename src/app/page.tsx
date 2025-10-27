@@ -5,6 +5,8 @@ import { Sparkles, Shield, ArrowRight, Star, Users, Clock, Target, Zap } from 'l
 import Link from 'next/link'
 import { useAuth } from '@/contexts/auth-context'
 import { AnimatedGallery } from '@/components/animated-gallery'
+import { config } from '@/lib/config'
+import { getPointsText } from '@/lib/grammar'
 export default function HomePage() {
   const { isAuthenticated } = useAuth()
 
@@ -64,12 +66,12 @@ export default function HomePage() {
                 {!isAuthenticated && (
                   <div className="flex items-center justify-center gap-2">
                     <Star className="w-3 h-3 text-yellow-500" />
-                    <span>Получите 6 поинтов за регистрацию</span>
+                    <span>Получите {getPointsText(config.REGISTRATION_POINTS)} за регистрацию</span>
                   </div>
                 )}
                 <div className="flex items-center justify-center gap-2">
                   <Users className="w-3 h-3 text-green-500" />
-                  <span>3 поинта = 1 генерация</span>
+                  <span>{config.GENERATION_POINTS_PER_IMAGE} поинта = 1 генерация</span>
                 </div>
                 <div className="flex items-center justify-center gap-2">
                   <Clock className="w-3 h-3 text-blue-500" />

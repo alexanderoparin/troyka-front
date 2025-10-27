@@ -35,6 +35,7 @@ export interface ImageRequest {
 export interface ImageResponse {
   description: string;
   imageUrls: string[];
+  balance?: number;
 }
 
 // Типы для сессий

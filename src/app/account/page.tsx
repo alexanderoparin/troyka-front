@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/contexts/auth-context"
 import { useRouter } from "next/navigation"
+import { getPointsText } from "@/lib/grammar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -172,7 +173,7 @@ export default function AccountPage() {
                 <div className="space-y-2">
                   <p className="text-muted-foreground">Баланс</p>
                   <p className="font-medium text-xl">
-                    {points || 0} поинтов
+                    {getPointsText(points || 0)}
                   </p>
                 </div>
               </div>

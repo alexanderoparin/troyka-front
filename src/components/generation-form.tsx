@@ -12,6 +12,7 @@ import { useAuth } from "@/contexts/auth-context"
 import { Wand2, UploadCloud, Layers, FileImage } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { getPointsText } from "@/lib/grammar"
+import { getRequiredPoints } from "@/lib/config"
 
 const generationSchema = z.object({
   prompt: z.string().min(10, "Описание должно содержать минимум 10 символов"),
@@ -56,7 +57,7 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
   const [isDragOver, setIsDragOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
-  const { points, refreshPoints } = useAuth()
+  const { points, refreshPoints, setBalance } = useAuth()
 
   const {
     register,
@@ -96,7 +97,7 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
     }
 
     // Проверяем баланс
-    const requiredPoints = data.numImages * 3
+    const requiredPoints = getRequiredPoints(data.numImages)
     if (points < requiredPoints) {
       toast({
         title: "Недостаточно поинтов",
@@ -157,14 +158,21 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
       if (response.data) {
         // Вызываем callback для обновления родительского компонента
         onGenerationComplete(response.data.imageUrls)
-        // Обновляем баланс после успешной генерации с небольшой задержкой
-        setTimeout(async () => {
-          await refreshPoints()
-        }, 1000)
+        
+        // Обновляем баланс из ответа API, если он есть
+        if (response.data.balance !== undefined) {
+          setBalance(response.data.balance)
+        } else {
+          // Fallback: запрашиваем баланс если его нет в ответе
+          setTimeout(() => {
+            refreshPoints().catch(err => console.error('Ошибка обновления баланса:', err))
+          }, 500)
+        }
+        
         toast({
           title: "Изображение создано!",
-          description: `Списано ${getPointsText(requiredPoints)}. Баланс обновится через секунду`,
-          duration: 1500,
+          description: `Списано ${getPointsText(requiredPoints)}`,
+          duration: 1000,
         })
         // Очищаем форму после успешной генерации
         setValue("prompt", "")

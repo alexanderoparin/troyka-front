@@ -13,6 +13,7 @@ import { Edit3, Wand2, Loader2, CreditCard } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { getPointsText } from "@/lib/grammar";
+import { getRequiredPoints } from "@/lib/config";
 
 interface ImageEditButtonProps {
   imageUrl: string;
@@ -33,7 +34,7 @@ export function ImageEditButton({
   const [numImages, setNumImages] = useState(1);
   const [outputFormat, setOutputFormat] = useState<'JPEG' | 'PNG'>('JPEG');
   const { toast } = useToast();
-  const { points, refreshPoints } = useAuth();
+  const { points, refreshPoints, setBalance } = useAuth();
 
   const handleEdit = async () => {
     if (!prompt.trim()) {
@@ -46,7 +47,7 @@ export function ImageEditButton({
     }
 
     // Проверяем баланс
-    const requiredPoints = numImages * 3;
+    const requiredPoints = getRequiredPoints(numImages);
     if (points < requiredPoints) {
       toast({
         title: "Недостаточно поинтов",
@@ -88,14 +89,20 @@ export function ImageEditButton({
       const response = await apiClient.generateImage(request);
 
       if (response.data) {
-        // Обновляем баланс после успешного редактирования с небольшой задержкой
-        setTimeout(async () => {
-          await refreshPoints();
-        }, 1000);
+        // Обновляем баланс из ответа API, если он есть
+        if (response.data.balance !== undefined) {
+          setBalance(response.data.balance);
+        } else {
+          // Fallback: запрашиваем баланс если его нет в ответе
+          setTimeout(() => {
+            refreshPoints().catch(err => console.error('Ошибка обновления баланса:', err));
+          }, 500);
+        }
+        
         toast({
           title: "Изображение отредактировано!",
-          description: `Списано ${getPointsText(requiredPoints)}. Баланс обновится через секунду`,
-          duration: 1500,
+          description: `Списано ${getPointsText(requiredPoints)}`,
+          duration: 1000,
         });
         
         if (onImageEdited) {
@@ -189,7 +196,7 @@ export function ImageEditButton({
               <span className="text-sm font-bold text-primary">{getPointsText(points)}</span>
             </div>
             <div className="text-sm text-muted-foreground">
-              Стоимость: {getPointsText(numImages * 3)}
+              Стоимость: {getPointsText(getRequiredPoints(numImages))}
             </div>
           </div>
 

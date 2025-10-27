@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { FileText, ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { config } from "@/lib/config"
+import { getPointsText } from "@/lib/grammar"
 
 export default function LegalPage() {
   const router = useRouter()
@@ -45,8 +47,8 @@ export default function LegalPage() {
 
             <h3 className="font-semibold">2. Система поинтов</h3>
             <p>
-              • При регистрации вы получаете +6 поинтов бесплатно<br/>
-              • 1 генерация изображения = 3 поинта<br/>
+              • При регистрации вы получаете +{getPointsText(config.REGISTRATION_POINTS)} бесплатно<br/>
+              • 1 генерация изображения = {config.GENERATION_POINTS_PER_IMAGE} поинта<br/>
               • Поинты не имеют срока действия
             </p>
 
