@@ -719,8 +719,8 @@ export function StudioChat({
                                 className="object-cover"
                               />
                               
-                              {/* Overlay с действиями в правом верхнем углу */}
-                              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                              {/* Overlay с действиями в левом нижнем углу */}
+                              <div className="absolute bottom-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
                                 <Tooltip>
                                   <TooltipTrigger asChild>
                                 <Button
@@ -761,7 +761,7 @@ export function StudioChat({
 
                               {/* Индикатор выбора */}
                               {selectedImages.includes(imageUrl) && (
-                                <div className="absolute top-2 left-2">
+                                <div className="absolute top-2 right-2">
                                   <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
                                     <span className="text-primary-foreground text-xs font-bold">
                                       {selectedImages.indexOf(imageUrl) + 1}
