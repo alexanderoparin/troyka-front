@@ -240,9 +240,9 @@ export function StudioSessions({
                 }
               }}
               disabled={isCreating}
-              className="aspect-square w-full max-w-[48px] rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center bg-primary/10 hover:bg-primary/20"
+              className="aspect-square w-full max-w-[48px] md:max-w-[72px] rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center hover:bg-muted/50"
             >
-              <Plus className="h-6 w-6 text-primary" />
+              <Plus className="h-6 w-6 md:h-8 md:w-8 text-primary" />
             </button>
           </div>
         </div>
@@ -277,14 +277,14 @@ export function StudioSessions({
                               alt={session.name}
                               fill
                               className="object-cover"
-                              sizes="64px"
+                              sizes="96px"
                               onError={(e) => {
                                 console.error('Session image load error:', session.lastImageUrl, e);
                               }}
                             />
                           ) : (
                             <div className="w-full h-full bg-muted flex items-center justify-center">
-                              <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                              <ImageIcon className="h-6 w-6 md:h-8 md:w-8 text-muted-foreground" />
                             </div>
                           )}
                           

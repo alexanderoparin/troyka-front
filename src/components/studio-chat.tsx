@@ -55,7 +55,7 @@ export function StudioChat({
   onGenerationComplete, 
   className 
 }: StudioChatProps) {
-  const { avatar } = useAuth()
+  const { avatar, setBalance, refreshPoints } = useAuth()
   const [prompt, setPrompt] = useState(() => {
     // Загружаем промпт из localStorage только при инициализации
     if (typeof window !== 'undefined') {
@@ -394,6 +394,16 @@ export function StudioChat({
         } else {
           // В обычном режиме очищаем загруженные изображения
         setUploadedImages([])
+        }
+        
+        // Обновляем баланс из ответа API, если он есть
+        if (response.data.balance !== undefined) {
+          setBalance(response.data.balance)
+        } else {
+          // Fallback: запрашиваем баланс если его нет в ответе
+          setTimeout(() => {
+            refreshPoints().catch(err => console.error('Ошибка обновления баланса:', err))
+          }, 500)
         }
         
         // Обновляем историю после успешной генерации

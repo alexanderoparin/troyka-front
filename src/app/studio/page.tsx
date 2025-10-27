@@ -290,7 +290,7 @@ export default function StudioPage() {
 
       {/* Левая панель - Сессии (скрыта на мобильных) */}
       {isSessionsVisible && (
-        <div className="hidden md:block w-16 border-r bg-muted/5 flex flex-col">
+        <div className="hidden md:block w-24 border-r bg-muted/5 flex flex-col">
           <StudioSessions
             currentSessionId={currentSessionId || undefined}
             onSessionSelect={handleSessionSelect}
