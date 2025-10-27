@@ -6,6 +6,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { Check, Star, Plus } from "lucide-react"
 import { cn, formatCurrency } from "@/lib/utils"
 import { PricingPlanResponse, apiClient } from "@/lib/api-client"
+import { config } from "@/lib/config"
 
 interface PricingCardProps {
   plan: PricingPlanResponse
@@ -18,8 +19,9 @@ export function PricingCard({ plan, isPopular = false, className }: PricingCardP
   const { toast } = useToast()
   const [isProcessing, setIsProcessing] = useState(false)
 
-  const generationsCount = Math.floor(plan.credits / 3)
-  const pricePerGeneration = plan.priceRub / generationsCount
+  const generationsCount = Math.floor(plan.credits / config.GENERATION_POINTS_PER_IMAGE)
+  // Используем unitPriceRubComputed с бэка (цена за генерацию в копейках), если есть, иначе считаем на фронте
+  const pricePerGeneration = plan.unitPriceRubComputed ? plan.unitPriceRubComputed : (plan.priceRub / generationsCount)
   const isPlanPopular = isPopular || plan.isPopular
 
   const handlePurchase = async () => {
