@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/components/ui/use-toast"
 import { useAuth } from "@/contexts/auth-context"
 import { Sparkles, ArrowLeft, Eye, EyeOff } from "lucide-react"
@@ -26,6 +27,9 @@ const registerSchema = z.object({
     .regex(/[a-zа-я]/, "Пароль должен содержать строчные буквы")
     .regex(/[A-ZА-Я]/, "Пароль должен содержать заглавные буквы")
     .regex(/\d/, "Пароль должен содержать цифры"),
+  agreeToTerms: z.boolean().refine((val) => val === true, {
+    message: "Необходимо принять пользовательское соглашение, политику конфиденциальности и политику возврата",
+  }),
 })
 
 type RegisterFormData = z.infer<typeof registerSchema>
@@ -43,6 +47,9 @@ export default function RegisterPage() {
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
+    defaultValues: {
+      agreeToTerms: false,
+    },
   })
 
   const onSubmit = async (data: RegisterFormData) => {
@@ -190,6 +197,35 @@ export default function RegisterPage() {
                 </div>
                 {errors.password && (
                   <p className="text-sm text-destructive">{errors.password.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-start space-x-2">
+                  <Checkbox
+                    id="agree-to-terms"
+                    {...register("agreeToTerms")}
+                  />
+                  <Label
+                    htmlFor="agree-to-terms"
+                    className="text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Я принимаю{" "}
+                    <Link href="/legal" className="text-primary hover:underline" target="_blank">
+                      пользовательское соглашение
+                    </Link>
+                    {", "}
+                    <Link href="/privacy" className="text-primary hover:underline" target="_blank">
+                      политику конфиденциальности
+                    </Link>
+                    {" "}и{" "}
+                    <Link href="/refund" className="text-primary hover:underline" target="_blank">
+                      политику возврата
+                    </Link>
+                  </Label>
+                </div>
+                {errors.agreeToTerms && (
+                  <p className="text-sm text-destructive">{errors.agreeToTerms.message}</p>
                 )}
               </div>
 
