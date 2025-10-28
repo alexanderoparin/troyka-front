@@ -60,6 +60,17 @@ export default function RefundPage() {
           </div>
         </CardContent>
       </Card>
+
+      <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+        <CardHeader>
+          <CardTitle className="text-gray-900 dark:text-gray-100">Контактная информация</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+          <p><strong>ИП Бурцев Даниил Викторович</strong></p>
+          <p>ИНН: 482619660921</p>
+          <p>Email: support@24reshai.ru</p>
+        </CardContent>
+      </Card>
     </div>
   )
 }
