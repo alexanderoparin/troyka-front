@@ -11,6 +11,7 @@ export interface AuthResponse {
   email: string;
   role: string;
   expiresAt: string;
+  isNewUser?: boolean;
 }
 
 export interface LoginRequest {

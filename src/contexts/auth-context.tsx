@@ -14,7 +14,7 @@ interface AuthState {
 interface AuthContextType extends AuthState {
   login: (credentials: LoginRequest) => Promise<{ success: boolean; error: string | null }>
   register: (userData: RegisterRequest) => Promise<{ success: boolean; error: string | null }>
-  loginWithTelegram: (telegramData: TelegramAuthRequest) => Promise<{ success: boolean; error: string | null }>
+  loginWithTelegram: (telegramData: TelegramAuthRequest) => Promise<{ success: boolean; error: string | null; data?: { isNewUser?: boolean } }>
   linkTelegram: (telegramData: TelegramAuthRequest) => Promise<{ success: boolean; error: string | null }>
   unlinkTelegram: () => Promise<{ success: boolean; error: string | null }>
   logout: () => Promise<void>
@@ -295,7 +295,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             points: pointsResponse.data || 0,
             avatar: avatarResponse.data || null,
           })
-          return { success: true, error: null }
+          return { success: true, error: null, data: { isNewUser: response.data?.isNewUser } }
         }
       } catch (error) {
         console.error('Ошибка получения данных пользователя после Telegram входа:', error)

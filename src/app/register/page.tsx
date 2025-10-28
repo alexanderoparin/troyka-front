@@ -89,10 +89,18 @@ export default function RegisterPage() {
       const result = await loginWithTelegram(user)
       
       if (result.success) {
-        toast({
-          title: "Успешная регистрация через Telegram!",
-          description: `Добро пожаловать в 24reshai! Вы получили ${getPointsText(config.REGISTRATION_POINTS)} при регистрации.`,
-        })
+        // Проверяем, является ли пользователь новым
+        if (result.data?.isNewUser) {
+          toast({
+            title: "Успешная регистрация через Telegram!",
+            description: `Добро пожаловать в 24reshai! Вы получили ${getPointsText(config.REGISTRATION_POINTS)} при регистрации.`,
+          })
+        } else {
+          toast({
+            title: "Успешный вход через Telegram!",
+            description: "Добро пожаловать обратно в 24reshai!",
+          })
+        }
         router.push("/studio")
       } else {
         toast({
