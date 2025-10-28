@@ -18,6 +18,7 @@ import { config } from "@/lib/config"
 import { getPointsText } from "@/lib/grammar"
 import { TelegramLoginButton } from "@/components/telegram-login-button"
 import { Separator } from "@/components/ui/separator"
+import { useQueryClient } from "@tanstack/react-query"
 
 const registerSchema = z.object({
   username: z.string().min(3, "Логин должен содержать минимум 3 символа"),
@@ -40,6 +41,7 @@ export default function RegisterPage() {
   const { register: registerUser, loginWithTelegram } = useAuth()
   const router = useRouter()
   const { toast } = useToast()
+  const queryClient = useQueryClient()
 
   const {
     register,
@@ -89,6 +91,10 @@ export default function RegisterPage() {
       const result = await loginWithTelegram(user)
       
       if (result.success) {
+        // Инвалидируем кэш сессий для обновления списка после создания дефолтной сессии
+        queryClient.invalidateQueries({ queryKey: ['sessions'] })
+        queryClient.invalidateQueries({ queryKey: ['defaultSession'] })
+        
         // Проверяем, является ли пользователь новым
         if (result.data?.isNewUser) {
           toast({
