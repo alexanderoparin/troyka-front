@@ -28,7 +28,8 @@ export default function AccountPage() {
   const { user, isAuthenticated, isLoading, logout, avatar, isEmailVerified, points } = useAuth()
   const router = useRouter()
 
-  if (isLoading) {
+  // Безопасная проверка наличия user
+  if (isLoading || !user) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -36,7 +37,7 @@ export default function AccountPage() {
     )
   }
 
-  if (!isAuthenticated || !user) {
+  if (!isAuthenticated) {
     return (
       <div className="text-center space-y-8 py-20">
         <div className="space-y-4">
@@ -92,25 +93,25 @@ export default function AccountPage() {
                     {user.telegramPhotoUrl ? (
                       <img 
                         src={user.telegramPhotoUrl} 
-                        alt={user.username}
+                        alt={user.username || 'User'}
                         className="w-12 h-12 rounded-full object-cover"
                       />
                     ) : (
                       avatar ? (
                         <img 
                           src={avatar} 
-                          alt={user.username}
+                          alt={user.username || 'User'}
                           className="w-12 h-12 rounded-full object-cover"
                         />
                       ) : (
                         <span className="text-lg font-bold text-primary">
-                          {user.username.charAt(0).toUpperCase()}
+                          {(user.username || 'U').charAt(0).toUpperCase()}
                         </span>
                       )
                     )}
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold">{user.username}</h3>
+                    <h3 className="text-lg font-semibold">{user.username || 'Пользователь'}</h3>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
@@ -123,7 +124,7 @@ export default function AccountPage() {
                         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                           <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.568 8.16l-1.61 7.59c-.12.54-.44.68-.9.42l-2.49-1.84-1.2 1.16c-.13.13-.24.24-.49.24l.18-2.56 4.64-4.19c.2-.18-.04-.28-.31-.1l-5.74 3.61-2.47-.77c-.54-.17-.55-.54.11-.8l9.71-3.74c.45-.17.84.11.7.8z"/>
                         </svg>
-                        <span>@{user.telegramUsername}</span>
+                        <span>@{user.telegramUsername || 'telegram'}</span>
                       </div>
                     )}
                   </div>
@@ -167,7 +168,7 @@ export default function AccountPage() {
                 <div className="space-y-2">
                   <p className="text-muted-foreground">Дата регистрации</p>
                   <p className="font-medium text-base">
-                    {formatDate(user.createdAt)}
+                    {user.createdAt ? formatDate(user.createdAt) : 'Не указана'}
                   </p>
                 </div>
                 <div className="space-y-2">
