@@ -114,15 +114,13 @@ export default function LoginPage() {
         <Card>
           <CardContent>
             {/* Telegram Login - First */}
-            <div className="mb-6">
-              <div className="flex justify-center">
-                <TelegramLoginButton
-                  onAuthCallback={handleTelegramAuth}
-                  botName={process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME || "reshai24_bot"}
-                  buttonSize="large"
-                  className="w-full max-w-[280px]"
-                />
-              </div>
+            <div className="mb-8 sm:mb-10 w-full flex justify-center">
+              <TelegramLoginButton
+                onAuthCallback={handleTelegramAuth}
+                botName={process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME || "reshai24_bot"}
+                buttonSize="large"
+                className="w-full max-w-[280px]"
+              />
             </div>
 
             {/* Separator */}
