@@ -161,7 +161,16 @@ export function SessionHistory({
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = filename || `image-${Date.now()}.jpg`
+      // Определяем расширение из URL, если имя файла не указано
+      if (!filename) {
+        const extension = imageUrl.toLowerCase().endsWith('.png') ? 'png' : 'jpg'
+        a.download = `image-${Date.now()}.${extension}`
+      } else {
+        // Если имя файла указано, но без расширения - добавляем его
+        const urlExtension = imageUrl.toLowerCase().endsWith('.png') ? 'png' : 'jpg'
+        const hasExtension = filename.includes('.')
+        a.download = hasExtension ? filename : `${filename}.${urlExtension}`
+      }
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)
@@ -345,7 +354,8 @@ export function SessionHistory({
                                 className="h-5 w-5 p-0"
                                 onClick={(e) => {
                                   e.stopPropagation()
-                                  downloadImage(imageUrl, `generated-${message.id}-${index + 1}.jpg`)
+                                  const extension = imageUrl.toLowerCase().endsWith('.png') ? 'png' : 'jpg'
+                                  downloadImage(imageUrl, `generated-${message.id}-${index + 1}.${extension}`)
                                 }}
                               >
                                 <Download className="h-3 w-3" />

@@ -36,7 +36,9 @@ export default function HistoryPage() {
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
-      link.download = `generated-image-${Date.now()}.jpg`
+      // Определяем расширение из URL
+      const extension = imageUrl.toLowerCase().endsWith('.png') ? 'png' : 'jpg'
+      link.download = `generated-image-${Date.now()}.${extension}`
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)

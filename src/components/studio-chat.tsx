@@ -461,7 +461,9 @@ export function StudioChat({
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
-      link.download = `generated-image-${Date.now()}.jpg`
+      // Определяем расширение из URL
+      const extension = imageUrl.toLowerCase().endsWith('.png') ? 'png' : 'jpg'
+      link.download = `generated-image-${Date.now()}.${extension}`
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
@@ -531,7 +533,13 @@ export function StudioChat({
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = filename || `image-${Date.now()}.jpg`
+      // Определяем расширение из URL, если имя файла не указано
+      if (!filename) {
+        const extension = imageUrl.toLowerCase().endsWith('.png') ? 'png' : 'jpg'
+        a.download = `image-${Date.now()}.${extension}`
+      } else {
+        a.download = filename
+      }
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)
