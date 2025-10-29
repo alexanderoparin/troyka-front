@@ -1284,7 +1284,9 @@
 }
 
 /* Telegram Login Button Styles */
-.telegram-login-container iframe {
+div[ref] iframe,
+iframe[src*="telegram.org"] {
   max-width: 100% !important;
   width: 100% !important;
+  box-sizing: border-box !important;
 }

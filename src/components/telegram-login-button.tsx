@@ -117,12 +117,13 @@ export const TelegramLoginButton = ({
   }, [botName, buttonSize, cornerRadius, requestAccess, usePic, lang, widgetVersion, onAuthCallback])
 
   return (
-    <div className={`${className} overflow-hidden w-full`}>
+    <div className={`${className} overflow-hidden w-full flex justify-center`} style={{ maxWidth: '100%' }}>
       <div 
         ref={containerRef} 
         className="w-full flex justify-center items-center overflow-hidden" 
         style={{ 
-          maxWidth: '100%'
+          maxWidth: '100%',
+          width: '100%'
         }} 
       />
     </div>
