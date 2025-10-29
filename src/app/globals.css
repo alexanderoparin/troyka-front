@@ -1289,4 +1289,11 @@ iframe[src*="telegram.org"] {
   max-width: 100% !important;
   width: 100% !important;
   box-sizing: border-box !important;
+  overflow: visible !important;
+}
+
+/* Fix for Telegram button avatar clipping */
+div[ref] iframe *,
+iframe[src*="telegram.org"] * {
+  overflow: visible !important;
 }

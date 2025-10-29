@@ -91,13 +91,18 @@ export const TelegramLoginButton = ({
       onAuthCallback?.(user)
     }
 
-    // Ограничиваем размер iframe после загрузки
+    // Ограничиваем размер iframe после загрузки и предотвращаем обрезку аватара
     const checkIframe = setInterval(() => {
       if (containerRef.current) {
         const iframe = containerRef.current.querySelector('iframe')
         if (iframe) {
           iframe.style.maxWidth = '100%'
           iframe.style.width = '100%'
+          iframe.style.overflow = 'visible'
+          // Добавляем padding для предотвращения обрезки аватара
+          if (containerRef.current.parentElement) {
+            containerRef.current.parentElement.style.overflow = 'visible'
+          }
           clearInterval(checkIframe)
         }
       }
@@ -117,10 +122,10 @@ export const TelegramLoginButton = ({
   }, [botName, buttonSize, cornerRadius, requestAccess, usePic, lang, widgetVersion, onAuthCallback])
 
   return (
-    <div className={`${className} overflow-hidden w-full flex justify-center`} style={{ maxWidth: '100%' }}>
+    <div className={`${className} overflow-visible w-full flex justify-center`} style={{ maxWidth: '100%' }}>
       <div 
         ref={containerRef} 
-        className="w-full flex justify-center items-center overflow-hidden" 
+        className="w-full flex justify-center items-center overflow-visible" 
         style={{ 
           maxWidth: '100%',
           width: '100%'
