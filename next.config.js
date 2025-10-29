@@ -5,6 +5,7 @@ const nextConfig = {
       'v3b.fal.media',
       'v3.fal.media',
       '24reshai.ru',
+      'localhost',
     ],
     remotePatterns: [
       {
@@ -18,6 +19,15 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: '24reshai.ru',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '8080',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
       },
     ],
   },

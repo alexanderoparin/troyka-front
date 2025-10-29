@@ -6,12 +6,12 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
 import { useAuth } from "@/contexts/auth-context"
-import { Sparkles, ArrowLeft, Eye, EyeOff } from "lucide-react"
+import { ArrowLeft, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import { TelegramLoginButton } from "@/components/telegram-login-button"
 import { Separator } from "@/components/ui/separator"
@@ -104,27 +104,40 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-4 sm:space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="flex items-center justify-center gap-2 mb-3 sm:mb-4">
-            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg flex items-center justify-center">
-              <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
-            </div>
-            <span className="text-lg sm:text-xl font-bold">24reshai</span>
-          </div>
           <h1 className="text-xl sm:text-2xl font-bold">Вход в аккаунт</h1>
           <p className="text-sm sm:text-base text-muted-foreground">
             Войдите, чтобы начать создавать изображения
           </p>
         </div>
 
-        {/* Login Form */}
+        {/* Login Card */}
         <Card>
-          <CardHeader>
-            <CardTitle>Авторизация</CardTitle>
-            <CardDescription>
-              Введите ваши учетные данные для входа
-            </CardDescription>
-          </CardHeader>
           <CardContent>
+            {/* Telegram Login - First */}
+            <div className="mb-6">
+              <div className="flex justify-center">
+                <TelegramLoginButton
+                  onAuthCallback={handleTelegramAuth}
+                  botName={process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME || "reshai24_bot"}
+                  buttonSize="large"
+                  className="w-full max-w-[280px]"
+                />
+              </div>
+            </div>
+
+            {/* Separator */}
+            <div className="relative mb-6">
+              <div className="absolute inset-0 flex items-center">
+                <Separator className="w-full" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  или
+                </span>
+              </div>
+            </div>
+
+            {/* Login Form */}
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="username">Логин</Label>
@@ -185,29 +198,6 @@ export default function LoginPage() {
                 )}
               </Button>
             </form>
-
-            {/* Telegram Login */}
-            <div className="mt-6">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <Separator className="w-full" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">
-                    или
-                  </span>
-                </div>
-              </div>
-              
-              <div className="mt-4 flex justify-center">
-                <TelegramLoginButton
-                  onAuthCallback={handleTelegramAuth}
-                  botName={process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME || "reshai24_bot"}
-                  buttonSize="large"
-                  className="w-full max-w-[280px]"
-                />
-              </div>
-            </div>
 
             <div className="mt-6 text-center space-y-2">
               <p className="text-sm text-muted-foreground">
