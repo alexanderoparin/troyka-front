@@ -72,9 +72,9 @@ export function StudioChat({
       const saved = localStorage.getItem('studio-numImages')
       if (saved) return parseInt(saved)
       // Мобильным устройствам (ширина < 640px) по умолчанию ставим 1 изображение
-      return window.innerWidth < 640 ? 1 : 2
+      return window.innerWidth < 640 ? 1 : 1
     }
-    return 2
+    return 1
   })
   const [outputFormat, setOutputFormat] = useState<'JPEG' | 'PNG'>(() => {
     if (typeof window !== 'undefined') {

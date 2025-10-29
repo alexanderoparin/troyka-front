@@ -16,7 +16,7 @@ import { getRequiredPoints } from "@/lib/config"
 
 const generationSchema = z.object({
   prompt: z.string().min(10, "Описание должно содержать минимум 10 символов"),
-  numImages: z.number().min(1).max(4).default(2),
+  numImages: z.number().min(1).max(4).default(1),
   outputFormat: z.enum(['JPEG', 'PNG']).default('JPEG'),
 })
 
@@ -69,7 +69,7 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
     resolver: zodResolver(generationSchema),
     defaultValues: {
       prompt: initialPrompt,
-      numImages: 2,
+      numImages: 1,
       outputFormat: 'JPEG',
     },
   })
