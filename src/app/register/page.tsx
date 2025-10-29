@@ -134,7 +134,7 @@ export default function RegisterPage() {
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,_rgba(59,130,246,0.3)_0%,_transparent_70%)] dark:bg-[radial-gradient(circle_at_center,_rgba(59,130,246,0.3)_0%,_transparent_70%)] pointer-events-none -z-10"></div>
       
       {/* Container для центрирования */}
-      <div className="flex justify-center relative z-10 py-8">
+      <div className="flex justify-center relative z-10 py-4 sm:py-8 lg:py-4">
         <div className="w-full max-w-5xl flex">
         {/* Left Side - Hero Panel */}
         <div className="hidden lg:flex lg:w-2/5 lg:h-screen relative overflow-hidden">
@@ -175,30 +175,6 @@ export default function RegisterPage() {
             {/* Register Card */}
             <Card className="border-0 shadow-lg overflow-visible">
               <CardContent className="overflow-visible p-4 sm:p-6">
-                {/* Telegram Login - First */}
-                <div className="mt-2 mb-4 w-full flex justify-center items-center px-2 overflow-visible">
-                  <div className="w-full max-w-[320px] flex justify-center pr-3 pl-2 py-2 overflow-visible">
-                    <TelegramLoginButton
-                      onAuthCallback={handleTelegramAuth}
-                      botName={process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME || "reshai24_bot"}
-                      buttonSize="large"
-                      className="w-full"
-                    />
-                  </div>
-                </div>
-
-                {/* Separator */}
-                <div className="relative mb-4 mt-4">
-                  <div className="absolute inset-0 flex items-center">
-                    <Separator className="w-full" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">
-                      или
-                    </span>
-                  </div>
-                </div>
-
                 {/* Register Form */}
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
                   <div className="space-y-1.5">

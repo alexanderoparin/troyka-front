@@ -107,7 +107,7 @@ export default function LoginPage() {
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,_rgba(59,130,246,0.3)_0%,_transparent_70%)] dark:bg-[radial-gradient(circle_at_center,_rgba(59,130,246,0.3)_0%,_transparent_70%)] pointer-events-none -z-10"></div>
       
       {/* Container для центрирования */}
-      <div className="flex justify-center relative z-10 py-8">
+      <div className="flex justify-center relative z-10 py-2 sm:py-4 lg:py-2">
         <div className="w-full max-w-5xl flex">
         {/* Left Side - Hero Panel */}
         <div className="hidden lg:flex lg:w-2/5 lg:h-screen relative overflow-hidden">
