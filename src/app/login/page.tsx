@@ -114,7 +114,7 @@ export default function LoginPage() {
         <Card>
           <CardContent className="overflow-x-hidden">
             {/* Telegram Login - First */}
-            <div className="mt-6 sm:mt-8 mb-8 sm:mb-10 w-full flex justify-center items-center px-2">
+            <div className="mt-8 sm:mt-10 mb-8 sm:mb-10 w-full flex justify-center items-center px-2">
               <div className="w-full max-w-[280px] flex justify-center">
                 <TelegramLoginButton
                   onAuthCallback={handleTelegramAuth}
