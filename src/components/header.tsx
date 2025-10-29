@@ -193,14 +193,9 @@ export function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <div className="flex items-center gap-2">
-              <Button asChild size="sm" className="text-sm px-4 py-2 h-8">
-                <Link href="/login">Войти</Link>
-              </Button>
-              <Button variant="outline" asChild size="sm" className="text-sm px-4 py-2 h-8">
-                <Link href="/register">Регистрация</Link>
-              </Button>
-            </div>
+            <Button asChild size="sm" className="text-sm px-4 py-2 h-8">
+              <Link href="/login">Войти</Link>
+            </Button>
           )}
         </div>
 
@@ -365,14 +360,9 @@ export function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <div className="flex items-center gap-2">
-              <Button asChild size="sm" className="text-sm px-4 py-2 h-8">
-                <Link href="/login">Войти</Link>
-              </Button>
-              <Button variant="outline" asChild size="sm" className="text-sm px-4 py-2 h-8">
-                <Link href="/register">Регистрация</Link>
-              </Button>
-            </div>
+            <Button asChild size="sm" className="text-sm px-4 py-2 h-8">
+              <Link href="/login">Войти</Link>
+            </Button>
           )}
         </div>
 

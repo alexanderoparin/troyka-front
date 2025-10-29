@@ -218,7 +218,7 @@ export default function PricingPage() {
         ) : (
           <div className="space-y-6">
             <p className="text-headline text-muted-foreground">
-              Зарегистрируйтесь и получите +6 поинтов для бесплатного тестирования
+              Зарегистрируйтесь и получите +{getPointsText(config.REGISTRATION_POINTS)} для бесплатного тестирования
             </p>
             <a href="/studio" className="btn-ios-primary px-8 py-3 text-headline inline-flex items-center">
               <Sparkles className="w-5 h-5 mr-3" />
