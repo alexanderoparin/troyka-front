@@ -16,7 +16,6 @@ import { Mail, MessageCircle, MapPin, Clock, Send, CheckCircle } from 'lucide-re
 const contactSchema = z.object({
   name: z.string().min(2, 'Имя должно содержать минимум 2 символа').max(100, 'Имя не должно превышать 100 символов'),
   email: z.string().email('Введите корректный email'),
-  phone: z.string().optional(),
   subject: z.string().min(5, 'Тема должна содержать минимум 5 символов').max(200, 'Тема не должна превышать 200 символов'),
   message: z.string().min(10, 'Сообщение должно содержать минимум 10 символов').max(2000, 'Сообщение не должно превышать 2000 символов'),
 });
@@ -44,7 +43,6 @@ export default function ContactsPage() {
       const request: ContactRequest = {
         name: data.name,
         email: data.email,
-        phone: data.phone || undefined,
         subject: data.subject,
         message: data.message,
       };
@@ -84,24 +82,24 @@ export default function ContactsPage() {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-8 lg:items-stretch">
           {/* Контактная информация */}
-          <div className="space-y-6">
-            <Card className="bg-slate-50 dark:bg-card border-slate-200 dark:border-border">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <MessageCircle className="w-5 h-5 text-primary" />
+          <div className="flex flex-col space-y-3 lg:h-full">
+            <Card className="bg-slate-50 dark:bg-card border-slate-200 dark:border-border flex-[0.8] flex flex-col">
+              <CardHeader className="pb-3 pt-5">
+                <CardTitle className="flex items-center space-x-2 text-2xl">
+                  <MessageCircle className="w-7 h-7 text-primary" />
                   <span>Контактная информация</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="py-3 flex-1 flex items-center">
                 <div className="flex items-center space-x-3">
-                  <Mail className="w-5 h-5 text-muted-foreground" />
+                  <Mail className="w-7 h-7 text-muted-foreground" />
                   <div>
-                    <p className="font-medium">Email</p>
+                    <p className="font-medium text-lg">Email</p>
                     <a 
                       href="mailto:support@24reshai.ru" 
-                      className="text-primary hover:text-primary/80 transition-colors duration-200"
+                      className="text-primary hover:text-primary/80 transition-colors duration-200 text-lg"
                     >
                       support@24reshai.ru
                     </a>
@@ -111,38 +109,38 @@ export default function ContactsPage() {
             </Card>
 
             {/* Реквизиты */}
-            <Card className="bg-slate-50 dark:bg-card border-slate-200 dark:border-border">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <MapPin className="w-5 h-5 text-primary" />
+            <Card className="bg-slate-50 dark:bg-card border-slate-200 dark:border-border flex-[1.1] flex flex-col">
+              <CardHeader className="pb-3 pt-5">
+                <CardTitle className="flex items-center space-x-2 text-2xl">
+                  <MapPin className="w-7 h-7 text-primary" />
                   <span>Реквизиты</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="py-3 space-y-3 flex-1">
                 <div>
-                  <p className="font-medium">Индивидуальный предприниматель</p>
-                  <p className="text-muted-foreground">Бурцев Даниил Викторович</p>
+                  <p className="font-medium text-lg">Индивидуальный предприниматель</p>
+                  <p className="text-muted-foreground text-lg">Бурцев Даниил Викторович</p>
                 </div>
                 <div>
-                  <p className="font-medium">ИНН</p>
-                  <p className="text-muted-foreground font-mono">482619660921</p>
+                  <p className="font-medium text-lg">ИНН</p>
+                  <p className="text-muted-foreground font-mono text-lg">482619660921</p>
                 </div>
               </CardContent>
             </Card>
 
             {/* Время работы */}
-            <Card className="bg-slate-50 dark:bg-card border-slate-200 dark:border-border">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Clock className="w-5 h-5 text-primary" />
+            <Card className="bg-slate-50 dark:bg-card border-slate-200 dark:border-border flex-[0.8] flex flex-col">
+              <CardHeader className="pb-3 pt-5">
+                <CardTitle className="flex items-center space-x-2 text-2xl">
+                  <Clock className="w-7 h-7 text-primary" />
                   <span>Время работы</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
+              <CardContent className="py-3 flex-1">
+                <p className="text-muted-foreground text-lg">
                   Поддержка работает 24/7
                 </p>
-                <p className="text-sm text-muted-foreground/70 mt-2">
+                <p className="text-base text-muted-foreground/70 mt-2">
                   Мы отвечаем на письма в течение 24 часов
                 </p>
               </CardContent>
@@ -153,7 +151,7 @@ export default function ContactsPage() {
           <div>
             <Card className="bg-slate-50 dark:bg-card border-slate-200 dark:border-border">
               <CardHeader>
-                <CardTitle>Написать нам</CardTitle>
+                <CardTitle className="text-2xl">Написать нам</CardTitle>
               </CardHeader>
               <CardContent>
                 {isSubmitted ? (
@@ -173,14 +171,14 @@ export default function ContactsPage() {
                     </Button>
                   </div>
                 ) : (
-                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                       <div>
-                        <Label htmlFor="name">Имя *</Label>
+                        <Label htmlFor="name" className="text-base">Имя *</Label>
                         <Input 
                           id="name" 
                           placeholder="Ваше имя"
-                          className={`mt-1 ${errors.name ? 'border-red-500' : ''}`}
+                          className={`mt-2 h-12 text-base ${errors.name ? 'border-red-500' : ''}`}
                           {...register('name')}
                         />
                         {errors.name && (
@@ -188,12 +186,12 @@ export default function ContactsPage() {
                         )}
                       </div>
                       <div>
-                        <Label htmlFor="email">Email *</Label>
+                        <Label htmlFor="email" className="text-base">Email *</Label>
                         <Input 
                           id="email" 
                           type="email" 
                           placeholder="your@email.com"
-                          className={`mt-1 ${errors.email ? 'border-red-500' : ''}`}
+                          className={`mt-2 h-12 text-base ${errors.email ? 'border-red-500' : ''}`}
                           {...register('email')}
                         />
                         {errors.email && (
@@ -203,22 +201,11 @@ export default function ContactsPage() {
                     </div>
                     
                     <div>
-                      <Label htmlFor="phone">Телефон</Label>
-                      <Input 
-                        id="phone" 
-                        type="tel" 
-                        placeholder="+7 (XXX) XXX-XX-XX"
-                        className="mt-1"
-                        {...register('phone')}
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="subject">Тема *</Label>
+                      <Label htmlFor="subject" className="text-base">Тема *</Label>
                       <Input 
                         id="subject" 
                         placeholder="Тема сообщения"
-                        className={`mt-1 ${errors.subject ? 'border-red-500' : ''}`}
+                        className={`mt-2 h-12 text-base ${errors.subject ? 'border-red-500' : ''}`}
                         {...register('subject')}
                       />
                       {errors.subject && (
@@ -227,12 +214,12 @@ export default function ContactsPage() {
                     </div>
                     
                     <div>
-                      <Label htmlFor="message">Сообщение *</Label>
+                      <Label htmlFor="message" className="text-base">Сообщение *</Label>
                       <Textarea 
                         id="message" 
                         placeholder="Ваше сообщение..."
-                        rows={5}
-                        className={`mt-1 ${errors.message ? 'border-red-500' : ''}`}
+                        rows={8}
+                        className={`mt-2 min-h-[160px] text-base ${errors.message ? 'border-red-500' : ''}`}
                         {...register('message')}
                       />
                       {errors.message && (
