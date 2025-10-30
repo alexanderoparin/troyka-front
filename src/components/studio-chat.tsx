@@ -434,10 +434,11 @@ export function StudioChat({
           duration: 1500,
         })
       } else {
-        throw new Error(response.error || 'Ошибка генерации')
+        throw { status: response.status, message: response.error }
       }
     } catch (error) {
-      const formatted = formatApiError((error as any)?.message || error)
+      const e: any = error
+      const formatted = formatApiError(e?.status ? e : ((e as any)?.message || e))
       toast({
         title: formatted.title,
         description: formatted.description,

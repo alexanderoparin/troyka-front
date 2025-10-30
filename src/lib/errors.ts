@@ -28,8 +28,44 @@ export function formatApiError(raw: unknown): FormattedError {
     description: 'Не удалось создать изображение. Попробуйте ещё раз позже.'
   }
 
-  const message = typeof raw === 'string' ? raw : (raw as any)?.message || ''
-  const lower = message.toLowerCase()
+  const hasStatus = typeof (raw as any)?.status === 'number'
+  const status: number | undefined = hasStatus ? (raw as any).status : undefined
+  const message = hasStatus ? ((raw as any).message || (raw as any).error || '') : (typeof raw === 'string' ? raw : (raw as any)?.message || '')
+  const lower = String(message).toLowerCase()
+
+  // Приоритетная обработка по HTTP-статусу (если есть)
+  if (typeof status === 'number') {
+    if (status === 422) {
+      return {
+        title: 'Невозможно обработать запрос',
+        description: 'Проверьте загруженное изображение и параметры, затем попробуйте снова.'
+      }
+    }
+    if (status === 429) {
+      return {
+        title: 'Слишком много запросов',
+        description: 'Подождите немного и попробуйте снова.'
+      }
+    }
+    if (status === 400) {
+      return {
+        title: 'Некорректный запрос',
+        description: 'Проверьте параметры и попробуйте снова.'
+      }
+    }
+    if (status === 401 || status === 403) {
+      return {
+        title: 'Сервис генерации недоступен',
+        description: 'Попробуйте позже. Если проблема повторяется — напишите в поддержку.'
+      }
+    }
+    if (status >= 500 || status === 502 || status === 503 || status === 504) {
+      return {
+        title: 'Сервис генерации недоступен',
+        description: 'Попробуйте позже. Если проблема повторяется — напишите в поддержку.'
+      }
+    }
+  }
 
   // Недостаточно поинтов
   if (lower.includes('недостаточно поинтов')) {
@@ -47,8 +83,12 @@ export function formatApiError(raw: unknown): FormattedError {
     }
   }
 
-  // Ответ FAL — всегда дружелюбное сообщение, без статуса и причин
-  if (lower.includes('сервис fal.ai вернул ошибку')) {
+  // Ответ от сервиса генерации/FAL — всегда дружелюбное сообщение, без статуса и причин
+  if (
+    lower.includes('сервис генерации вернул ошибку') ||
+    lower.includes('сервис генерации недоступен') ||
+    lower.includes('fal.ai')
+  ) {
     return {
       title: 'Сервис генерации недоступен',
       description: 'Попробуйте изменить параметры или загрузить другое изображение.'

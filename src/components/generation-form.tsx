@@ -179,11 +179,11 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
         setValue("prompt", "")
         setUploadedImages([])
       } else {
-        throw new Error(response.error || "Ошибка генерации")
+        throw { status: response.status, message: response.error }
       }
       
     } catch (error: any) {
-      const formatted = formatApiError(error?.message || error)
+      const formatted = formatApiError(error?.status ? error : (error?.message || error))
       toast({
         title: formatted.title,
         description: formatted.description,
