@@ -104,6 +104,16 @@ export function StudioChat({
       const response = await apiClient.getArtStyles()
       if (response.data && response.data.length > 0) {
         setArtStyles(response.data)
+        // Если у пользователя ещё нет выбранного стиля, устанавливаем дефолт
+        if (typeof window !== 'undefined') {
+          const saved = localStorage.getItem('studio-artStyle')
+          if (!saved) {
+            const hasRealistic = response.data.some(s => s.name === 'Реалистичный')
+            const initialStyle = hasRealistic ? 'Реалистичный' : response.data[0].name
+            setArtStyle(initialStyle)
+            localStorage.setItem('studio-artStyle', initialStyle)
+          }
+        }
       } else {
         // Fallback к статичным стилям если API не отвечает
         setArtStyles([
@@ -126,6 +136,14 @@ export function StudioChat({
           { name: 'Готика', prompt: 'gothic art, dark atmosphere, mysterious mood' },
           { name: 'Футуризм', prompt: 'futuristic style, sci-fi aesthetic, cyberpunk elements' }
         ])
+        // При отсутствии данных от API тоже проставляем дефолт, если не сохранён
+        if (typeof window !== 'undefined') {
+          const saved = localStorage.getItem('studio-artStyle')
+          if (!saved) {
+            setArtStyle('Реалистичный')
+            localStorage.setItem('studio-artStyle', 'Реалистичный')
+          }
+        }
       }
     }
     loadArtStyles()
