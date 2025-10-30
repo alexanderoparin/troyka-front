@@ -27,6 +27,7 @@ import { cn } from "@/lib/utils"
 import { useToast } from "@/components/ui/use-toast"
 import { useAuth } from "@/contexts/auth-context"
 import { apiClient } from "@/lib/api-client"
+import { formatApiError } from "@/lib/errors"
 import {
   Tooltip,
   TooltipContent,
@@ -436,31 +437,21 @@ export function StudioChat({
         throw new Error(response.error || 'Ошибка генерации')
       }
     } catch (error) {
-      const message = (error as any)?.message as string | undefined
-      const notEnoughPoints = message?.toLowerCase().includes("недостаточно поинтов")
-
-      if (notEnoughPoints) {
-        toast({
-          title: "Недостаточно поинтов",
-          description: "Для генерации не хватает поинтов. Купите пакет, чтобы продолжить.",
-          action: (
-            <a
-              href="/pricing"
-              className="ml-2 inline-flex h-12 items-center justify-center rounded-md bg-primary px-4 text-base font-medium text-primary-foreground hover:opacity-90"
-            >
-              Купить поинты
-            </a>
-          ),
-          variant: "default",
-          duration: 20000,
-        })
-      } else {
+      const formatted = formatApiError((error as any)?.message || error)
       toast({
-        title: "Ошибка генерации",
-        description: "Не удалось создать изображения",
-        variant: "destructive",
+        title: formatted.title,
+        description: formatted.description,
+        variant: formatted.title === 'Недостаточно поинтов' ? 'default' : 'destructive',
+        action: formatted.title === 'Недостаточно поинтов' ? (
+          <a
+            href="/pricing"
+            className="ml-2 inline-flex h-12 items-center justify-center rounded-md bg-primary px-4 text-base font-medium text-primary-foreground hover:opacity-90"
+          >
+            Купить поинты
+          </a>
+        ) : undefined,
+        duration: formatted.title === 'Недостаточно поинтов' ? 20000 : 6000,
       })
-      }
     } finally {
       setIsGenerating(false)
     }

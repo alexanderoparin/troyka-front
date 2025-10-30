@@ -18,6 +18,7 @@ import {
 import { cn } from "@/lib/utils"
 import { useToast } from "@/components/ui/use-toast"
 import Image from "next/image"
+import { formatApiError } from "@/lib/errors"
 
 interface StudioDialogProps {
   onGenerationComplete: (images: string[]) => void
@@ -65,10 +66,12 @@ export function StudioDialog({
         description: `Создано ${mockImages.length} изображений`,
       })
     } catch (error) {
+      const formatted = formatApiError((error as any)?.message || error)
       toast({
-        title: "Ошибка генерации",
-        description: "Не удалось создать изображения",
-        variant: "destructive",
+        title: formatted.title,
+        description: formatted.description,
+        variant: formatted.title === 'Недостаточно поинтов' ? 'default' : 'destructive',
+        duration: formatted.title === 'Недостаточно поинтов' ? 20000 : 6000,
       })
     } finally {
       setIsGenerating(false)

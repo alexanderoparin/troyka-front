@@ -14,6 +14,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { getPointsText } from "@/lib/grammar";
 import { getRequiredPoints } from "@/lib/config";
+import { formatApiError } from "@/lib/errors";
 
 interface ImageEditButtonProps {
   imageUrl: string;
@@ -116,31 +117,21 @@ export function ImageEditButton({
       }
       
     } catch (error: any) {
-      const message = error?.message as string | undefined
-      const notEnoughPoints = message?.toLowerCase().includes("недостаточно поинтов")
-
-      if (notEnoughPoints) {
-        toast({
-          title: "Недостаточно поинтов",
-          description: `Требуется ${getPointsText(requiredPoints)}, у вас ${getPointsText(points)}. Купите поинты, чтобы продолжить`,
-          action: (
-            <a
-              href="/pricing"
-              className="ml-2 inline-flex h-12 items-center justify-center rounded-md bg-primary px-4 text-base font-medium text-primary-foreground hover:opacity-90"
-            >
-              Купить поинты
-            </a>
-          ),
-          variant: "default",
-          duration: 20000,
-        })
-      } else {
-        toast({
-          title: "Ошибка редактирования",
-          description: error.message || "Не удалось отредактировать изображение",
-          variant: "destructive",
-        })
-      }
+      const formatted = formatApiError(error?.message || error)
+      toast({
+        title: formatted.title,
+        description: formatted.description,
+        variant: formatted.title === 'Недостаточно поинтов' ? 'default' : 'destructive',
+        action: formatted.title === 'Недостаточно поинтов' ? (
+          <a
+            href="/pricing"
+            className="ml-2 inline-flex h-12 items-center justify-center rounded-md bg-primary px-4 text-base font-medium text-primary-foreground hover:opacity-90"
+          >
+            Купить поинты
+          </a>
+        ) : undefined,
+        duration: formatted.title === 'Недостаточно поинтов' ? 20000 : 6000,
+      })
     } finally {
       setIsEditing(false);
     }
