@@ -47,27 +47,11 @@ export function formatApiError(raw: unknown): FormattedError {
     }
   }
 
-  // Ответ FAL с деталями
+  // Ответ FAL — всегда дружелюбное сообщение, без статуса и причин
   if (lower.includes('сервис fal.ai вернул ошибку')) {
-    const bodyText = extractFalBody(message)
-    const bodyJson = tryParseJson(bodyText)
-
-    if (bodyJson) {
-      const detail = bodyJson.detail || bodyJson.error || bodyJson.message
-      if (typeof detail === 'string' && detail.trim().length > 0) {
-        return { title: 'Ошибка генерации', description: detail }
-      }
-      // Частые структуры FAL
-      const firstErr = Array.isArray(bodyJson.errors) ? bodyJson.errors[0] : null
-      if (firstErr && typeof firstErr.message === 'string') {
-        return { title: 'Ошибка генерации', description: firstErr.message }
-      }
-    }
-
-    // Если не json — покажем весь хвост как есть, но коротко
-    if (bodyText) {
-      const short = bodyText.length > 300 ? bodyText.slice(0, 300) + '…' : bodyText
-      return { title: 'Ошибка генерации', description: short }
+    return {
+      title: 'Сервис генерации недоступен',
+      description: 'Попробуйте изменить параметры или загрузить другое изображение.'
     }
   }
 
