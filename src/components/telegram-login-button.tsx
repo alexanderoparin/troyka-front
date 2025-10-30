@@ -96,8 +96,11 @@ export const TelegramLoginButton = ({
       if (containerRef.current) {
         const iframe = containerRef.current.querySelector('iframe')
         if (iframe) {
+          // Центрируем кнопку внутри и убираем растягивание на всю ширину
           iframe.style.maxWidth = '100%'
-          iframe.style.width = '100%'
+          iframe.style.width = 'auto'
+          iframe.style.display = 'block'
+          iframe.style.margin = '0 auto'
           iframe.style.overflow = 'visible'
           // Добавляем padding для предотвращения обрезки аватара
           if (containerRef.current.parentElement) {
