@@ -6,10 +6,12 @@ import { EmailVerificationBanner } from "@/components/email-verification-banner"
 import { StudioSessions } from "@/components/studio-sessions"
 import { StudioChat } from "@/components/studio-chat"
 import { Header } from "@/components/header"
-import { AlertCircle, User, Eye, Menu } from "lucide-react"
+import { AlertCircle, User, Eye, Menu, ArrowLeft } from "lucide-react"
+import Footer from "@/components/footer"
 import { getPointsText } from "@/lib/grammar"
 import Link from "next/link"
 import { useState, useCallback, useEffect } from "react"
+import Image from "next/image"
 import { useDefaultSession, useSessionsList } from "@/hooks/use-sessions-list"
 import { useToast } from "@/components/ui/use-toast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
@@ -30,6 +32,7 @@ export default function StudioPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [selectedSession, setSelectedSession] = useState<any>(null)
   const [renameSessionName, setRenameSessionName] = useState("")
+  
   
   // Получаем дефолтную сессию
   const { defaultSession, isLoading: isLoadingDefaultSession } = useDefaultSession()
@@ -196,26 +199,63 @@ export default function StudioPage() {
   // Если пользователь не авторизован
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5">
-        <div className="text-center space-y-6 p-8">
-          <div className="w-20 h-20 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
-            <User className="h-10 w-10 text-primary" />
-          </div>
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold">Добро пожаловать в студию!</h1>
-            <p className="text-muted-foreground text-lg">
-              Войдите в аккаунт, чтобы начать создавать изображения
-            </p>
-          </div>
-          <div className="flex gap-4 justify-center">
-            <Link href="/login">
-              <Button size="lg">Войти</Button>
-            </Link>
-            <Link href="/register">
-              <Button variant="outline" size="lg">Регистрация</Button>
-            </Link>
+      <div className="relative bg-white dark:bg-slate-900 min-h-screen flex flex-col">
+        <div className="fixed inset-0 bg-white dark:bg-slate-900 pointer-events-none -z-10"></div>
+        <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,_rgba(59,130,246,0.3)_0%,_transparent_70%)] dark:bg-[radial-gradient(circle_at_center,_rgba(59,130,246,0.3)_0%,_transparent_70%)] pointer-events-none -z-10"></div>
+
+        {/* Верхний хедер с навигацией */}
+        <Header />
+
+        <div className="flex justify-center relative z-10 py-3 sm:py-5 flex-1">
+          <div className="w-full max-w-5xl flex">
+            {/* Left Side - Hero Panel (как на странице входа) */}
+            <div className="hidden lg:flex lg:w-2/5 lg:h-[82vh] relative overflow-hidden">
+              <div className="absolute top-20 left-20 w-2 h-2 bg-blue-300 dark:bg-blue-300 rounded-full animate-pulse opacity-60 dark:opacity-80 z-10"></div>
+              <div className="absolute top-32 right-32 w-3 h-3 bg-blue-300 dark:bg-blue-300 rounded-full animate-pulse opacity-60 dark:opacity-80 z-10" style={{ animationDelay: '0.5s' }}></div>
+              <div className="absolute bottom-32 left-32 w-2 h-2 bg-blue-300 dark:bg-blue-300 rounded-full animate-pulse opacity-60 dark:opacity-80 z-10" style={{ animationDelay: '1s' }}></div>
+              <div className="absolute bottom-20 right-20 w-3 h-3 bg-blue-300 dark:bg-blue-300 rounded-full animate-pulse opacity-60 dark:opacity-80 z-10" style={{ animationDelay: '1.5s' }}></div>
+              <div className="absolute top-1/2 left-1/4 w-1 h-1 bg-blue-200 dark:bg-blue-200 rounded-full animate-pulse opacity-80 dark:opacity-90 z-10" style={{ animationDelay: '0.3s' }}></div>
+              <div className="absolute top-1/3 right-1/4 w-1 h-1 bg-blue-200 dark:bg-blue-200 rounded-full animate-pulse opacity-80 dark:opacity-90 z-10" style={{ animationDelay: '0.8s' }}></div>
+
+              <div className="relative z-10 w-full h-full flex items-center justify-center p-8">
+                <div className="relative w-72 h-72 max-w-full max-h-full">
+                  <Image
+                    src="/login-hero.png"
+                    alt="24reshai Logo"
+                    fill
+                    className="object-contain drop-shadow-2xl"
+                    priority
+                    sizes="320px"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Right Side - Call to login only */}
+            <div className="w-full lg:w-3/5 flex items-center justify-center relative z-10 p-4 sm:p-5 lg:p-6 lg:px-5">
+              <div className="w-full max-w-md lg:max-w-lg space-y-4 text-center">
+                <div className="space-y-2">
+                  <h1 className="text-xl sm:text-2xl font-bold">Добро пожаловать в студию!</h1>
+                  <p className="text-sm text-muted-foreground">Войдите, чтобы начать создавать изображения</p>
+                </div>
+                <div>
+                  <Link href="/login">
+                    <Button size="lg" className="w-full sm:w-auto">Войти</Button>
+                  </Link>
+                </div>
+                <div className="text-center pt-1">
+                  <Button variant="ghost" asChild>
+                    <Link href="/" className="flex items-center gap-2 justify-center">
+                      <ArrowLeft className="w-4 h-4" />
+                      На главную
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+        <Footer />
       </div>
     )
   }

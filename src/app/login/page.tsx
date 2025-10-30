@@ -107,7 +107,7 @@ export default function LoginPage() {
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,_rgba(59,130,246,0.3)_0%,_transparent_70%)] dark:bg-[radial-gradient(circle_at_center,_rgba(59,130,246,0.3)_0%,_transparent_70%)] pointer-events-none -z-10"></div>
       
       {/* Container для центрирования */}
-      <div className="flex justify-center relative z-10 py-2 sm:py-4 lg:py-2">
+      <div className="flex justify-center relative z-10 py-1 sm:py-3 lg:py-1">
         <div className="w-full max-w-5xl flex">
         {/* Left Side - Hero Panel */}
         <div className="hidden lg:flex lg:w-2/5 lg:h-screen relative overflow-hidden">
@@ -120,7 +120,7 @@ export default function LoginPage() {
           <div className="absolute top-1/3 right-1/4 w-1 h-1 bg-blue-200 dark:bg-blue-200 rounded-full animate-pulse opacity-80 dark:opacity-90 z-10" style={{ animationDelay: '0.8s' }}></div>
           
           {/* Logo Image - Reduced size */}
-          <div className="relative z-10 w-full h-full flex items-center justify-center p-12">
+          <div className="relative z-10 w-full h-full flex items-center justify-center p-8">
             <div className="relative w-72 h-72 max-w-full max-h-full">
               <Image
                 src="/login-hero.png"
@@ -135,7 +135,7 @@ export default function LoginPage() {
         </div>
 
         {/* Right Side - Login Form */}
-        <div className="w-full lg:w-3/5 flex items-center justify-center relative z-10 p-4 sm:p-6 lg:p-8 lg:px-6">
+        <div className="w-full lg:w-3/5 flex items-center justify-center relative z-10 p-3 sm:p-5 lg:p-6 lg:px-5">
           <div className="w-full max-w-md lg:max-w-lg space-y-4">
             {/* Header */}
             <div className="space-y-1">
