@@ -64,7 +64,7 @@ export default function RegisterPage() {
       if (result.success) {
         toast({
           title: "Регистрация успешна!",
-          description: "Можете сразу пользоваться студией. Письмо подтверждения отправлено на почту (необязательно).",
+          description: "Можно начинать создавать изображения.",
         })
         router.push("/studio")
       } else {
