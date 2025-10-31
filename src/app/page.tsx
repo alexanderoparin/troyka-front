@@ -16,7 +16,7 @@ export default function HomePage() {
       {/* Background for entire page */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(59,130,246,0.3)_0%,_transparent_70%)] dark:bg-[radial-gradient(circle_at_center,_rgba(59,130,246,0.3)_0%,_transparent_70%)] pointer-events-none -z-10" />
       
-      {/* Decorative stars/particles - равномерно по всей странице */}
+      {/* Decorative stars/particles - равномерно по всей странице, на заднем фоне */}
       <div className="absolute top-20 left-[15%] w-2 h-2 bg-blue-300 dark:bg-blue-300 rounded-full animate-pulse opacity-60 dark:opacity-80 z-0 pointer-events-none"></div>
       <div className="absolute top-32 left-[85%] w-3 h-3 bg-blue-300 dark:bg-blue-300 rounded-full animate-pulse opacity-60 dark:opacity-80 z-0 pointer-events-none" style={{ animationDelay: '0.5s' }}></div>
       <div className="absolute top-[400px] left-[25%] w-2 h-2 bg-blue-300 dark:bg-blue-300 rounded-full animate-pulse opacity-60 dark:opacity-80 z-0 pointer-events-none" style={{ animationDelay: '1s' }}></div>
@@ -49,7 +49,7 @@ export default function HomePage() {
         <div className="absolute top-0 right-0 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-blob-1 -z-10" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-blob-2 -z-10" />
 
-        <div className="max-w-7xl mx-auto w-full px-4 relative z-10">
+        <div className="max-w-7xl mx-auto w-full px-4 relative z-[1]">
           <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-8 lg:gap-12">
             {/* Left Side - Content */}
             <div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-6 lg:w-1/2">
