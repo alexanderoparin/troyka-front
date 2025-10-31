@@ -28,7 +28,7 @@ export default function HomePage() {
             <div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-6 lg:w-1/2">
               <Badge variant="secondary" className="text-sm bg-gradient-to-r from-primary/10 to-blue-500/10 text-primary border-primary/20 dark:bg-primary/20 dark:text-primary-foreground dark:border-primary/30 px-4 py-2 rounded-full w-fit animate-ios-fade-in">
                 <Sparkles className="w-3 h-3 mr-2" />
-                Революция в создании изображений с ИИ
+                Революция в создании изображений с искусственным интеллектом
               </Badge>
               
               <div className="space-y-4 max-w-2xl">
@@ -50,13 +50,6 @@ export default function HomePage() {
                     <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform" />
                   </button>
                 </Link>
-                {!isAuthenticated && (
-                  <Link href="/login" className="flex-1">
-                    <button className="btn-ios-ghost px-8 py-4 text-headline w-full flex items-center justify-center">
-                      Войти в аккаунт
-                    </button>
-                  </Link>
-                )}
               </div>
 
               {/* Features - Quick Stats */}
@@ -246,45 +239,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="space-y-8 px-4 py-12 sm:py-16">
-        <div className="max-w-4xl mx-auto text-center space-y-6 sm:space-y-8">
-          <div className="space-y-4">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
-              Готовы начать создавать?
-            </h2>
-            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-              Присоединяйтесь к тысячам пользователей, которые уже создают профессиональные изображения с помощью ИИ
-            </p>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/studio">
-              <button className="btn-ios-primary px-8 py-4 text-headline flex items-center justify-center group min-w-[200px]">
-                <Sparkles className="w-5 h-5 mr-3 group-hover:rotate-12 transition-transform" />
-                {isAuthenticated ? "Открыть студию" : "Начать бесплатно"}
-                <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform" />
-              </button>
-            </Link>
-            {!isAuthenticated && (
-              <Link href="/register">
-                <button className="btn-ios-ghost px-8 py-4 text-headline flex items-center justify-center min-w-[200px]">
-                  Зарегистрироваться
-                </button>
-              </Link>
-            )}
-          </div>
-
-          {!isAuthenticated && (
-            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground pt-4">
-              <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-              <span>{getPointsText(config.REGISTRATION_POINTS)} при регистрации</span>
-              <span className="mx-2">•</span>
-              <span>Без кредитной карты</span>
-            </div>
-          )}
-        </div>
-      </section>
     </div>
   )
 }
