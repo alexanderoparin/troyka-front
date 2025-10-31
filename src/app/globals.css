@@ -582,6 +582,10 @@
   .transition-ios-slow {
     transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
+  
+  .duration-600 {
+    transition-duration: 600ms;
+  }
 }
 
 /* iOS Keyframe Animations */
@@ -648,6 +652,28 @@
 
 .scroll-horizontal:hover {
   animation-play-state: paused;
+}
+
+/* Card Flip Animation */
+@keyframes card-flip {
+  0% {
+    transform: perspective(1000px) rotateY(0deg);
+  }
+  50% {
+    transform: perspective(1000px) rotateY(90deg);
+  }
+  100% {
+    transform: perspective(1000px) rotateY(0deg);
+  }
+}
+
+.card-flipping {
+  animation: card-flip 3s ease-in-out;
+  transform-style: preserve-3d;
+}
+
+.duration-3000 {
+  transition-duration: 3000ms;
 }
 
 /* Blob Animations for Studio Page */
