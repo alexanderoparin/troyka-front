@@ -103,8 +103,12 @@ export function StudioChat({
   useEffect(() => {
     const loadArtStyles = async () => {
       const response = await apiClient.getArtStyles()
+      // Опция "Без стиля" всегда первая
+      const noStyleOption = { name: 'Без стиля', prompt: '' }
+      
       if (response.data && response.data.length > 0) {
-        setArtStyles(response.data)
+        // Добавляем "Без стиля" в начало списка
+        setArtStyles([noStyleOption, ...response.data])
         // Если у пользователя ещё нет выбранного стиля, устанавливаем дефолт
         if (typeof window !== 'undefined') {
           const saved = localStorage.getItem('studio-artStyle')
@@ -117,7 +121,7 @@ export function StudioChat({
         }
       } else {
         // Fallback к статичным стилям если API не отвечает
-        setArtStyles([
+        const fallbackStyles = [
           { name: 'Реалистичный', prompt: 'photorealistic, high quality, detailed, professional photography' },
           { name: 'Аниме', prompt: 'anime style, manga art, vibrant colors, Japanese animation' },
           { name: 'Пиксель-арт', prompt: 'pixel art, 8-bit style, retro gaming aesthetic' },
@@ -136,7 +140,9 @@ export function StudioChat({
           { name: 'Минимализм', prompt: 'minimalist art, clean composition, simple background' },
           { name: 'Готика', prompt: 'gothic art, dark atmosphere, mysterious mood' },
           { name: 'Футуризм', prompt: 'futuristic style, sci-fi aesthetic, cyberpunk elements' }
-        ])
+        ]
+        // Добавляем "Без стиля" в начало fallback списка
+        setArtStyles([noStyleOption, ...fallbackStyles])
         // При отсутствии данных от API тоже проставляем дефолт, если не сохранён
         if (typeof window !== 'undefined') {
           const saved = localStorage.getItem('studio-artStyle')

@@ -24,6 +24,7 @@ const generationSchema = z.object({
 type GenerationFormData = z.infer<typeof generationSchema>
 
 const ART_STYLES = [
+  { name: 'Без стиля', prompt: '' },
   { name: 'Реалистичный', prompt: 'photorealistic, high quality, detailed, professional photography' },
   { name: 'Аниме', prompt: 'anime style, manga art, vibrant colors, Japanese animation' },
   { name: 'Пиксель-арт', prompt: 'pixel art, 8-bit style, retro gaming aesthetic' },
