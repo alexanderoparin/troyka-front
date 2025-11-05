@@ -229,26 +229,26 @@ export default function StudioPage() {
                   />
                 </div>
               </div>
-            </div>
+          </div>
 
             {/* Right Side - Call to login only */}
             <div className="w-full lg:w-3/5 flex items-center justify-center relative z-10 p-4 sm:p-5 lg:p-6 lg:px-5">
               <div className="w-full max-w-md lg:max-w-lg space-y-4 text-center">
-                <div className="space-y-2">
+          <div className="space-y-2">
                   <h1 className="text-xl sm:text-2xl font-bold">Добро пожаловать в студию!</h1>
                   <p className="text-sm text-muted-foreground">Войдите, чтобы начать создавать изображения</p>
-                </div>
+          </div>
                 <div>
-                  <Link href="/login">
+            <Link href="/login">
                     <Button size="lg" className="w-full sm:w-auto">Войти</Button>
-                  </Link>
+            </Link>
                 </div>
                 <div className="text-center pt-1">
                   <Button variant="ghost" asChild>
                     <Link href="/" className="flex items-center gap-2 justify-center">
                       <ArrowLeft className="w-4 h-4" />
                       На главную
-                    </Link>
+            </Link>
                   </Button>
                 </div>
               </div>

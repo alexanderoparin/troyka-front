@@ -112,11 +112,12 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
     setIsGenerating(true)
 
     try {
-      // Добавляем стиль к промпту
+      // Находим стиль и получаем его id (нужно будет получить из API, пока используем fallback)
+      // Для generation-form нужно получить стили из API или использовать fallback
+      // Пока используем дефолтное значение 1 (Без стиля)
       const selectedStyle = ART_STYLES.find(style => style.name === artStyle)
-      const promptWithStyle = selectedStyle?.prompt 
-        ? `${data.prompt}, ${selectedStyle.prompt}` 
-        : data.prompt
+      // TODO: Получать id стиля из API, пока используем дефолтное значение
+      const styleId = 1 // Будет обновлено после получения стилей из API
       
       // Обрабатываем загруженные изображения - загружаем blob URL'ы на сервер
       let processedImageUrls: string[] = []
@@ -148,11 +149,12 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
       }
       
       const request: ImageRequest = {
-        prompt: promptWithStyle,
+        prompt: data.prompt, // Оригинальный промпт пользователя (промпт стиля добавится на бэке перед отправкой в FalAI)
         inputImageUrls: processedImageUrls,
         numImages: data.numImages,
         outputFormat: data.outputFormat,
-        sessionId: sessionId
+        sessionId: sessionId,
+        styleId: styleId
       }
 
       const response = await apiClient.generateImage(request)

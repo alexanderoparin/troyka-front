@@ -31,6 +31,7 @@ export interface ImageRequest {
   numImages?: number;
   outputFormat?: 'JPEG' | 'PNG';
   sessionId?: number;
+  styleId?: number;
 }
 
 export interface ImageResponse {
@@ -58,6 +59,8 @@ export interface SessionMessage {
   imageCount: number;
   outputFormat: string;
   description?: string;
+  styleId?: number;
+  styleName?: string;
 }
 
 export interface SessionDetail {
@@ -166,8 +169,18 @@ export interface ContactResponse {
 
 // Art Style interfaces
 export interface ArtStyle {
+  id: number;
   name: string;
   prompt: string;
+}
+
+export interface UserArtStyle {
+  styleId: number;
+  styleName: string;
+}
+
+export interface UpdateUserArtStyleRequest {
+  styleId: number;
 }
 
 // Telegram OAuth interfaces
@@ -896,6 +909,17 @@ class ApiClient {
   // Get all art styles
   async getArtStyles(): Promise<ApiResponse<ArtStyle[]>> {
     return this.request<ArtStyle[]>('/api/art-styles');
+  }
+
+  async getUserArtStyle(): Promise<ApiResponse<UserArtStyle>> {
+    return this.request<UserArtStyle>('/api/art-styles/user');
+  }
+
+  async updateUserArtStyle(styleId: number): Promise<ApiResponse<{ message: string }>> {
+    return this.request<{ message: string }>('/api/art-styles/user', {
+      method: 'PUT',
+      body: JSON.stringify({ styleId }),
+    });
   }
 
 }

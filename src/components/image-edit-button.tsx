@@ -118,20 +118,20 @@ export function ImageEditButton({
       
     } catch (error: any) {
       const formatted = formatApiError(error?.status ? error : (error?.message || error))
-      toast({
+        toast({
         title: formatted.title,
         description: formatted.description,
         variant: formatted.title === 'Недостаточно поинтов' ? 'default' : 'destructive',
         action: formatted.title === 'Недостаточно поинтов' ? (
-          <a
-            href="/pricing"
-            className="ml-2 inline-flex h-12 items-center justify-center rounded-md bg-primary px-4 text-base font-medium text-primary-foreground hover:opacity-90"
-          >
-            Купить поинты
-          </a>
+            <a
+              href="/pricing"
+              className="ml-2 inline-flex h-12 items-center justify-center rounded-md bg-primary px-4 text-base font-medium text-primary-foreground hover:opacity-90"
+            >
+              Купить поинты
+            </a>
         ) : undefined,
         duration: formatted.title === 'Недостаточно поинтов' ? 20000 : 6000,
-      })
+        })
     } finally {
       setIsEditing(false);
     }

@@ -26,7 +26,7 @@ import {
 import { cn } from "@/lib/utils"
 import { useToast } from "@/components/ui/use-toast"
 import { useAuth } from "@/contexts/auth-context"
-import { apiClient } from "@/lib/api-client"
+import { apiClient, ArtStyle } from "@/lib/api-client"
 import { formatApiError } from "@/lib/errors"
 import {
   Tooltip,
@@ -97,58 +97,59 @@ export function StudioChat({
   const [isDragOver, setIsDragOver] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isEditingMode, setIsEditingMode] = useState(false)
-  const [artStyles, setArtStyles] = useState<{ name: string; prompt: string }[]>([])
+  const [artStyles, setArtStyles] = useState<ArtStyle[]>([])
   
-  // Загружаем стили из базы данных при монтировании компонента
+  // Загружаем стили из базы данных и сохраненный стиль пользователя при монтировании компонента
   useEffect(() => {
     const loadArtStyles = async () => {
       const response = await apiClient.getArtStyles()
-      // Опция "Без стиля" всегда первая
-      const noStyleOption = { name: 'Без стиля', prompt: '' }
       
       if (response.data && response.data.length > 0) {
-        // Добавляем "Без стиля" в начало списка
-        setArtStyles([noStyleOption, ...response.data])
-        // Если у пользователя ещё нет выбранного стиля, устанавливаем дефолт
-        if (typeof window !== 'undefined') {
-          const saved = localStorage.getItem('studio-artStyle')
-          if (!saved) {
-            const hasRealistic = response.data.some(s => s.name === 'Реалистичный')
-            const initialStyle = hasRealistic ? 'Реалистичный' : response.data[0].name
-            setArtStyle(initialStyle)
-            localStorage.setItem('studio-artStyle', initialStyle)
+        // Используем стили из API (включая "Без стиля" с id=1)
+        setArtStyles(response.data)
+        
+        // Загружаем сохраненный стиль пользователя из БД
+        const userStyleResponse = await apiClient.getUserArtStyle()
+        if (userStyleResponse.data?.styleName) {
+          const savedStyleName = userStyleResponse.data.styleName
+          const savedStyleId = userStyleResponse.data.styleId
+          const savedStyle = response.data.find(s => s.name === savedStyleName || s.id === savedStyleId)
+          if (savedStyle) {
+            setArtStyle(savedStyle.name)
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('studio-artStyle', savedStyle.name)
+            }
+            return
           }
         }
-      } else {
-        // Fallback к статичным стилям если API не отвечает
-        const fallbackStyles = [
-          { name: 'Реалистичный', prompt: 'photorealistic, high quality, detailed, professional photography' },
-          { name: 'Аниме', prompt: 'anime style, manga art, vibrant colors, Japanese animation' },
-          { name: 'Пиксель-арт', prompt: 'pixel art, 8-bit style, retro gaming aesthetic' },
-          { name: 'Масляная живопись', prompt: 'oil painting, classical art style, brushstrokes visible' },
-          { name: 'Акварель', prompt: 'watercolor painting, soft brushstrokes, translucent colors' },
-          { name: 'Цифровая живопись', prompt: 'digital art, concept art style, clean lines' },
-          { name: 'Карандашный рисунок', prompt: 'pencil sketch, hand-drawn illustration, graphite shading' },
-          { name: 'Портрет', prompt: 'professional portrait photography, studio lighting, sharp focus' },
-          { name: 'Пейзаж', prompt: 'landscape photography, golden hour lighting, wide angle' },
-          { name: 'Макро', prompt: 'macro photography, extreme close-up, detailed textures' },
-          { name: 'Черно-белое', prompt: 'black and white photography, monochrome, high contrast' },
-          { name: 'HDR', prompt: 'HDR photography, high dynamic range, vibrant colors' },
-          { name: 'Винтаж', prompt: 'vintage photography, film grain, retro aesthetic' },
-          { name: 'Кинематографичный', prompt: 'cinematic lighting, movie still, dramatic composition' },
-          { name: 'Сюрреализм', prompt: 'surreal art, dreamlike atmosphere, impossible elements' },
-          { name: 'Минимализм', prompt: 'minimalist art, clean composition, simple background' },
-          { name: 'Готика', prompt: 'gothic art, dark atmosphere, mysterious mood' },
-          { name: 'Футуризм', prompt: 'futuristic style, sci-fi aesthetic, cyberpunk elements' }
-        ]
-        // Добавляем "Без стиля" в начало fallback списка
-        setArtStyles([noStyleOption, ...fallbackStyles])
-        // При отсутствии данных от API тоже проставляем дефолт, если не сохранён
+        
+        // Если стиль не найден в БД, проверяем localStorage или устанавливаем дефолт
         if (typeof window !== 'undefined') {
           const saved = localStorage.getItem('studio-artStyle')
-          if (!saved) {
-            setArtStyle('Реалистичный')
-            localStorage.setItem('studio-artStyle', 'Реалистичный')
+          if (saved) {
+            // Проверяем, что сохраненный стиль существует в списке
+            const savedStyle = response.data.find(s => s.name === saved)
+            if (savedStyle) {
+              setArtStyle(saved)
+              // Сохраняем в БД для синхронизации
+              apiClient.updateUserArtStyle(savedStyle.id).catch(() => {
+                // Игнорируем ошибки при сохранении
+              })
+              return
+            }
+          }
+          
+          // По умолчанию ставим "Реалистичный" (id=2), иначе берем первый в списке
+          const realistic = response.data.find(s => s.id === 2)
+          const initialStyle = realistic?.name || response.data[0]?.name || 'Без стиля'
+          setArtStyle(initialStyle)
+          localStorage.setItem('studio-artStyle', initialStyle)
+          // Сохраняем дефолтный стиль в БД
+          const initialStyleObj = response.data.find(s => s.name === initialStyle)
+          if (initialStyleObj) {
+            apiClient.updateUserArtStyle(initialStyleObj.id).catch(() => {
+              // Игнорируем ошибки при сохранении
+            })
           }
         }
       }
@@ -192,8 +193,16 @@ export function StudioChat({
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('studio-artStyle', artStyle)
+      
+      // Сохраняем стиль в БД при изменении
+      const selectedStyle = artStyles.find(s => s.name === artStyle)
+      if (selectedStyle) {
+        apiClient.updateUserArtStyle(selectedStyle.id).catch(() => {
+          // Игнорируем ошибки при сохранении (например, если пользователь не авторизован)
+        })
+      }
     }
-  }, [artStyle])
+  }, [artStyle, artStyles])
   
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -391,25 +400,24 @@ export function StudioChat({
 
     setIsGenerating(true)
     try {
-      // Добавляем стиль к промпту
+      // Находим стиль по имени и получаем его id
       const selectedStyle = artStyles.find(style => style.name === artStyle)
-      const promptWithStyle = selectedStyle?.prompt 
-        ? `${prompt}, ${selectedStyle.prompt}` 
-        : prompt
+      const styleId = selectedStyle?.id || 1 // По умолчанию id = 1 (Без стиля)
       
-      // Вызываем API для генерации
+      // Вызываем API для генерации (передаем styleId, на бэке промпт стиля будет добавлен к промпту перед отправкой в FalAI)
       const request = {
-        prompt: promptWithStyle,
+        prompt: prompt, // Оригинальный промпт пользователя
         inputImageUrls: uploadedImages.length > 0 ? uploadedImages : [],
         numImages: numImages,
         outputFormat: outputFormat,
-        sessionId: sessionId
+        sessionId: sessionId,
+        styleId: styleId
       }
       
       const response = await apiClient.generateImage(request)
       
       if (response.data) {
-        onGenerationComplete(response.data.imageUrls, promptWithStyle)
+        onGenerationComplete(response.data.imageUrls, prompt)
         // НЕ очищаем промпт - он остается в поле ввода
         
         // В режиме редактирования прикрепляем НОВЫЕ сгенерированные изображения
@@ -671,7 +679,7 @@ export function StudioChat({
                       <div className="flex-1">
                         <Card className="p-3 bg-muted/50 dark:bg-muted/20">
                           <p className="text-sm leading-relaxed text-foreground">
-                            {message.prompt.replace(/, (photorealistic|anime style|pixel art|oil painting|watercolor painting|digital art|pencil sketch|professional portrait|landscape photography|macro photography|black and white|HDR photography|vintage photography|cinematic lighting|surreal art|minimalist art|gothic art|futuristic style|cyberpunk style|cyberpunk elements|sci-fi aesthetic|neon-noir aesthetic|futuristic city|dense urban landscape|vibrant neon signs|dark rainy streets|8-bit style|retro gaming aesthetic|classical art style|brushstrokes visible|soft brushstrokes|translucent colors|hand-drawn illustration|graphite shading|studio lighting|sharp focus|golden hour lighting|wide angle|extreme close-up|detailed textures|monochrome|high contrast|high dynamic range|film grain|retro aesthetic|movie still|dramatic composition|dreamlike atmosphere|impossible elements|clean composition|simple background|dark atmosphere|mysterious mood|high quality|detailed|professional photography|manga art|vibrant colors|Japanese animation).*$/, '')}
+                            {message.prompt}
                           </p>
                           
                           {/* Миниатюры входных изображений */}
@@ -712,6 +720,13 @@ export function StudioChat({
                                   </div>
                                 </div>
                               ))}
+                            </div>
+                          )}
+                          
+                          {/* Информация о стиле, если есть */}
+                          {message.styleName && (
+                            <div className="mt-3 text-xs text-muted-foreground">
+                              {message.styleName}
                             </div>
                           )}
                           
