@@ -286,7 +286,7 @@ export function SessionHistory({
                   <div className="flex-1">
                     <Card className="p-3 bg-muted/50 dark:bg-muted/20">
                       <p className="text-sm">
-                        {message.prompt.replace(/, (photorealistic|anime style|pixel art|oil painting|watercolor painting|digital art|pencil sketch|professional portrait|landscape photography|macro photography|black and white|HDR photography|vintage photography|cinematic lighting|surreal art|minimalist art|gothic art|futuristic style).*$/, '')}
+                        {message.prompt.replace(/, (photorealistic|anime style|pixel art|oil painting|watercolor painting|digital art|pencil sketch|professional portrait|landscape photography|macro photography|black and white|HDR photography|vintage photography|cinematic lighting|surreal art|minimalist art|gothic art|futuristic style|cyberpunk style|cyberpunk elements|sci-fi aesthetic|neon-noir aesthetic|futuristic city|dense urban landscape|vibrant neon signs|dark rainy streets|8-bit style|retro gaming aesthetic|classical art style|brushstrokes visible|soft brushstrokes|translucent colors|hand-drawn illustration|graphite shading|studio lighting|sharp focus|golden hour lighting|wide angle|extreme close-up|detailed textures|monochrome|high contrast|high dynamic range|film grain|retro aesthetic|movie still|dramatic composition|dreamlike atmosphere|impossible elements|clean composition|simple background|dark atmosphere|mysterious mood|high quality|detailed|professional photography|manga art|vibrant colors|Japanese animation).*$/, '')}
                       </p>
                       <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
                         <span>{formatDate(message.createdAt)}</span>
@@ -304,6 +304,14 @@ export function SessionHistory({
                   </div>
                   <div className="flex-1">
                     <Card className="p-3 bg-muted/50 dark:bg-muted/20">
+                      {/* Описание от ИИ (если есть) */}
+                      {message.description && message.description.trim() && (
+                        <div className="mb-3 p-2 rounded-lg bg-primary/5 dark:bg-primary/10 border border-primary/20">
+                          <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                            {message.description}
+                          </p>
+                        </div>
+                      )}
                       <div className="flex flex-wrap gap-2">
                         {message.imageUrls.map((imageUrl, index) => (
                           <div

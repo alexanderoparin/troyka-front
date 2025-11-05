@@ -57,6 +57,7 @@ export interface SessionMessage {
   createdAt: string;
   imageCount: number;
   outputFormat: string;
+  description?: string;
 }
 
 export interface SessionDetail {
