@@ -992,30 +992,7 @@ export function StudioChat({
                       {/* Кнопки управления и генерации */}
                       <div className="flex items-end gap-1">
                         {/* Слева колонка: настройки + загрузка */}
-                      <div className="flex flex-col gap-1">
-                          {/* Кнопка улучшения промпта */}
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-10 w-10 p-0 bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 border border-purple-500/20"
-                                onClick={handleEnhancePrompt}
-                                disabled={isEnhancing || isGenerating || !prompt?.trim()}
-                                title="Улучшить промпт с помощью ИИ"
-                              >
-                                {isEnhancing ? (
-                                  <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : (
-                                  <Lightbulb className="h-4 w-4" />
-                                )}
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent className="z-[9998]">
-                              <p>{isEnhancing ? "Улучшение промпта с помощью ИИ..." : "Улучшить промпт с помощью ИИ"}</p>
-                            </TooltipContent>
-                          </Tooltip>
-
+                        <div className="flex flex-col gap-1">
                           {/* Кнопка настроек */}
                           <DropdownMenu open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                             <DropdownMenuTrigger asChild>
@@ -1031,45 +1008,43 @@ export function StudioChat({
                               <DropdownMenuLabel>Настройки генерации</DropdownMenuLabel>
                               <DropdownMenuSeparator />
                             
-                          {/* Формат изображения */}
-                            <DropdownMenuItem
-                              onClick={(e) => {
-                                e.preventDefault()
-                                setOutputFormat(prev => prev === 'JPEG' ? 'PNG' : 'JPEG')
-                              }}
-                              className="flex items-center justify-between"
-                            >
-                              <span>Формат</span>
-                              <span className="text-muted-foreground">{outputFormat}</span>
-                            </DropdownMenuItem>
-                            
-                            {/* Количество изображений */}
-                            <DropdownMenuItem
-                              onClick={(e) => {
-                                e.preventDefault()
-                                setNumImages(prev => prev >= 4 ? 1 : prev + 1)
-                              }}
-                              className="flex items-center justify-between"
-                            >
-                              <span>Количество</span>
-                              <span className="text-muted-foreground">{numImages}</span>
-                            </DropdownMenuItem>
-                            
-                            {/* Стиль */}
-                            <DropdownMenuItem
-                              onClick={(e) => {
-                                e.preventDefault()
-                                const currentIndex = artStyles.findIndex(style => style.name === artStyle)
-                                const nextIndex = (currentIndex + 1) % artStyles.length
-                                setArtStyle(artStyles[nextIndex].name)
-                              }}
-                              className="flex items-center justify-between"
-                            >
-                              <span>Стиль</span>
-                              <span className="text-muted-foreground text-xs">{artStyle}</span>
-                            </DropdownMenuItem>
-                            
-                            
+                              {/* Формат изображения */}
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  setOutputFormat(prev => prev === 'JPEG' ? 'PNG' : 'JPEG')
+                                }}
+                                className="flex items-center justify-between"
+                              >
+                                <span>Формат</span>
+                                <span className="text-muted-foreground">{outputFormat}</span>
+                              </DropdownMenuItem>
+                              
+                              {/* Количество изображений */}
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  setNumImages(prev => prev >= 4 ? 1 : prev + 1)
+                                }}
+                                className="flex items-center justify-between"
+                              >
+                                <span>Количество</span>
+                                <span className="text-muted-foreground">{numImages}</span>
+                              </DropdownMenuItem>
+                              
+                              {/* Стиль */}
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  const currentIndex = artStyles.findIndex(style => style.name === artStyle)
+                                  const nextIndex = (currentIndex + 1) % artStyles.length
+                                  setArtStyle(artStyles[nextIndex].name)
+                                }}
+                                className="flex items-center justify-between"
+                              >
+                                <span>Стиль</span>
+                                <span className="text-muted-foreground text-xs">{artStyle}</span>
+                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
 
@@ -1098,26 +1073,52 @@ export function StudioChat({
                           </Tooltip>
                         </div>
 
-                        {/* Справа большая кнопка генерации */}
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              size="lg"
-                              className="h-[84px] w-14 p-0 bg-primary hover:bg-primary/90 text-primary-foreground"
-                              onClick={handleGenerate}
-                              disabled={isGenerating || !prompt.trim()}
-                            >
-                              {isGenerating ? (
-                                <Loader2 className="h-5 w-5 animate-spin" />
-                              ) : (
-                                <Sparkles className="h-5 w-5" />
-                              )}
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent className="z-[9998]">
-                            <p>{isGenerating ? "Генерация..." : "Генерировать"}</p>
-                          </TooltipContent>
-                        </Tooltip>
+                        {/* Справа колонка: улучшение + генерация */}
+                        <div className="flex flex-col gap-1">
+                          {/* Кнопка улучшения промпта */}
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-10 w-14 p-0 bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 border border-purple-500/20"
+                                onClick={handleEnhancePrompt}
+                                disabled={isEnhancing || isGenerating || !prompt?.trim()}
+                                title="Улучшить промпт с помощью ИИ"
+                              >
+                                {isEnhancing ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <Lightbulb className="h-4 w-4" />
+                                )}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent className="z-[9998]">
+                              <p>{isEnhancing ? "Улучшение промпта с помощью ИИ..." : "Улучшить промпт с помощью ИИ"}</p>
+                            </TooltipContent>
+                          </Tooltip>
+
+                          {/* Кнопка генерации */}
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                size="sm"
+                                className="h-10 w-14 p-0 bg-primary hover:bg-primary/90 text-primary-foreground"
+                                onClick={handleGenerate}
+                                disabled={isGenerating || !prompt.trim()}
+                              >
+                                {isGenerating ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <Sparkles className="h-4 w-4" />
+                                )}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent className="z-[9998]">
+                              <p>{isGenerating ? "Генерация..." : "Генерировать"}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
                       </div>
                     </div>
 
