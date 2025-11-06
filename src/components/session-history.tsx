@@ -314,11 +314,9 @@ export function SessionHistory({
                     <Card className="p-3 bg-muted/50 dark:bg-muted/20">
                       {/* Описание от ИИ (если есть) */}
                       {message.description && message.description.trim() && (
-                        <div className="mb-3 p-2 rounded-lg bg-primary/5 dark:bg-primary/10 border border-primary/20">
-                          <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
-                            {message.description}
-                          </p>
-                        </div>
+                        <p className="mb-3 text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                          {message.description}
+                        </p>
                       )}
                       <div className="flex flex-wrap gap-2">
                         {message.imageUrls.map((imageUrl, index) => (
