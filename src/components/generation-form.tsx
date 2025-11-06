@@ -7,9 +7,9 @@ import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
-import { apiClient, ImageRequest } from "@/lib/api-client"
+import { apiClient, ImageRequest, EnhancePromptRequest, ArtStyle } from "@/lib/api-client"
 import { useAuth } from "@/contexts/auth-context"
-import { Wand2, UploadCloud, Layers, FileImage } from "lucide-react"
+import { Wand2, UploadCloud, Layers, FileImage, Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { getPointsText } from "@/lib/grammar"
 import { getRequiredPoints } from "@/lib/config"
@@ -54,12 +54,25 @@ interface GenerationFormProps {
 
 export function GenerationForm({ onGenerationComplete, initialPrompt = "", initialImages = [], sessionId }: GenerationFormProps) {
   const [isGenerating, setIsGenerating] = useState(false)
+  const [isEnhancing, setIsEnhancing] = useState(false)
   const [uploadedImages, setUploadedImages] = useState<string[]>(initialImages)
   const [artStyle, setArtStyle] = useState('Реалистичный')
+  const [artStyles, setArtStyles] = useState<ArtStyle[]>([])
   const [isDragOver, setIsDragOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
   const { points, refreshPoints, setBalance } = useAuth()
+
+  // Загружаем стили из API при монтировании компонента
+  React.useEffect(() => {
+    const loadArtStyles = async () => {
+      const response = await apiClient.getArtStyles()
+      if (response.data && response.data.length > 0) {
+        setArtStyles(response.data)
+      }
+    }
+    loadArtStyles()
+  }, [])
 
   const {
     register,
@@ -280,6 +293,87 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
     }
   }
 
+  const handleEnhancePrompt = async () => {
+    const currentPrompt = prompt?.trim() || ""
+    
+    // Проверяем, что промпт не пустой (минимум 10 символов)
+    if (currentPrompt.length < 10) {
+      toast({
+        title: "Ошибка",
+        description: "Промпт должен содержать минимум 10 символов",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsEnhancing(true)
+
+    try {
+      // Находим выбранный стиль и получаем его id
+      const selectedStyle = artStyles.find(style => style.name === artStyle)
+      const styleId = selectedStyle?.id || 1 // По умолчанию id = 1 (Без стиля)
+
+      // Подготавливаем изображения для запроса (если есть)
+      let imageUrls: string[] | undefined = undefined
+      if (uploadedImages.length > 0) {
+        // Обрабатываем blob URL'ы, если есть
+        const processedUrls = await Promise.all(
+          uploadedImages.map(async (url) => {
+            if (url.startsWith('blob:')) {
+              try {
+                const response = await fetch(url)
+                const blob = await response.blob()
+                const file = new File([blob], 'image.jpg', { type: blob.type })
+                const uploadResponse = await apiClient.uploadFile(file)
+                if (uploadResponse.data) {
+                  return uploadResponse.data
+                } else {
+                  throw new Error(uploadResponse.error || 'Ошибка загрузки файла')
+                }
+              } catch (error) {
+                console.error('Ошибка загрузки blob URL:', error)
+                return url // Возвращаем оригинальный URL при ошибке
+              }
+            } else {
+              return url
+            }
+          })
+        )
+        imageUrls = processedUrls
+      }
+
+      const request: EnhancePromptRequest = {
+        prompt: currentPrompt,
+        imageUrls: imageUrls,
+        styleId: styleId,
+      }
+
+      const response = await apiClient.enhancePrompt(request)
+
+      if (response.data) {
+        // Подставляем улучшенный промпт в поле
+        setValue("prompt", response.data.enhancedPrompt)
+        toast({
+          title: "Промпт улучшен!",
+          description: "Промпт успешно улучшен. Вы можете отредактировать его перед генерацией.",
+          duration: 3000,
+        })
+      } else {
+        throw new Error(response.error || "Ошибка улучшения промпта")
+      }
+    } catch (error: any) {
+      const formatted = formatApiError(error?.status ? error : (error?.message || error))
+      toast({
+        title: formatted.title,
+        description: formatted.description,
+        variant: "destructive",
+        duration: 6000,
+      })
+    } finally {
+      setIsEnhancing(false)
+    }
+  }
+
 
   return (
     <div 
@@ -315,8 +409,31 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
             
             {/* Upload Button, Image Count and Format inside prompt area */}
             <div className="absolute bottom-4 right-4 flex flex-col gap-2">
-              {/* Первый ряд - 3 кнопки */}
+              {/* Первый ряд - 4 кнопки */}
               <div className="flex items-center gap-2">
+                {/* Enhance Prompt Button */}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleEnhancePrompt}
+                  disabled={isEnhancing || isGenerating || !prompt?.trim() || prompt.trim().length < 10}
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 border border-purple-500/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Улучшить промпт с помощью ИИ"
+                >
+                  {isEnhancing ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-purple-600 dark:border-purple-400 border-t-transparent rounded-full animate-spin"></div>
+                      <span className="text-sm font-medium">...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4" />
+                      <span className="text-sm font-medium">Улучшить</span>
+                    </>
+                  )}
+                </Button>
+                
                 {/* Format Button */}
                 <Button
                   type="button"

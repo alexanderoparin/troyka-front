@@ -13,6 +13,7 @@ import {
   Eye, 
   Loader2,
   Sparkles,
+  Lightbulb,
   User,
   Bot,
   Copy,
@@ -26,7 +27,7 @@ import {
 import { cn } from "@/lib/utils"
 import { useToast } from "@/components/ui/use-toast"
 import { useAuth } from "@/contexts/auth-context"
-import { apiClient, ArtStyle } from "@/lib/api-client"
+import { apiClient, ArtStyle, EnhancePromptRequest } from "@/lib/api-client"
 import { formatApiError } from "@/lib/errors"
 import {
   Tooltip,
@@ -65,6 +66,7 @@ export function StudioChat({
     return ""
   })
   const [isGenerating, setIsGenerating] = useState(false)
+  const [isEnhancing, setIsEnhancing] = useState(false)
   const [selectedImages, setSelectedImages] = useState<string[]>([])
   const [copiedImageUrl, setCopiedImageUrl] = useState<string | null>(null)
   const [numImages, setNumImages] = useState(() => {
@@ -387,6 +389,63 @@ export function StudioChat({
       }
     }
   }, [toast])
+
+  const handleEnhancePrompt = useCallback(async () => {
+    const currentPrompt = prompt?.trim() || ""
+    
+    if (currentPrompt.length < 10) {
+      toast({
+        title: "Ошибка",
+        description: "Промпт должен содержать минимум 10 символов",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsEnhancing(true)
+
+    try {
+      const selectedStyle = artStyles.find(style => style.name === artStyle)
+      const styleId = selectedStyle?.id || 1
+
+      let imageUrls: string[] | undefined = undefined
+      if (uploadedImages.length > 0) {
+        imageUrls = uploadedImages
+      }
+
+      const request: EnhancePromptRequest = {
+        prompt: currentPrompt,
+        imageUrls: imageUrls,
+        styleId: styleId,
+      }
+
+      const response = await apiClient.enhancePrompt(request)
+
+      if (response.data) {
+        setPrompt(response.data.enhancedPrompt)
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('studio-prompt', response.data.enhancedPrompt)
+        }
+        toast({
+          title: "Промпт улучшен!",
+          description: "Промпт успешно улучшен. Вы можете отредактировать его перед генерацией.",
+          duration: 3000,
+        })
+      } else {
+        throw new Error(response.error || "Ошибка улучшения промпта")
+      }
+    } catch (error: any) {
+      const formatted = formatApiError(error?.status ? error : (error?.message || error))
+      toast({
+        title: formatted.title,
+        description: formatted.description,
+        variant: "destructive",
+        duration: 6000,
+      })
+    } finally {
+      setIsEnhancing(false)
+    }
+  }, [prompt, artStyle, artStyles, uploadedImages, toast])
 
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) {
@@ -852,7 +911,7 @@ export function StudioChat({
             <div className="fixed bottom-2 left-0 right-0" style={{ zIndex: 10 }}>
               <div className="flex justify-center px-2 sm:px-6">
                 <div 
-                  className={`${isFocused ? 'bg-background/95' : 'bg-background/60'} backdrop-blur-md border border-border/40 rounded-lg shadow-lg px-2 py-1 w-full max-w-[700px] transition-all duration-200 ${
+                  className={`${isFocused ? 'bg-background/95' : 'bg-background/60'} backdrop-blur-md border border-border/40 rounded-lg shadow-lg px-2 py-1 w-full max-w-[700px] sm:max-w-[1000px] transition-all duration-200 ${
                     isDragOver ? 'border-primary/60 bg-primary/5' : ''
                   }`}
                   onDragOver={handleDragOver}
@@ -934,6 +993,29 @@ export function StudioChat({
                       <div className="flex items-end gap-1">
                         {/* Слева колонка: настройки + загрузка */}
                       <div className="flex flex-col gap-1">
+                          {/* Кнопка улучшения промпта */}
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-10 w-10 p-0 bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 border border-purple-500/20"
+                                onClick={handleEnhancePrompt}
+                                disabled={isEnhancing || isGenerating || !prompt?.trim()}
+                                title="Улучшить промпт с помощью ИИ"
+                              >
+                                {isEnhancing ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <Lightbulb className="h-4 w-4" />
+                                )}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent className="z-[9998]">
+                              <p>{isEnhancing ? "Улучшение промпта с помощью ИИ..." : "Улучшить промпт с помощью ИИ"}</p>
+                            </TooltipContent>
+                          </Tooltip>
+
                           {/* Кнопка настроек */}
                           <DropdownMenu open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                             <DropdownMenuTrigger asChild>
@@ -1059,19 +1141,50 @@ export function StudioChat({
                       
                       {/* Кнопки управления - справа в 2 ряда */}
                       <div className="flex flex-col gap-1">
-                        {/* Первый ряд - 3 кнопки */}
+                        {/* Первый ряд - 4 кнопки */}
                         <div className="flex items-center gap-1">
+                          {/* Кнопка улучшения промпта */}
+                          <Tooltip delayDuration={300}>
+                            <TooltipTrigger asChild>
+                              <span className="inline-block">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="h-10 w-10 p-0 bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 border border-purple-500/20"
+                                  onClick={handleEnhancePrompt}
+                                  disabled={isEnhancing || isGenerating || !prompt?.trim()}
+                                >
+                                  {isEnhancing ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <Lightbulb className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent className="z-[140]">
+                              <p>{isEnhancing ? "Улучшение промпта с помощью ИИ..." : "Улучшить промпт с помощью ИИ"}</p>
+                            </TooltipContent>
+                          </Tooltip>
+
                           {/* Формат изображения */}
                           <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-10 w-14 p-0 text-sm bg-muted/80 hover:bg-muted/95 border border-border/80"
-                              >
-                                {outputFormat}
-                              </Button>
-                            </DropdownMenuTrigger>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-10 w-14 p-0 text-sm bg-muted/80 hover:bg-muted/95 border border-border/80"
+                                  >
+                                    {outputFormat}
+                                  </Button>
+                                </DropdownMenuTrigger>
+                              </TooltipTrigger>
+                              <TooltipContent className="z-[140]">
+                                <p>Формат изображения</p>
+                              </TooltipContent>
+                            </Tooltip>
                             <DropdownMenuContent className="w-32 z-[150]" align="start">
                               <DropdownMenuItem onClick={() => setOutputFormat('JPEG')}>
                                 JPEG
@@ -1084,15 +1197,22 @@ export function StudioChat({
                           
                           {/* Количество изображений */}
                           <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-10 w-12 p-0 text-sm bg-muted/80 hover:bg-muted/95 border border-border/80"
-                              >
-                                {numImages}
-                              </Button>
-                            </DropdownMenuTrigger>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-10 w-12 p-0 text-sm bg-muted/80 hover:bg-muted/95 border border-border/80"
+                                  >
+                                    {numImages}
+                                  </Button>
+                                </DropdownMenuTrigger>
+                              </TooltipTrigger>
+                              <TooltipContent className="z-[140]">
+                                <p>Количество изображений</p>
+                              </TooltipContent>
+                            </Tooltip>
                             <DropdownMenuContent className="w-32 z-[150]" align="start">
                               <DropdownMenuItem onClick={() => setNumImages(1)}>1</DropdownMenuItem>
                               <DropdownMenuItem onClick={() => setNumImages(2)}>2</DropdownMenuItem>
@@ -1139,15 +1259,22 @@ export function StudioChat({
                         {/* Второй ряд - кнопка стиля (широкая) */}
                         <div className="flex items-center">
                           <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-9 w-full p-0 text-sm bg-muted/80 hover:bg-muted/95 border border-border/80"
-                              >
-                                {artStyle}
-                              </Button>
-                            </DropdownMenuTrigger>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-9 w-full p-0 text-sm bg-muted/80 hover:bg-muted/95 border border-border/80"
+                                  >
+                                    {artStyle}
+                                  </Button>
+                                </DropdownMenuTrigger>
+                              </TooltipTrigger>
+                              <TooltipContent className="z-[140]">
+                                <p>Стиль изображения</p>
+                              </TooltipContent>
+                            </Tooltip>
                             <DropdownMenuContent className="w-56 z-[150]" align="start">
                               {artStyles.map((style) => (
                                 <DropdownMenuItem 
@@ -1163,22 +1290,24 @@ export function StudioChat({
                       </div>
 
                       {/* Кнопка генерации - отдельно справа */}
-                        <Tooltip>
+                        <Tooltip delayDuration={300}>
                           <TooltipTrigger asChild>
-                            <Button
-                            size="sm"
-                            className="h-[80px] w-[80px] p-0 bg-primary hover:bg-primary/90 text-primary-foreground"
-                              onClick={handleGenerate}
-                              disabled={isGenerating || !prompt.trim()}
-                            >
-                              {isGenerating ? (
-                              <Loader2 className="h-6 w-6 animate-spin" />
-                              ) : (
-                              <Sparkles className="h-6 w-6" />
-                              )}
-                            </Button>
+                            <span className="inline-block">
+                              <Button
+                                size="sm"
+                                className="h-[80px] w-[80px] p-0 bg-primary hover:bg-primary/90 text-primary-foreground"
+                                onClick={handleGenerate}
+                                disabled={isGenerating || !prompt.trim()}
+                              >
+                                {isGenerating ? (
+                                  <Loader2 className="h-6 w-6 animate-spin" />
+                                ) : (
+                                  <Sparkles className="h-6 w-6" />
+                                )}
+                              </Button>
+                            </span>
                           </TooltipTrigger>
-                          <TooltipContent className="z-[9998]">
+                          <TooltipContent className="z-[140]">
                             <p>{isGenerating ? "Генерация изображений..." : "Генерировать изображения"}</p>
                           </TooltipContent>
                         </Tooltip>

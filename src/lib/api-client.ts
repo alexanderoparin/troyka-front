@@ -183,6 +183,17 @@ export interface UpdateUserArtStyleRequest {
   styleId: number;
 }
 
+// Prompt enhancement interfaces
+export interface EnhancePromptRequest {
+  prompt: string;
+  imageUrls?: string[];
+  styleId?: number;
+}
+
+export interface EnhancePromptResponse {
+  enhancedPrompt: string;
+}
+
 // Telegram OAuth interfaces
 export interface TelegramAuthRequest {
   id: number;
@@ -919,6 +930,14 @@ class ApiClient {
     return this.request<{ message: string }>('/api/art-styles/user', {
       method: 'PUT',
       body: JSON.stringify({ styleId }),
+    });
+  }
+
+  // Prompt enhancement API
+  async enhancePrompt(request: EnhancePromptRequest): Promise<ApiResponse<EnhancePromptResponse>> {
+    return this.request<EnhancePromptResponse>('/api/prompt/enhance', {
+      method: 'POST',
+      body: JSON.stringify(request),
     });
   }
 
