@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useSessionHistory } from "@/hooks/use-session-detail"
 import Image from "next/image"
+import { ASPECT_RATIOS, DEFAULT_ASPECT_RATIO, type AspectRatio } from "@/lib/constants"
 
 interface StudioChatProps {
   sessionId?: number
@@ -85,6 +86,19 @@ export function StudioChat({
       return (saved as 'JPEG' | 'PNG') || 'JPEG'
     }
     return 'JPEG'
+  })
+  const [aspectRatio, setAspectRatio] = useState<AspectRatio>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('studio-aspectRatio')
+      // Валидация: проверяем, что сохраненное значение допустимо
+      if (saved && ASPECT_RATIOS.includes(saved as AspectRatio)) {
+        return saved as AspectRatio
+      }
+      // Если значение невалидное (например, старое "auto") или отсутствует, используем дефолт
+      localStorage.setItem('studio-aspectRatio', DEFAULT_ASPECT_RATIO)
+      return DEFAULT_ASPECT_RATIO
+    }
+    return DEFAULT_ASPECT_RATIO
   })
   const [artStyle, setArtStyle] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -191,6 +205,12 @@ export function StudioChat({
       localStorage.setItem('studio-outputFormat', outputFormat)
     }
   }, [outputFormat])
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('studio-aspectRatio', aspectRatio)
+    }
+  }, [aspectRatio])
   
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -470,7 +490,8 @@ export function StudioChat({
         numImages: numImages,
         outputFormat: outputFormat,
         sessionId: sessionId,
-        styleId: styleId
+        styleId: styleId,
+        aspectRatio: aspectRatio
       }
       
       const response = await apiClient.generateImage(request)
@@ -529,7 +550,7 @@ export function StudioChat({
     } finally {
       setIsGenerating(false)
     }
-  }, [prompt, numImages, outputFormat, onGenerationComplete, toast, artStyle, sessionId, uploadedImages, updateHistoryAfterGeneration, isEditingMode])
+  }, [prompt, numImages, outputFormat, aspectRatio, onGenerationComplete, toast, artStyle, sessionId, uploadedImages, updateHistoryAfterGeneration, isEditingMode, artStyles])
 
   const handleImageExpand = (imageUrl: string) => {
     setSelectedImageForModal(imageUrl)
@@ -894,6 +915,12 @@ export function StudioChat({
                               <span>{message.imageUrls.length} {getImageText(message.imageUrls.length)}</span>
                               <span>•</span>
                               <span>{message.outputFormat || 'JPEG'}</span>
+                              {message.aspectRatio && (
+                                <>
+                                  <span>•</span>
+                                  <span>{message.aspectRatio}</span>
+                                </>
+                              )}
                             </div>
                           )}
                         </Card>
@@ -1030,6 +1057,20 @@ export function StudioChat({
                               >
                                 <span>Количество</span>
                                 <span className="text-muted-foreground">{numImages}</span>
+                              </DropdownMenuItem>
+                              
+                              {/* Соотношение сторон */}
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  const currentIndex = ASPECT_RATIOS.indexOf(aspectRatio)
+                                  const nextIndex = (currentIndex + 1) % ASPECT_RATIOS.length
+                                  setAspectRatio(ASPECT_RATIOS[nextIndex])
+                                }}
+                                className="flex items-center justify-between"
+                              >
+                                <span>Соотношение</span>
+                                <span className="text-muted-foreground text-xs">{aspectRatio}</span>
                               </DropdownMenuItem>
                               
                               {/* Стиль */}
@@ -1221,44 +1262,8 @@ export function StudioChat({
                               <DropdownMenuItem onClick={() => setNumImages(4)}>4</DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
-                        
-                          {/* Загрузка изображения - input перенесен наверх */}
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-10 w-12 p-0 bg-muted/80 hover:bg-muted/95 border border-border/80"
-                                onClick={() => {
-                                  console.log('Upload button clicked')
-                                  console.log('fileInputRef.current:', fileInputRef.current)
-                                  
-                                  // Пробуем через ref
-                                  if (fileInputRef.current) {
-                                    fileInputRef.current.click()
-                                  } else {
-                                    // Fallback через querySelector
-                                    const input = document.getElementById('studio-file-input') as HTMLInputElement
-                                    console.log('Fallback input found:', input)
-                                    if (input) {
-                                      input.click()
-                                    } else {
-                                      console.error('No file input found!')
-                                    }
-                                  }
-                                }}
-                              >
-                                <ImageIcon className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent className="z-[140]">
-                              <p>Загрузить изображение</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </div>
-                        
-                        {/* Второй ряд - кнопка стиля (широкая) */}
-                        <div className="flex items-center">
+                          
+                          {/* Соотношение сторон */}
                           <DropdownMenu>
                             <Tooltip>
                               <TooltipTrigger asChild>
@@ -1266,7 +1271,36 @@ export function StudioChat({
                                   <Button
                                     variant="outline"
                                     size="sm"
-                                    className="h-9 w-full p-0 text-sm bg-muted/80 hover:bg-muted/95 border border-border/80"
+                                    className="h-10 w-14 p-0 text-xs bg-muted/80 hover:bg-muted/95 border border-border/80"
+                                  >
+                                    {aspectRatio}
+                                  </Button>
+                                </DropdownMenuTrigger>
+                              </TooltipTrigger>
+                              <TooltipContent className="z-[140]">
+                                <p>Соотношение сторон</p>
+                              </TooltipContent>
+                            </Tooltip>
+                            <DropdownMenuContent className="w-32 z-[150]" align="start">
+                              {ASPECT_RATIOS.map((ratio) => (
+                                <DropdownMenuItem key={ratio} onClick={() => setAspectRatio(ratio)}>
+                                  {ratio}
+                                </DropdownMenuItem>
+                              ))}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                        
+                        {/* Второй ряд - кнопка стиля (короче) + загрузка изображения */}
+                        <div className="flex items-center gap-1">
+                          <DropdownMenu>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-9 flex-1 p-0 text-sm bg-muted/80 hover:bg-muted/95 border border-border/80"
                                   >
                                     {artStyle}
                                   </Button>
@@ -1287,6 +1321,32 @@ export function StudioChat({
                               ))}
                             </DropdownMenuContent>
                           </DropdownMenu>
+                          
+                          {/* Загрузка изображения */}
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-9 w-12 p-0 bg-muted/80 hover:bg-muted/95 border border-border/80"
+                                onClick={() => {
+                                  if (fileInputRef.current) {
+                                    fileInputRef.current.click()
+                                  } else {
+                                    const input = document.getElementById('studio-file-input') as HTMLInputElement
+                                    if (input) {
+                                      input.click()
+                                    }
+                                  }
+                                }}
+                              >
+                                <ImageIcon className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent className="z-[140]">
+                              <p>Загрузить изображение</p>
+                            </TooltipContent>
+                          </Tooltip>
                         </div>
                       </div>
 

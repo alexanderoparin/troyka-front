@@ -32,6 +32,7 @@ export interface ImageRequest {
   outputFormat?: 'JPEG' | 'PNG';
   sessionId?: number;
   styleId?: number;
+  aspectRatio?: string;
 }
 
 export interface ImageResponse {
@@ -61,6 +62,7 @@ export interface SessionMessage {
   description?: string;
   styleId?: number;
   styleName?: string;
+  aspectRatio?: string;
 }
 
 export interface SessionDetail {
