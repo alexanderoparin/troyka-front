@@ -499,15 +499,7 @@ export function StudioChat({
       if (response.data) {
         onGenerationComplete(response.data.imageUrls, prompt)
         // НЕ очищаем промпт - он остается в поле ввода
-        
-        // В режиме редактирования прикрепляем НОВЫЕ сгенерированные изображения
-        if (isEditingMode) {
-          setUploadedImages(response.data.imageUrls)
-          setSelectedImages(response.data.imageUrls)
-        } else {
-          // В обычном режиме очищаем загруженные изображения
-        setUploadedImages([])
-        }
+        // Оставляем прикрепленные изображения - пользователь сам открепит их, если нужно
         
         // Обновляем баланс из ответа API, если он есть
         if (response.data.balance !== undefined) {
@@ -952,9 +944,9 @@ export function StudioChat({
                 {/* Компактный блок с миниатюрами */}
                 <div className="flex items-center gap-2 bg-muted/50 rounded-lg px-2 py-1">
                   {/* Миниатюры изображений */}
-                  <div className="flex gap-1">
+                  <div className="flex gap-2">
                     {uploadedImages.map((imageUrl, index) => (
-                      <div key={index} className="relative w-6 h-6 rounded overflow-hidden border group">
+                      <div key={index} className="relative w-16 h-16 rounded-lg overflow-hidden border border-border/50 group">
                         <Image
                           src={imageUrl}
                           alt={`Прикрепленное изображение ${index + 1}`}
@@ -971,25 +963,13 @@ export function StudioChat({
                           }}
                           size="sm"
                           variant="ghost"
-                          className="absolute -top-1 -right-1 h-3 w-3 p-0 opacity-0 group-hover:opacity-100 transition-opacity text-xs bg-red-500 hover:bg-red-600 text-white"
+                          className="absolute top-1 right-1 h-5 w-5 p-0 opacity-0 group-hover:opacity-100 transition-opacity text-xs bg-red-500 hover:bg-red-600 text-white rounded-full"
                         >
-                          ×
+                          <X className="h-3 w-3" />
                         </Button>
                       </div>
                     ))}
                   </div>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => {
-                      setUploadedImages([])
-                      setSelectedImages([])
-                      setIsEditingMode(false)
-                    }}
-                    className="h-5 w-5 p-0 text-muted-foreground hover:text-foreground"
-                  >
-                    <X className="h-3 w-3" />
-                  </Button>
                 </div>
               </div>
             </div>
