@@ -76,6 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Проверяем, не получили ли мы 401 ошибку
           if (userResponse.status === 401 || pointsResponse.status === 401 || avatarResponse.status === 401) {
             // Токен истек или недействителен - разлогиниваем
+            console.log('Токен истек (401), разлогиниваем пользователя')
             apiClient.logout()
             setState({
               user: null,
@@ -88,16 +89,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             return
           }
           
-          if (userResponse.data) {
+          // Проверяем наличие данных пользователя
+          if (userResponse.data && userResponse.status === 200) {
+            // Данные пользователя получены успешно
             setState({
               user: userResponse.data,
               isAuthenticated: true,
               isLoading: false,
-              points: pointsResponse.data || 0,
-              avatar: avatarResponse.data || null,
+              points: (pointsResponse.status === 200 && pointsResponse.data !== undefined) ? pointsResponse.data : 0,
+              avatar: (avatarResponse.status === 200 && avatarResponse.data) ? avatarResponse.data : null,
             })
           } else {
-            // Токен недействителен
+            // Данные пользователя не получены или ошибка
+            console.warn('Не удалось получить данные пользователя:', {
+              userStatus: userResponse.status,
+              userError: userResponse.error,
+              pointsStatus: pointsResponse.status,
+              pointsError: pointsResponse.error
+            })
             apiClient.logout()
             setState({
               user: null,

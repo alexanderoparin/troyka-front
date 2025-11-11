@@ -294,12 +294,29 @@ class ApiClient {
       const contentType = response.headers.get('content-type');
       let data;
       
-      if (contentType && contentType.includes('application/json')) {
-        data = await response.json();
-      } else {
-        // Если не JSON, читаем как текст
-        const text = await response.text();
-        data = { message: text };
+      try {
+        if (contentType && contentType.includes('application/json')) {
+          const text = await response.text();
+          // Проверяем, не пустой ли ответ
+          if (text.trim() === '') {
+            data = null;
+          } else {
+            try {
+              data = JSON.parse(text);
+            } catch (parseError) {
+              console.error('Ошибка парсинга JSON:', parseError, 'Текст ответа:', text);
+              data = { message: text || 'Ошибка парсинга JSON' };
+            }
+          }
+        } else {
+          // Если не JSON, читаем как текст
+          const text = await response.text();
+          data = { message: text };
+        }
+      } catch (error) {
+        // Ошибка чтения ответа
+        console.error('Ошибка чтения ответа:', error);
+        data = { message: 'Ошибка чтения ответа' };
       }
 
       if (!response.ok) {
@@ -314,13 +331,13 @@ class ApiClient {
         }
         
         return {
-          error: data.message || data.error || 'Произошла ошибка',
+          error: data?.message || data?.error || 'Произошла ошибка',
           status: response.status,
         };
       }
 
       return {
-        data,
+        data: data !== null ? data : undefined,
         status: response.status,
       };
     } catch (error: any) {
@@ -791,7 +808,15 @@ class ApiClient {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        const errorData = await response.json();
+        // Если получили 401 (Unauthorized), токен истек или недействителен
+        if (response.status === 401) {
+          this.removeToken();
+          if (this.onUnauthorizedCallback) {
+            this.onUnauthorizedCallback();
+          }
+        }
+        
+        const errorData = await response.json().catch(() => ({}));
         return {
           error: errorData.message || errorData.error || 'Ошибка получения баланса',
           status: response.status,
