@@ -40,6 +40,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Флаг для предотвращения запросов во время logout
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
+  // Устанавливаем callback для обработки 401 ошибок
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      // При получении 401 автоматически разлогиниваем пользователя
+      setState({
+        user: null,
+        isAuthenticated: false,
+        isLoading: false,
+        points: 0,
+        avatar: null,
+      })
+    }
+    
+    apiClient.setOnUnauthorized(handleUnauthorized)
+    
+    return () => {
+      apiClient.setOnUnauthorized(() => {})
+    }
+  }, [])
+
   // Проверяем аутентификацию при загрузке
   useEffect(() => {
     if (hasInitialized || isLoggingOut) return // Предотвращаем повторные вызовы и запросы во время logout
@@ -52,6 +72,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             apiClient.getUserPoints(),
             apiClient.getUserAvatar()
           ])
+          
+          // Проверяем, не получили ли мы 401 ошибку
+          if (userResponse.status === 401 || pointsResponse.status === 401 || avatarResponse.status === 401) {
+            // Токен истек или недействителен - разлогиниваем
+            apiClient.logout()
+            setState({
+              user: null,
+              isAuthenticated: false,
+              isLoading: false,
+              points: 0,
+              avatar: null,
+            })
+            setHasInitialized(true)
+            return
+          }
           
           if (userResponse.data) {
             setState({

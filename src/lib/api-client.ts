@@ -236,6 +236,7 @@ export interface PaymentHistory {
 class ApiClient {
   private baseUrl: string;
   private timeout: number;
+  private onUnauthorizedCallback: (() => void) | null = null;
 
   constructor() {
     // На продакшене используем HTTPS через домен, на локальной разработке - HTTP
@@ -247,6 +248,11 @@ class ApiClient {
       // console.log('API Base URL:', this.baseUrl);
       // console.log('Current hostname:', window.location.hostname);
     }
+  }
+
+  // Метод для установки callback при 401 ошибке
+  setOnUnauthorized(callback: () => void): void {
+    this.onUnauthorizedCallback = callback;
   }
 
   private async request<T>(
@@ -297,6 +303,16 @@ class ApiClient {
       }
 
       if (!response.ok) {
+        // Если получили 401 (Unauthorized), токен истек или недействителен
+        if (response.status === 401) {
+          // Удаляем токен из localStorage
+          this.removeToken();
+          // Вызываем callback для уведомления о необходимости разлогинивания
+          if (this.onUnauthorizedCallback) {
+            this.onUnauthorizedCallback();
+          }
+        }
+        
         return {
           error: data.message || data.error || 'Произошла ошибка',
           status: response.status,
@@ -442,6 +458,14 @@ class ApiClient {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
+        // Если получили 401 (Unauthorized), токен истек или недействителен
+        if (response.status === 401) {
+          this.removeToken();
+          if (this.onUnauthorizedCallback) {
+            this.onUnauthorizedCallback();
+          }
+        }
+        
         const errorData = await response.json();
         return {
           error: errorData.message || errorData.error || 'Ошибка загрузки файла',
@@ -506,6 +530,14 @@ class ApiClient {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
+        // Если получили 401 (Unauthorized), токен истек или недействителен
+        if (response.status === 401) {
+          this.removeToken();
+          if (this.onUnauthorizedCallback) {
+            this.onUnauthorizedCallback();
+          }
+        }
+        
         const errorData = await response.json().catch(() => ({}));
         return {
           data: undefined,
