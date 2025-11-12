@@ -499,7 +499,16 @@ export function StudioChat({
       if (response.data) {
         onGenerationComplete(response.data.imageUrls, prompt)
         // НЕ очищаем промпт - он остается в поле ввода
-        // Оставляем прикрепленные изображения - пользователь сам открепит их, если нужно
+        
+        // Логика прикрепления изображений после генерации:
+        // - Если НЕТ прикрепленных изображений → прикрепляем первое сгенерированное
+        // - Если БЫЛО прикрепленное изображение → оставляем его (не заменяем на результат)
+        const hadUploadedImages = uploadedImages.length > 0
+        if (!hadUploadedImages && response.data.imageUrls.length > 0) {
+          // Прикрепляем первое сгенерированное изображение
+          setUploadedImages([response.data.imageUrls[0]])
+        }
+        // Если были прикрепленные изображения, оставляем их как есть
         
         // Обновляем баланс из ответа API, если он есть
         if (response.data.balance !== undefined) {
