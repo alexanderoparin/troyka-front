@@ -1,6 +1,6 @@
 "use client"
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
 import { apiClient, LoginRequest, RegisterRequest, UserInfo, TelegramAuthRequest } from '@/lib/api-client'
 
 interface AuthState {
@@ -39,6 +39,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [hasInitialized, setHasInitialized] = useState(false)
   // Флаг для предотвращения запросов во время logout
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  // Ref для предотвращения дублирующих запросов в StrictMode (синхронная проверка)
+  const isCheckingAuthRef = useRef(false)
 
   // Устанавливаем callback для обработки 401 ошибок
   useEffect(() => {
@@ -62,7 +64,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Проверяем аутентификацию при загрузке
   useEffect(() => {
-    if (hasInitialized || isLoggingOut) return // Предотвращаем повторные вызовы и запросы во время logout
+    if (hasInitialized || isLoggingOut || isCheckingAuthRef.current) return // Предотвращаем повторные вызовы и запросы во время logout
+    isCheckingAuthRef.current = true
     
     const checkAuth = async () => {
       if (apiClient.isAuthenticated()) {
@@ -138,10 +141,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       
       setHasInitialized(true) // Отмечаем, что инициализация завершена
+      isCheckingAuthRef.current = false
     }
 
     checkAuth()
-  }, [hasInitialized])
+  }, [hasInitialized, isLoggingOut])
 
   const login = useCallback(async (credentials: LoginRequest) => {
     setState(prev => ({ ...prev, isLoading: true }))

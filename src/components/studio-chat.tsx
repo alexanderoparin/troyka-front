@@ -114,9 +114,14 @@ export function StudioChat({
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isEditingMode, setIsEditingMode] = useState(false)
   const [artStyles, setArtStyles] = useState<ArtStyle[]>([])
+  const isInitializingStyleRef = useRef(false) // Флаг для предотвращения дублирующих запросов при инициализации
   
   // Загружаем стили из базы данных и сохраненный стиль пользователя при монтировании компонента
   useEffect(() => {
+    // Предотвращаем повторные вызовы в StrictMode
+    if (isInitializingStyleRef.current) return
+    isInitializingStyleRef.current = true
+    
     const loadArtStyles = async () => {
       const response = await apiClient.getArtStyles()
       
@@ -135,6 +140,7 @@ export function StudioChat({
             if (typeof window !== 'undefined') {
               localStorage.setItem('studio-artStyle', savedStyle.name)
             }
+            isInitializingStyleRef.current = false
             return
           }
         }
@@ -147,10 +153,11 @@ export function StudioChat({
             const savedStyle = response.data.find(s => s.name === saved)
             if (savedStyle) {
               setArtStyle(saved)
-              // Сохраняем в БД для синхронизации
+              // Сохраняем в БД для синхронизации (только один раз)
               apiClient.updateUserArtStyle(savedStyle.id).catch(() => {
                 // Игнорируем ошибки при сохранении
               })
+              isInitializingStyleRef.current = false
               return
             }
           }
@@ -160,7 +167,7 @@ export function StudioChat({
           const initialStyle = realistic?.name || response.data[0]?.name || 'Без стиля'
           setArtStyle(initialStyle)
           localStorage.setItem('studio-artStyle', initialStyle)
-          // Сохраняем дефолтный стиль в БД
+          // Сохраняем дефолтный стиль в БД (только один раз)
           const initialStyleObj = response.data.find(s => s.name === initialStyle)
           if (initialStyleObj) {
             apiClient.updateUserArtStyle(initialStyleObj.id).catch(() => {
@@ -169,6 +176,7 @@ export function StudioChat({
           }
         }
       }
+      isInitializingStyleRef.current = false
     }
     loadArtStyles()
   }, [])
@@ -213,15 +221,20 @@ export function StudioChat({
   }, [aspectRatio])
   
   useEffect(() => {
+    // Пропускаем сохранение во время инициализации (чтобы избежать дублирования запросов)
+    if (isInitializingStyleRef.current) return
+    
     if (typeof window !== 'undefined') {
       localStorage.setItem('studio-artStyle', artStyle)
       
-      // Сохраняем стиль в БД при изменении
-      const selectedStyle = artStyles.find(s => s.name === artStyle)
-      if (selectedStyle) {
-        apiClient.updateUserArtStyle(selectedStyle.id).catch(() => {
-          // Игнорируем ошибки при сохранении (например, если пользователь не авторизован)
-        })
+      // Сохраняем стиль в БД при изменении (только если стили уже загружены)
+      if (artStyles.length > 0) {
+        const selectedStyle = artStyles.find(s => s.name === artStyle)
+        if (selectedStyle) {
+          apiClient.updateUserArtStyle(selectedStyle.id).catch(() => {
+            // Игнорируем ошибки при сохранении (например, если пользователь не авторизован)
+          })
+        }
       }
     }
   }, [artStyle, artStyles])
