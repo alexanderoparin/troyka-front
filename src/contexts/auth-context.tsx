@@ -35,12 +35,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     avatar: null,
   })
 
-  // Флаг для предотвращения дублирования запросов в Strict Mode
-  const [hasInitialized, setHasInitialized] = useState(false)
   // Флаг для предотвращения запросов во время logout
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   // Ref для предотвращения дублирующих запросов в StrictMode (синхронная проверка)
   const isCheckingAuthRef = useRef(false)
+  // Ref для отслеживания инициализации (не вызывает ре-рендеры)
+  const hasInitializedRef = useRef(false)
 
   // Устанавливаем callback для обработки 401 ошибок
   useEffect(() => {
@@ -62,24 +62,72 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  // Проверяем аутентификацию при загрузке
+  // Проверяем аутентификацию при загрузке (только один раз)
   useEffect(() => {
-    if (hasInitialized || isLoggingOut || isCheckingAuthRef.current) return // Предотвращаем повторные вызовы и запросы во время logout
+    // Предотвращаем повторные вызовы: если уже инициализировали или проверяем, или идет logout
+    if (hasInitializedRef.current || isLoggingOut || isCheckingAuthRef.current) {
+      return
+    }
+    
+    // Устанавливаем флаги синхронно, чтобы предотвратить параллельные запросы
     isCheckingAuthRef.current = true
+    hasInitializedRef.current = true
     
     const checkAuth = async () => {
-      if (apiClient.isAuthenticated()) {
-        try {
-          const [userResponse, pointsResponse, avatarResponse] = await Promise.all([
-            apiClient.getUserInfo(),
-            apiClient.getUserPoints(),
-            apiClient.getUserAvatar()
-          ])
-          
-          // Проверяем, не получили ли мы 401 ошибку
-          if (userResponse.status === 401 || pointsResponse.status === 401 || avatarResponse.status === 401) {
-            // Токен истек или недействителен - разлогиниваем
-            console.log('Токен истек (401), разлогиниваем пользователя')
+      try {
+        if (apiClient.isAuthenticated()) {
+          try {
+            const [userResponse, pointsResponse, avatarResponse] = await Promise.all([
+              apiClient.getUserInfo(),
+              apiClient.getUserPoints(),
+              apiClient.getUserAvatar()
+            ])
+            
+            // Проверяем, не получили ли мы 401 ошибку
+            if (userResponse.status === 401 || pointsResponse.status === 401 || avatarResponse.status === 401) {
+              // Токен истек или недействителен - разлогиниваем
+              console.log('Токен истек (401), разлогиниваем пользователя')
+              apiClient.logout()
+              setState({
+                user: null,
+                isAuthenticated: false,
+                isLoading: false,
+                points: 0,
+                avatar: null,
+              })
+              return
+            }
+            
+            // Проверяем наличие данных пользователя
+            if (userResponse.data && userResponse.status === 200) {
+              // Данные пользователя получены успешно
+              setState({
+                user: userResponse.data,
+                isAuthenticated: true,
+                isLoading: false,
+                points: (pointsResponse.status === 200 && pointsResponse.data !== undefined) ? pointsResponse.data : 0,
+                avatar: (avatarResponse.status === 200 && avatarResponse.data) ? avatarResponse.data : null,
+              })
+            } else {
+              // Данные пользователя не получены или ошибка
+              console.warn('Не удалось получить данные пользователя:', {
+                userStatus: userResponse.status,
+                userError: userResponse.error,
+                pointsStatus: pointsResponse.status,
+                pointsError: pointsResponse.error
+              })
+              apiClient.logout()
+              setState({
+                user: null,
+                isAuthenticated: false,
+                isLoading: false,
+                points: 0,
+                avatar: null,
+              })
+            }
+          } catch (error) {
+            // Ошибка при получении данных пользователя
+            console.error('Ошибка при проверке аутентификации:', error)
             apiClient.logout()
             setState({
               user: null,
@@ -88,64 +136,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               points: 0,
               avatar: null,
             })
-            setHasInitialized(true)
-            return
           }
-          
-          // Проверяем наличие данных пользователя
-          if (userResponse.data && userResponse.status === 200) {
-            // Данные пользователя получены успешно
-            setState({
-              user: userResponse.data,
-              isAuthenticated: true,
-              isLoading: false,
-              points: (pointsResponse.status === 200 && pointsResponse.data !== undefined) ? pointsResponse.data : 0,
-              avatar: (avatarResponse.status === 200 && avatarResponse.data) ? avatarResponse.data : null,
-            })
-          } else {
-            // Данные пользователя не получены или ошибка
-            console.warn('Не удалось получить данные пользователя:', {
-              userStatus: userResponse.status,
-              userError: userResponse.error,
-              pointsStatus: pointsResponse.status,
-              pointsError: pointsResponse.error
-            })
-            apiClient.logout()
-            setState({
-              user: null,
-              isAuthenticated: false,
-              isLoading: false,
-              points: 0,
-              avatar: null,
-            })
-          }
-        } catch (error) {
-          // Ошибка при получении данных пользователя
-          apiClient.logout()
-          setState({
-            user: null,
+        } else {
+          // Токена нет, пользователь не авторизован
+          setState(prev => ({
+            ...prev,
             isAuthenticated: false,
             isLoading: false,
             points: 0,
             avatar: null,
-          })
+          }))
         }
-      } else {
-        setState(prev => ({
-          ...prev,
-          isAuthenticated: false,
-          isLoading: false,
-          points: 0,
-          avatar: null,
-        }))
+      } finally {
+        // Сбрасываем флаг проверки после завершения (успешного или с ошибкой)
+        isCheckingAuthRef.current = false
       }
-      
-      setHasInitialized(true) // Отмечаем, что инициализация завершена
-      isCheckingAuthRef.current = false
     }
 
     checkAuth()
-  }, [hasInitialized, isLoggingOut])
+  }, [isLoggingOut]) // Убрали hasInitialized из зависимостей, используем ref
 
   const login = useCallback(async (credentials: LoginRequest) => {
     setState(prev => ({ ...prev, isLoading: true }))
@@ -269,6 +278,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       points: 0,
       avatar: null,
     })
+    
+    // Сбрасываем флаги инициализации для возможности повторной проверки при следующем входе
+    hasInitializedRef.current = false
+    isCheckingAuthRef.current = false
     
     // Сбрасываем флаг через небольшую задержку
     setTimeout(() => setIsLoggingOut(false), 1000)
