@@ -396,16 +396,13 @@ export default function AdminDashboardPage() {
             {filteredPayments.length > 0 ? (
               <div className="space-y-4 w-full">
                 {filteredPayments.map((payment) => {
-                  // Форматируем описание: "Пополнение баланса - Стартер (100 поинтов)"
-                  const displayDescription = payment.creditsAmount 
-                    ? `Пополнение баланса - ${payment.description} (${payment.creditsAmount} поинтов)`
-                    : payment.description;
+                  // Используем описание как есть, так как оно уже содержит всю необходимую информацию
+                  const displayDescription = payment.description;
                   
-                  // Формируем строку с информацией о пользователе
+                  // Формируем строку с информацией о пользователе (без Telegram username)
                   const userInfoParts = [
                     payment.username,
-                    payment.email && payment.email.trim() ? `(${payment.email})` : null,
-                    payment.telegramUsername ? `@${payment.telegramUsername}` : null
+                    payment.email && payment.email.trim() ? `(${payment.email})` : null
                   ].filter(Boolean);
                   
                   const userInfo = userInfoParts.join(' ');
@@ -432,7 +429,7 @@ export default function AdminDashboardPage() {
                             {payment.telegramFirstName && (
                               <p className="text-xs text-muted-foreground mt-1 break-words overflow-wrap-anywhere">
                                 Telegram: {payment.telegramFirstName}
-                                {payment.telegramId && ` (ID: ${payment.telegramId})`}
+                                {payment.telegramUsername ? ` (@${payment.telegramUsername})` : payment.telegramId ? ` (ID: ${payment.telegramId})` : ''}
                               </p>
                             )}
                           </div>
@@ -446,9 +443,6 @@ export default function AdminDashboardPage() {
                       </div>
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs sm:text-sm text-muted-foreground w-full">
                         <div className="flex flex-wrap items-center gap-2 sm:gap-4 w-full sm:w-auto">
-                          <span className="break-words">
-                            <strong>Поинты:</strong> {payment.creditsAmount}
-                          </span>
                           <span className="break-words">
                             <strong>Создан:</strong> {formatDate(new Date(payment.createdAt))}
                           </span>
@@ -512,10 +506,10 @@ export default function AdminDashboardPage() {
               <div className="space-y-4 w-full">
                 {filteredUsers.map((user) => {
                   const avatarUrl = user.telegramPhotoUrl;
+                  // Формируем строку с информацией о пользователе (без Telegram username)
                   const userInfoParts = [
                     user.username,
-                    user.email && user.email.trim() ? `(${user.email})` : null,
-                    user.telegramUsername ? `@${user.telegramUsername}` : null
+                    user.email && user.email.trim() ? `(${user.email})` : null
                   ].filter(Boolean);
                   
                   return (
@@ -538,7 +532,7 @@ export default function AdminDashboardPage() {
                             {user.telegramFirstName && (
                               <p className="text-xs text-muted-foreground mt-1 break-words overflow-wrap-anywhere">
                                 Telegram: {user.telegramFirstName}
-                                {user.telegramId && ` (ID: ${user.telegramId})`}
+                                {user.telegramUsername ? ` (@${user.telegramUsername})` : user.telegramId ? ` (ID: ${user.telegramId})` : ''}
                               </p>
                             )}
                           </div>
