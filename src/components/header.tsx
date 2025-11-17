@@ -17,7 +17,8 @@ import {
   User, 
   LogOut, 
   CreditCard,
-  Plus
+  Plus,
+  Shield
 } from "lucide-react"
 import { getPointsText } from "@/lib/grammar"
 
@@ -179,6 +180,14 @@ export function Header() {
                     Аккаунт
                   </Link>
                 </DropdownMenuItem>
+                {user?.role === 'ADMIN' && (
+                  <DropdownMenuItem asChild>
+                    <Link href="/admin/dashboard">
+                      <Shield className="mr-2 h-4 w-4" />
+                      Админ-панель
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem asChild>
                   <Link href="/pricing">
                     <Plus className="mr-2 h-4 w-4" />
@@ -339,6 +348,14 @@ export function Header() {
                     Аккаунт
                   </Link>
                 </DropdownMenuItem>
+                {user?.role === 'ADMIN' && (
+                  <DropdownMenuItem asChild>
+                    <Link href="/admin/dashboard">
+                      <Shield className="mr-2 h-4 w-4" />
+                      Админ-панель
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem asChild>
                   <Link href="/pricing">
                     <Plus className="mr-2 h-4 w-4" />

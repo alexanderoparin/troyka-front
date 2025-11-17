@@ -233,6 +233,54 @@ export interface PaymentHistory {
   isTest?: boolean;
 }
 
+// Admin panel interfaces
+export interface AdminPaymentDTO {
+  id: number;
+  userId: number;
+  username: string;
+  email: string;
+  telegramId: number | null;
+  telegramUsername: string | null;
+  telegramFirstName: string | null;
+  telegramPhotoUrl: string | null;
+  amount: number;
+  description: string;
+  status: string;
+  creditsAmount: number;
+  paidAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  isTest: boolean;
+}
+
+export interface AdminUserDTO {
+  id: number;
+  username: string;
+  email: string;
+  role: string;
+  emailVerified: boolean;
+  telegramId: number | null;
+  telegramUsername: string | null;
+  telegramFirstName: string | null;
+  telegramPhotoUrl: string | null;
+  points: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminStatsDTO {
+  totalUsers: number;
+  totalPayments: number;
+  totalRevenue: number;
+  todayRevenue: number;
+  weekRevenue: number;
+  monthRevenue: number;
+  paidPaymentsCount: number;
+  pendingPaymentsCount: number;
+  failedPaymentsCount: number;
+  averagePaymentAmount: number;
+}
+
 class ApiClient {
   private baseUrl: string;
   private timeout: number;
@@ -1000,6 +1048,18 @@ class ApiClient {
     });
   }
 
+  // Admin panel methods
+  async getAdminPayments(): Promise<ApiResponse<AdminPaymentDTO[]>> {
+    return this.request<AdminPaymentDTO[]>('/api/admin/payments');
+  }
+
+  async getAdminUsers(): Promise<ApiResponse<AdminUserDTO[]>> {
+    return this.request<AdminUserDTO[]>('/api/admin/users');
+  }
+
+  async getAdminStats(): Promise<ApiResponse<AdminStatsDTO>> {
+    return this.request<AdminStatsDTO>('/api/admin/stats');
+  }
 }
 
 // Экспортируем singleton instance
