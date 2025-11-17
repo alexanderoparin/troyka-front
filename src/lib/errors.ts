@@ -33,12 +33,20 @@ export function formatApiError(raw: unknown): FormattedError {
   const message = hasStatus ? ((raw as any).message || (raw as any).error || '') : (typeof raw === 'string' ? raw : (raw as any)?.message || '')
   const lower = String(message).toLowerCase()
 
+  // Фильтр безопасности Gemini (content_filter)
+  if (lower.includes('заблокированы фильтром безопасности') || lower.includes('content_filter')) {
+    return {
+      title: 'Контент заблокирован фильтром безопасности',
+      description: 'Промпт или изображение были заблокированы. Попробуйте изменить текст промпта или загрузить другое изображение.'
+    }
+  }
+
   // Приоритетная обработка по HTTP-статусу (если есть)
   if (typeof status === 'number') {
     if (status === 422) {
       return {
         title: 'Невозможно обработать запрос',
-        description: 'Проверьте загруженное изображение и параметры, затем попробуйте снова.'
+        description: message || 'Проверьте загруженное изображение и параметры, затем попробуйте снова.'
       }
     }
     if (status === 429) {

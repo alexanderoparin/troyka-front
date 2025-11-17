@@ -465,7 +465,8 @@ export function StudioChat({
           duration: 3000,
         })
       } else {
-        throw new Error(response.error || "Ошибка улучшения промпта")
+        // Передаем объект с error и status для правильной обработки в formatApiError
+        throw { error: response.error || "Ошибка улучшения промпта", status: response.status }
       }
     } catch (error: any) {
       const formatted = formatApiError(error?.status ? error : (error?.message || error))
