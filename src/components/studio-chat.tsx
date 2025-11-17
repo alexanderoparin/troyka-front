@@ -245,9 +245,11 @@ export function StudioChat({
 
   // Сохраняем промпт в localStorage при изменении
   const handlePromptChange = (value: string) => {
-    setPrompt(value)
+    // Ограничиваем длину до 5000 символов
+    const limitedValue = value.slice(0, 5000)
+    setPrompt(limitedValue)
     if (typeof window !== 'undefined') {
-      localStorage.setItem('studio-prompt', value)
+      localStorage.setItem('studio-prompt', limitedValue)
     }
   }
 
@@ -1004,20 +1006,26 @@ export function StudioChat({
                     {/* Мобильная версия - минималистичный layout */}
                     <div className="flex items-start gap-2 sm:hidden">
                       {/* Поле ввода - полная ширина */}
-                      <Textarea
-                        value={prompt}
-                        onChange={(e) => handlePromptChange(e.target.value)}
-                        placeholder={isDragOver ? "Отпустите файл для загрузки..." : isEditingMode ? "Опишите изменения для прикрепленного изображения..." : "Опишите изображение, которое хотите создать..."}
-                        className="h-12 resize-none text-sm flex-1 bg-muted/80 border border-border/80 focus:border-primary/80 focus:bg-muted/95"
-                        onFocus={() => setIsFocused(true)}
-                        onBlur={() => setIsFocused(false)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-                            e.preventDefault()
-                            handleGenerate()
-                          }
-                        }}
-                      />
+                      <div className="flex-1 relative">
+                        <Textarea
+                          value={prompt}
+                          onChange={(e) => handlePromptChange(e.target.value)}
+                          placeholder={isDragOver ? "Отпустите файл для загрузки..." : isEditingMode ? "Опишите изменения для прикрепленного изображения..." : "Опишите изображение, которое хотите создать..."}
+                          className="h-12 resize-none text-sm flex-1 bg-muted/80 border border-border/80 focus:border-primary/80 focus:bg-muted/95 pr-12"
+                          onFocus={() => setIsFocused(true)}
+                          onBlur={() => setIsFocused(false)}
+                          maxLength={5000}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                              e.preventDefault()
+                              handleGenerate()
+                            }
+                          }}
+                        />
+                        <div className="absolute bottom-1 right-2 text-xs text-muted-foreground pointer-events-none">
+                          {prompt.length}/5000
+                        </div>
+                      </div>
                       
                       {/* Кнопки управления и генерации */}
                       <div className="flex items-end gap-1">
@@ -1169,20 +1177,26 @@ export function StudioChat({
                     {/* Десктопная версия - горизонтальный layout */}
                     <div className="hidden sm:flex items-center gap-2">
                       {/* Поле ввода - слева */}
-                      <Textarea
-                        value={prompt}
-                        onChange={(e) => handlePromptChange(e.target.value)}
-                        placeholder={isDragOver ? "Отпустите файл для загрузки..." : isEditingMode ? "Опишите изменения для прикрепленного изображения..." : "Опишите изображение, которое хотите создать..."}
-                        className="h-[54px] resize-none text-base flex-1 bg-muted/80 border border-border/80 focus:border-primary/80 focus:bg-muted/95"
-                        onFocus={() => setIsFocused(true)}
-                        onBlur={() => setIsFocused(false)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-                            e.preventDefault()
-                            handleGenerate()
-                          }
-                        }}
-                      />
+                      <div className="flex-1 relative">
+                        <Textarea
+                          value={prompt}
+                          onChange={(e) => handlePromptChange(e.target.value)}
+                          placeholder={isDragOver ? "Отпустите файл для загрузки..." : isEditingMode ? "Опишите изменения для прикрепленного изображения..." : "Опишите изображение, которое хотите создать..."}
+                          className="h-[54px] resize-none text-base flex-1 bg-muted/80 border border-border/80 focus:border-primary/80 focus:bg-muted/95 pr-16"
+                          onFocus={() => setIsFocused(true)}
+                          onBlur={() => setIsFocused(false)}
+                          maxLength={5000}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                              e.preventDefault()
+                              handleGenerate()
+                            }
+                          }}
+                        />
+                        <div className="absolute bottom-1 right-2 text-xs text-muted-foreground pointer-events-none">
+                          {prompt.length}/5000
+                        </div>
+                      </div>
                       
                       {/* Кнопки управления - справа в 2 ряда */}
                       <div className="flex flex-col gap-1">
