@@ -278,7 +278,7 @@ export interface AdminStatsDTO {
   paidPaymentsCount: number;
   pendingPaymentsCount: number;
   failedPaymentsCount: number;
-  averagePaymentAmount: number;
+  yearRevenue: number;
 }
 
 class ApiClient {
