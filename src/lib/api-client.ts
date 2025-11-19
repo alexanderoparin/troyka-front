@@ -305,7 +305,8 @@ class ApiClient {
 
   private async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
+    customTimeout?: number
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseUrl}${endpoint}`;
     
@@ -329,7 +330,8 @@ class ApiClient {
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+      const timeout = customTimeout ?? this.timeout;
+      const timeoutId = setTimeout(() => controller.abort(), timeout);
 
       const response = await fetch(url, {
         ...config,
@@ -1045,7 +1047,7 @@ class ApiClient {
     return this.request<EnhancePromptResponse>('/api/prompt/enhance', {
       method: 'POST',
       body: JSON.stringify(request),
-    });
+    }, 60000); // 60 секунд таймаут для запросов улучшения промпта
   }
 
   // Admin panel methods
