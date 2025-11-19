@@ -494,7 +494,7 @@ class ApiClient {
     return this.request<ImageResponse>('/api/fal/image/run/create', {
       method: 'POST',
       body: JSON.stringify(request),
-    });
+    }, 180000); // 3 минуты таймаут для генерации изображений (соответствует бэкенду)
   }
 
   // File Upload API
