@@ -10,13 +10,14 @@ import { AlertCircle, User, Eye, Menu, ArrowLeft } from "lucide-react"
 import Footer from "@/components/footer"
 import { getPointsText } from "@/lib/grammar"
 import Link from "next/link"
-import { useState, useCallback, useEffect } from "react"
+import { useState, useCallback, useEffect, useRef } from "react"
 import Image from "next/image"
 import { useDefaultSession, useSessionsList } from "@/hooks/use-sessions-list"
 import { useToast } from "@/components/ui/use-toast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { apiClient } from "@/lib/api-client"
 
 export default function StudioPage() {
   const { user, isAuthenticated, isEmailVerified, points } = useAuth()
@@ -262,6 +263,18 @@ export default function StudioPage() {
 
   // Проверка доступа к студии: email должен быть подтвержден ИЛИ должен быть привязан Telegram
   const hasStudioAccess = isEmailVerified() || (user?.telegramId != null)
+  const emailSentRef = useRef(false)
+  
+  // Автоматически отправляем письмо при заходе на студию без доступа
+  useEffect(() => {
+    if (!hasStudioAccess && user && !isEmailVerified() && !user.telegramId && !emailSentRef.current) {
+      emailSentRef.current = true
+      // Автоматически отправляем письмо подтверждения
+      apiClient.checkAndSendVerificationEmail().catch(() => {
+        // Игнорируем ошибки, чтобы не показывать лишние уведомления
+      })
+    }
+  }, [hasStudioAccess, user])
   
   if (!hasStudioAccess) {
     return (
