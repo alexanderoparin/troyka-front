@@ -21,6 +21,7 @@ export default function VerifyEmailPage() {
   const [verificationResult, setVerificationResult] = useState<boolean | null>(null)
   const [processedToken, setProcessedToken] = useState<string | null>(null)
   const isProcessingRef = useRef(false)
+  const isCheckingEmailRef = useRef(false)
 
   // Авто-редирект в студию после успешной верификации
   useEffect(() => {
@@ -74,16 +75,21 @@ export default function VerifyEmailPage() {
     }
     
     if (!token) {
-      // Если нет токена, но есть email - это нормальная ситуация после регистрации
-      if (emailParam) {
-        setIsLoading(false)
-        setVerificationResult(false)
+      // Если нет токена, автоматически проверяем и отправляем письмо если нужно
+      // Защита от повторных вызовов
+      if (isCheckingEmailRef.current) {
+        console.log('Already checking email, skipping')
         return
       }
-      // Если нет ни токена, ни email - это ошибка
-      setError('Токен подтверждения не найден')
-      setIsLoading(false)
-      setVerificationResult(false)
+      isCheckingEmailRef.current = true
+      
+      if (emailParam) {
+        // Автоматически отправляем письмо при заходе на страницу без токена
+        checkAndSendEmail()
+        return
+      }
+      // Если нет ни токена, ни email - проверяем и отправляем письмо для текущего пользователя
+      checkAndSendEmail()
       return
     }
 
@@ -93,6 +99,48 @@ export default function VerifyEmailPage() {
     setProcessedToken(token)
     verifyEmail(token)
   }, [searchParams]) // Убираем лишние зависимости
+
+  const checkAndSendEmail = async () => {
+    // Защита от повторных вызовов
+    if (isCheckingEmailRef.current && verificationResult !== null) {
+      return
+    }
+    
+    try {
+      setIsLoading(true)
+      const response = await apiClient.checkAndSendVerificationEmail()
+      
+      if (response.data) {
+        setIsLoading(false)
+        setVerificationResult(false)
+        isCheckingEmailRef.current = false
+        toast({
+          title: response.data.message || "Проверьте почту",
+          description: "Письмо с подтверждением отправлено на ваш email",
+        })
+      } else {
+        setIsLoading(false)
+        setVerificationResult(false)
+        isCheckingEmailRef.current = false
+        setError(response.error || 'Ошибка отправки письма')
+        toast({
+          title: "Ошибка",
+          description: response.error || "Не удалось отправить письмо",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      setIsLoading(false)
+      setVerificationResult(false)
+      isCheckingEmailRef.current = false
+      setError('Произошла ошибка при отправке письма')
+      toast({
+        title: "Ошибка",
+        description: "Произошла непредвиденная ошибка",
+        variant: "destructive",
+      })
+    }
+  }
 
   const verifyEmail = async (token: string) => {
     console.log('verifyEmail called with token:', token, 'isVerifying:', isVerifying, 'processedToken:', processedToken)

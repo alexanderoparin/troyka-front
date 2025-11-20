@@ -260,7 +260,75 @@ export default function StudioPage() {
     )
   }
 
-  // Ранее блокировали доступ без подтверждения email. По новой политике — доступ открыт.
+  // Проверка доступа к студии: email должен быть подтвержден ИЛИ должен быть привязан Telegram
+  const hasStudioAccess = isEmailVerified() || (user?.telegramId != null)
+  
+  if (!hasStudioAccess) {
+    return (
+      <div className="relative bg-white dark:bg-slate-900 min-h-screen flex flex-col">
+        <div className="fixed inset-0 bg-white dark:bg-slate-900 pointer-events-none -z-10"></div>
+        <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,_rgba(59,130,246,0.3)_0%,_transparent_70%)] dark:bg-[radial-gradient(circle_at_center,_rgba(59,130,246,0.3)_0%,_transparent_70%)] pointer-events-none -z-10"></div>
+
+        {/* Верхний хедер с навигацией */}
+        <Header />
+
+        <div className="flex justify-center relative z-10 py-3 sm:py-5 flex-1">
+          <div className="w-full max-w-5xl flex">
+            {/* Left Side - Hero Panel */}
+            <div className="hidden lg:flex lg:w-2/5 lg:h-[82vh] relative overflow-hidden">
+              <div className="absolute top-20 left-20 w-2 h-2 bg-blue-300 dark:bg-blue-300 rounded-full animate-pulse opacity-60 dark:opacity-80 z-10"></div>
+              <div className="absolute top-32 right-32 w-3 h-3 bg-blue-300 dark:bg-blue-300 rounded-full animate-pulse opacity-60 dark:opacity-80 z-10" style={{ animationDelay: '0.5s' }}></div>
+              <div className="absolute bottom-32 left-32 w-2 h-2 bg-blue-300 dark:bg-blue-300 rounded-full animate-pulse opacity-60 dark:opacity-80 z-10" style={{ animationDelay: '1s' }}></div>
+              <div className="absolute bottom-20 right-20 w-3 h-3 bg-blue-300 dark:bg-blue-300 rounded-full animate-pulse opacity-60 dark:opacity-80 z-10" style={{ animationDelay: '1.5s' }}></div>
+
+              <div className="relative z-10 w-full h-full flex items-center justify-center p-8">
+                <div className="relative w-72 h-72 max-w-full max-h-full">
+                  <Image
+                    src="/login-hero.png"
+                    alt="24reshai Logo"
+                    fill
+                    className="object-contain drop-shadow-2xl"
+                    priority
+                    sizes="320px"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Right Side - Email verification required */}
+            <div className="w-full lg:w-3/5 flex items-center justify-center relative z-10 p-4 sm:p-5 lg:p-6 lg:px-5">
+              <div className="w-full max-w-md lg:max-w-lg space-y-4 text-center">
+                <div className="space-y-2">
+                  <AlertCircle className="w-12 h-12 mx-auto text-yellow-500" />
+                  <h1 className="text-xl sm:text-2xl font-bold">Подтвердите email для доступа к студии</h1>
+                  <p className="text-sm text-muted-foreground">
+                    Для использования студии необходимо подтвердить ваш email адрес или привязать Telegram аккаунт
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Button size="lg" className="w-full" asChild>
+                    <Link href="/verify-email">Подтвердить email</Link>
+                  </Button>
+                  <Button variant="outline" size="lg" className="w-full" asChild>
+                    <Link href="/account">Привязать Telegram</Link>
+                  </Button>
+                </div>
+                <div className="text-center pt-1">
+                  <Button variant="ghost" asChild>
+                    <Link href="/" className="flex items-center gap-2 justify-center">
+                      <ArrowLeft className="w-4 h-4" />
+                      На главную
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    )
+  }
 
   // Загрузка дефолтной сессии
   if (isLoadingDefaultSession) {

@@ -513,6 +513,12 @@ class ApiClient {
     });
   }
 
+  async checkAndSendVerificationEmail(): Promise<ApiResponse<{ message: string }>> {
+    return this.request<{ message: string }>('/api/auth/check-and-send-verification', {
+      method: 'POST',
+    });
+  }
+
   isAuthenticated(): boolean {
     return !!this.getToken();
   }
