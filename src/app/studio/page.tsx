@@ -34,12 +34,26 @@ export default function StudioPage() {
   const [selectedSession, setSelectedSession] = useState<any>(null)
   const [renameSessionName, setRenameSessionName] = useState("")
   
+  // Проверка доступа к студии: email должен быть подтвержден ИЛИ должен быть привязан Telegram
+  const hasStudioAccess = isEmailVerified() || (user?.telegramId != null)
+  const emailSentRef = useRef(false)
   
   // Получаем дефолтную сессию
   const { defaultSession, isLoading: isLoadingDefaultSession } = useDefaultSession()
   
   // Хук для работы с сессиями
   const { createSession, isCreating, renameSession, deleteSession, isRenaming, isDeleting } = useSessionsList(0, 20)
+  
+  // Автоматически отправляем письмо при заходе на студию без доступа
+  useEffect(() => {
+    if (!hasStudioAccess && user && !isEmailVerified() && !user.telegramId && !emailSentRef.current) {
+      emailSentRef.current = true
+      // Автоматически отправляем письмо подтверждения
+      apiClient.checkAndSendVerificationEmail().catch(() => {
+        // Игнорируем ошибки, чтобы не показывать лишние уведомления
+      })
+    }
+  }, [hasStudioAccess, user, isEmailVerified])
 
   // Устанавливаем дефолтную сессию при загрузке
   useEffect(() => {
@@ -120,21 +134,18 @@ export default function StudioPage() {
 
   // Обработчик скрытия блока с сессиями
   const handleHideSessions = useCallback(() => {
-    console.log('handleHideSessions called, setting isSessionsVisible to false')
     setIsSessionsVisible(false)
     setIsCreateDialogOpen(true) // Открываем диалог создания сессии
   }, [])
 
   // Обработчики для переименования и удаления сессий
   const handleOpenRenameDialog = useCallback((session: any) => {
-    console.log('Opening rename dialog for session:', session.name)
     setSelectedSession(session)
     setRenameSessionName(session.name)
     setIsRenameDialogOpen(true)
   }, [])
 
   const handleOpenDeleteDialog = useCallback((session: any) => {
-    console.log('Opening delete dialog for session:', session.name)
     setSelectedSession(session)
     setIsDeleteDialogOpen(true)
   }, [])
@@ -261,21 +272,6 @@ export default function StudioPage() {
     )
   }
 
-  // Проверка доступа к студии: email должен быть подтвержден ИЛИ должен быть привязан Telegram
-  const hasStudioAccess = isEmailVerified() || (user?.telegramId != null)
-  const emailSentRef = useRef(false)
-  
-  // Автоматически отправляем письмо при заходе на студию без доступа
-  useEffect(() => {
-    if (!hasStudioAccess && user && !isEmailVerified() && !user.telegramId && !emailSentRef.current) {
-      emailSentRef.current = true
-      // Автоматически отправляем письмо подтверждения
-      apiClient.checkAndSendVerificationEmail().catch(() => {
-        // Игнорируем ошибки, чтобы не показывать лишние уведомления
-      })
-    }
-  }, [hasStudioAccess, user])
-  
   if (!hasStudioAccess) {
     return (
       <div className="relative bg-white dark:bg-slate-900 min-h-screen flex flex-col">
