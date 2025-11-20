@@ -18,7 +18,15 @@ import { TelegramLoginButton } from "@/components/telegram-login-button"
 import { Separator } from "@/components/ui/separator"
 
 const loginSchema = z.object({
-  username: z.string().min(3, "Логин должен содержать минимум 3 символа"),
+  username: z.string()
+    .min(1, "Логин обязателен")
+    .refine((val) => val.trim().length >= 3, {
+      message: "Логин должен содержать минимум 3 символа (без учета пробелов)",
+    })
+    .refine((val) => val.trim() === val, {
+      message: "Логин не может начинаться или заканчиваться пробелом",
+    })
+    .transform((val) => val.trim()),
   password: z.string().min(6, "Пароль должен содержать минимум 6 символов"),
 })
 

@@ -22,7 +22,18 @@ import { Separator } from "@/components/ui/separator"
 import { useQueryClient } from "@tanstack/react-query"
 
 const registerSchema = z.object({
-  username: z.string().min(3, "Логин должен содержать минимум 3 символа"),
+  username: z.string()
+    .min(1, "Логин обязателен")
+    .refine((val) => val.trim().length >= 3, {
+      message: "Логин должен содержать минимум 3 символа (без учета пробелов)",
+    })
+    .refine((val) => val.trim().length <= 50, {
+      message: "Логин не должен превышать 50 символов",
+    })
+    .refine((val) => val.trim() === val, {
+      message: "Логин не может начинаться или заканчиваться пробелом",
+    })
+    .transform((val) => val.trim()),
   email: z.string().email("Введите корректный email"),
   password: z.string()
     .min(8, "Пароль должен содержать минимум 8 символов")
