@@ -12,6 +12,7 @@ export function ConditionalLayout({ children }: ConditionalLayoutProps) {
   const pathname = usePathname()
   
   // Для студии используем специальный layout без header и footer
+  // Баннер будет показан через SystemStatusBanner в layout.tsx
   if (pathname === '/studio') {
     return (
       <div className="h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">

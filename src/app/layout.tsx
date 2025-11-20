@@ -7,6 +7,7 @@ import { QueryProvider } from '@/components/query-provider'
 import { AuthProvider } from '@/contexts/auth-context'
 import { Toaster } from '@/components/ui/toaster'
 import { ConditionalLayout } from '@/components/conditional-layout'
+import { SystemStatusBanner } from '@/components/system-status-banner'
 
 const inter = Inter({ subsets: ['latin', 'cyrillic'] })
 
@@ -91,6 +92,7 @@ export default function RootLayout({
         >
           <QueryProvider>
             <AuthProvider>
+              <SystemStatusBanner />
               <ConditionalLayout>
                 {children}
               </ConditionalLayout>

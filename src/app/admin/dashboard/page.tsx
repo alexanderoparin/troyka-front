@@ -1,13 +1,17 @@
 "use client"
 
 import { useAuth } from "@/contexts/auth-context"
-import { apiClient, AdminPaymentDTO, AdminUserDTO, AdminStatsDTO } from "@/lib/api-client"
+import { apiClient, AdminPaymentDTO, AdminUserDTO, AdminStatsDTO, SystemStatus, SystemStatusRequest, SystemStatusHistoryDTO, SystemStatusWithMetadata } from "@/lib/api-client"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useToast } from "@/components/ui/use-toast"
 import { 
   Shield,
   ArrowLeft,
@@ -20,17 +24,21 @@ import {
   Search,
   CheckCircle,
   Clock,
-  XCircle
+  XCircle,
+  Settings,
+  AlertTriangle,
+  Server
 } from "lucide-react"
-import { formatDate } from "@/lib/utils"
+import { formatDate, cn } from "@/lib/utils"
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
-type TabType = 'stats' | 'payments' | 'users'
+type TabType = 'stats' | 'payments' | 'users' | 'system'
 
 export default function AdminDashboardPage() {
   const { isAuthenticated, isLoading, user } = useAuth()
   const router = useRouter()
+  const { toast } = useToast()
   const [activeTab, setActiveTab] = useState<TabType>('stats')
   const [stats, setStats] = useState<AdminStatsDTO | null>(null)
   const [payments, setPayments] = useState<AdminPaymentDTO[]>([])
@@ -39,6 +47,11 @@ export default function AdminDashboardPage() {
   const [error, setError] = useState<string | null>(null)
   const [paymentSearch, setPaymentSearch] = useState("")
   const [userSearch, setUserSearch] = useState("")
+  const [systemStatus, setSystemStatus] = useState<SystemStatusWithMetadata | null>(null)
+  const [systemHistory, setSystemHistory] = useState<SystemStatusHistoryDTO[]>([])
+  const [statusMessage, setStatusMessage] = useState("")
+  const [selectedStatus, setSelectedStatus] = useState<SystemStatus>('ACTIVE')
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false)
 
   useEffect(() => {
     if (!isLoading && (!isAuthenticated || user?.role !== 'ADMIN')) {
@@ -77,6 +90,22 @@ export default function AdminDashboardPage() {
         } else {
           setError(response.error || 'Ошибка загрузки пользователей')
         }
+      } else if (activeTab === 'system') {
+        const [statusResponse, historyResponse] = await Promise.all([
+          apiClient.getAdminSystemStatus(),
+          apiClient.getSystemStatusHistory(50)
+        ])
+        if (statusResponse.data) {
+          setSystemStatus(statusResponse.data)
+          setSelectedStatus(statusResponse.data.status)
+          setStatusMessage(statusResponse.data.message || "")
+        }
+        if (historyResponse.data) {
+          setSystemHistory(historyResponse.data)
+        }
+        if (statusResponse.error || historyResponse.error) {
+          setError(statusResponse.error || historyResponse.error || 'Ошибка загрузки данных системы')
+        }
       }
     } catch (err) {
       setError('Произошла ошибка при загрузке данных')
@@ -104,6 +133,19 @@ export default function AdminDashboardPage() {
         return <XCircle className="h-4 w-4 text-red-500" />
       default:
         return <Clock className="h-4 w-4 text-gray-500" />
+    }
+  }
+
+  const getStatusLabel = (status: SystemStatus): string => {
+    switch (status) {
+      case 'ACTIVE':
+        return 'Активен'
+      case 'DEGRADED':
+        return 'Ограничен'
+      case 'MAINTENANCE':
+        return 'Техническое обслуживание'
+      default:
+        return status
     }
   }
 
@@ -245,6 +287,14 @@ export default function AdminDashboardPage() {
         >
           <Users className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
           <span className="whitespace-nowrap">Пользователи</span>
+        </Button>
+        <Button
+          variant={activeTab === 'system' ? 'default' : 'ghost'}
+          onClick={() => setActiveTab('system')}
+          className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary flex-shrink-0 text-xs sm:text-sm px-2 sm:px-4"
+        >
+          <Server className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+          <span className="whitespace-nowrap">Система</span>
         </Button>
         </div>
       </div>
@@ -575,6 +625,209 @@ export default function AdminDashboardPage() {
             )}
           </CardContent>
         </Card>
+      ) : activeTab === 'system' ? (
+        <div className="space-y-6">
+          {/* Current Status Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Server className="h-5 w-5" />
+                Текущий статус системы
+              </CardTitle>
+              <CardDescription>
+                Управление статусом системы и оповещениями для пользователей
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {systemStatus && (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <Label className="w-32">Текущий статус:</Label>
+                    <Badge 
+                      variant={systemStatus.status === 'ACTIVE' ? 'default' : 
+                              systemStatus.status === 'DEGRADED' ? 'secondary' : 'destructive'}
+                      className={cn(
+                        "text-sm",
+                        systemStatus.status === 'DEGRADED' && "bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-600"
+                      )}
+                    >
+                      {systemStatus.status === 'ACTIVE' && '🟢 Активен'}
+                      {systemStatus.status === 'DEGRADED' && '🟡 Ограничен'}
+                      {systemStatus.status === 'MAINTENANCE' && '🔴 Техническое обслуживание'}
+                    </Badge>
+                    {systemStatus.isSystem && (
+                      <Badge variant="outline" className="text-xs">
+                        Автоматический
+                      </Badge>
+                    )}
+                  </div>
+                  {systemStatus.message && (
+                    <div className="flex items-start gap-4">
+                      <Label className="w-32">Сообщение:</Label>
+                      <p className="text-sm text-muted-foreground flex-1">{systemStatus.message}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="border-t pt-6 space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="status-select">Новый статус</Label>
+                  <Select
+                    value={selectedStatus}
+                    onValueChange={(value) => {
+                      setSelectedStatus(value as SystemStatus)
+                      // Устанавливаем дефолтное сообщение при выборе статуса
+                      if (value === 'DEGRADED') {
+                        setStatusMessage("Система работает с ограничениями, возможны задержки")
+                      } else if (value === 'MAINTENANCE') {
+                        setStatusMessage("Серьезные проблемы с инфраструктурой, сервис может быть недоступен")
+                      } else {
+                        setStatusMessage("")
+                      }
+                    }}
+                  >
+                    <SelectTrigger id="status-select">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ACTIVE">🟢 Активен</SelectItem>
+                      <SelectItem value="DEGRADED">🟡 Ограничен</SelectItem>
+                      <SelectItem value="MAINTENANCE">🔴 Техническое обслуживание</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {selectedStatus !== 'ACTIVE' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="status-message">Сообщение для пользователей</Label>
+                    <Textarea
+                      id="status-message"
+                      value={statusMessage}
+                      onChange={(e) => setStatusMessage(e.target.value)}
+                      placeholder={
+                        selectedStatus === 'DEGRADED'
+                          ? "Система работает с ограничениями, возможны задержки"
+                          : "Серьезные проблемы с инфраструктурой, сервис может быть недоступен"
+                      }
+                      rows={3}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Оставьте пустым, чтобы использовать дефолтное сообщение
+                    </p>
+                  </div>
+                )}
+
+                <Button
+                  onClick={async () => {
+                    setIsUpdatingStatus(true)
+                    try {
+                      const request: SystemStatusRequest = {
+                        status: selectedStatus,
+                        message: selectedStatus === 'ACTIVE' ? undefined : (statusMessage.trim() || undefined)
+                      }
+                      const response = await apiClient.updateSystemStatus(request)
+                      if (response.data) {
+                        toast({
+                          title: "Статус обновлен",
+                          description: "Статус системы успешно обновлен",
+                        })
+                        // Обновляем данные
+                        await loadData()
+                      } else {
+                        toast({
+                          title: "Ошибка",
+                          description: response.error || "Не удалось обновить статус",
+                          variant: "destructive",
+                        })
+                      }
+                    } catch (error) {
+                      toast({
+                        title: "Ошибка",
+                        description: "Произошла ошибка при обновлении статуса",
+                        variant: "destructive",
+                      })
+                    } finally {
+                      setIsUpdatingStatus(false)
+                    }
+                  }}
+                  disabled={isUpdatingStatus}
+                  className="w-full sm:w-auto"
+                >
+                  {isUpdatingStatus ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                      Обновление...
+                    </>
+                  ) : (
+                    "Обновить статус"
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* History Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="h-5 w-5" />
+                История изменений
+              </CardTitle>
+              <CardDescription>
+                Последние изменения статуса системы
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {systemHistory.length > 0 ? (
+                <div className="space-y-3">
+                  {systemHistory.map((item) => (
+                    <div
+                      key={item.id}
+                      className="border rounded-lg p-4 hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="flex items-start justify-between gap-4 mb-2">
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant={item.status === 'ACTIVE' ? 'default' : 
+                                    item.status === 'DEGRADED' ? 'secondary' : 'destructive'}
+                            className={cn(
+                              "text-xs",
+                              item.status === 'DEGRADED' && "bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-600"
+                            )}
+                          >
+                            {getStatusLabel(item.status)}
+                          </Badge>
+                          {item.isSystem && (
+                            <Badge variant="outline" className="text-xs">
+                              Автоматический
+                            </Badge>
+                          )}
+                        </div>
+                        <span className="text-xs text-muted-foreground whitespace-nowrap">
+                          {formatDate(new Date(item.createdAt))}
+                        </span>
+                      </div>
+                      {item.message && (
+                        <p className="text-sm text-muted-foreground mb-2">{item.message}</p>
+                      )}
+                      {item.username && (
+                        <p className="text-xs text-muted-foreground">
+                          Изменено пользователем: {item.username}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-muted-foreground">
+                  <Clock className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>История изменений пуста</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       ) : null}
       </div>
     </div>

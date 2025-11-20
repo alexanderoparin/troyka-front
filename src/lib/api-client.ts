@@ -281,6 +281,34 @@ export interface AdminStatsDTO {
   yearRevenue: number;
 }
 
+// System status interfaces
+export type SystemStatus = 'ACTIVE' | 'DEGRADED' | 'MAINTENANCE';
+
+export interface SystemStatusResponse {
+  status: SystemStatus;
+  message: string | null;
+}
+
+export interface SystemStatusRequest {
+  status: SystemStatus;
+  message?: string;
+}
+
+export interface SystemStatusHistoryDTO {
+  id: number;
+  status: SystemStatus;
+  message: string | null;
+  username: string | null;
+  isSystem: boolean;
+  createdAt: string;
+}
+
+export interface SystemStatusWithMetadata {
+  status: SystemStatus;
+  message: string | null;
+  isSystem: boolean | null;
+}
+
 class ApiClient {
   private baseUrl: string;
   private timeout: number;
@@ -1061,6 +1089,27 @@ class ApiClient {
 
   async getAdminStats(): Promise<ApiResponse<AdminStatsDTO>> {
     return this.request<AdminStatsDTO>('/api/admin/stats');
+  }
+
+  // System status methods
+  async getSystemStatus(): Promise<ApiResponse<SystemStatusResponse>> {
+    return this.request<SystemStatusResponse>('/api/system/status');
+  }
+
+  // Admin system status methods
+  async getAdminSystemStatus(): Promise<ApiResponse<SystemStatusWithMetadata>> {
+    return this.request<SystemStatusWithMetadata>('/api/admin/system/status');
+  }
+
+  async updateSystemStatus(request: SystemStatusRequest): Promise<ApiResponse<{ message: string }>> {
+    return this.request<{ message: string }>('/api/admin/system/status', {
+      method: 'PUT',
+      body: JSON.stringify(request),
+    });
+  }
+
+  async getSystemStatusHistory(limit: number = 50): Promise<ApiResponse<SystemStatusHistoryDTO[]>> {
+    return this.request<SystemStatusHistoryDTO[]>(`/api/admin/system/history?limit=${limit}`);
   }
 }
 
