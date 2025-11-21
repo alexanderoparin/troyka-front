@@ -345,7 +345,7 @@ export function StudioChat({
       pollingIntervalsRef.current.clear()
     }
   }, [startPolling])
-
+  
   // Очищаем промпт и изображения при смене сессии
   useEffect(() => {
     setPrompt("")
