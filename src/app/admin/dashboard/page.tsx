@@ -172,7 +172,8 @@ export default function AdminDashboardPage() {
     (p.username && p.username.toLowerCase().includes(paymentSearch.toLowerCase())) ||
     (p.email && p.email.toLowerCase().includes(paymentSearch.toLowerCase())) ||
     (p.telegramUsername && p.telegramUsername.toLowerCase().includes(paymentSearch.toLowerCase())) ||
-    p.id.toString().includes(paymentSearch)
+    p.id.toString().includes(paymentSearch) ||
+    p.userId.toString().includes(paymentSearch)
   )
 
   const filteredUsers = users.filter(u =>
@@ -385,29 +386,38 @@ export default function AdminDashboardPage() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs sm:text-sm font-medium">Оплачено</CardTitle>
-              <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 flex-shrink-0" />
+              <CardTitle className="text-xs sm:text-sm font-medium">Регистраций сегодня</CardTitle>
+              <Users className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
             </CardHeader>
             <CardContent>
-              <div className="text-xl sm:text-2xl font-bold">{stats.paidPaymentsCount}</div>
+              <div className="text-xl sm:text-2xl font-bold">{stats.todayRegistrations}</div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs sm:text-sm font-medium">Ожидает оплаты</CardTitle>
-              <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-500 flex-shrink-0" />
+              <CardTitle className="text-xs sm:text-sm font-medium">Регистраций за неделю</CardTitle>
+              <Users className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
             </CardHeader>
             <CardContent>
-              <div className="text-xl sm:text-2xl font-bold">{stats.pendingPaymentsCount}</div>
+              <div className="text-xl sm:text-2xl font-bold">{stats.weekRegistrations}</div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs sm:text-sm font-medium">Неудачных</CardTitle>
-              <XCircle className="h-3 w-3 sm:h-4 sm:w-4 text-red-500 flex-shrink-0" />
+              <CardTitle className="text-xs sm:text-sm font-medium">Регистраций за месяц</CardTitle>
+              <Users className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
             </CardHeader>
             <CardContent>
-              <div className="text-xl sm:text-2xl font-bold">{stats.failedPaymentsCount}</div>
+              <div className="text-xl sm:text-2xl font-bold">{stats.monthRegistrations}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium">Регистраций за год</CardTitle>
+              <Users className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-xl sm:text-2xl font-bold">{stats.yearRegistrations}</div>
             </CardContent>
           </Card>
         </div>
@@ -462,7 +472,6 @@ export default function AdminDashboardPage() {
                     <div key={payment.id} className="w-full max-w-full border rounded-lg p-3 sm:p-4 hover:bg-muted/50 transition-colors overflow-hidden">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3 w-full">
                         <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0 w-full sm:w-auto">
-                          <div className="flex-shrink-0">{getStatusIcon(payment.status)}</div>
                           <Avatar className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0">
                             {avatarUrl ? (
                               <AvatarImage src={avatarUrl} alt={payment.username} />
@@ -474,7 +483,7 @@ export default function AdminDashboardPage() {
                           <div className="flex-1 min-w-0 overflow-hidden">
                             <h3 className="font-medium text-sm sm:text-base break-words overflow-wrap-anywhere">{displayDescription}</h3>
                             <p className="text-xs sm:text-sm text-muted-foreground break-words overflow-wrap-anywhere">
-                              Платеж #{payment.id} • {userInfo}
+                              Платеж #{payment.id} • Пользователь ID: {payment.userId} • {userInfo}
                             </p>
                             {payment.telegramFirstName && (
                               <p className="text-xs text-muted-foreground mt-1 break-words overflow-wrap-anywhere">
@@ -488,7 +497,6 @@ export default function AdminDashboardPage() {
                           <div className="font-semibold text-base sm:text-lg mb-1 break-words">
                             {payment.amount.toLocaleString('ru-RU')} ₽
                           </div>
-                          <div className="w-fit">{getStatusBadge(payment.status)}</div>
                         </div>
                       </div>
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs sm:text-sm text-muted-foreground w-full">

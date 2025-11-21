@@ -259,7 +259,6 @@ export interface AdminPaymentDTO {
   telegramPhotoUrl: string | null;
   amount: number;
   description: string;
-  status: string;
   creditsAmount: number;
   paidAt: string | null;
   createdAt: string;
@@ -289,10 +288,11 @@ export interface AdminStatsDTO {
   todayRevenue: number;
   weekRevenue: number;
   monthRevenue: number;
-  paidPaymentsCount: number;
-  pendingPaymentsCount: number;
-  failedPaymentsCount: number;
   yearRevenue: number;
+  todayRegistrations: number;
+  weekRegistrations: number;
+  monthRegistrations: number;
+  yearRegistrations: number;
 }
 
 // System status interfaces
