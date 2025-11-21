@@ -41,6 +41,20 @@ export interface ImageResponse {
   balance?: number;
 }
 
+// Queue generation interfaces
+export interface QueueRequestStatus {
+  id: number;
+  falRequestId: string;
+  queueStatus: 'IN_QUEUE' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED';
+  queuePosition?: number;
+  prompt: string;
+  imageUrls: string[];
+  description?: string;
+  sessionId: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Типы для сессий
 export interface Session {
   id: number;
@@ -529,6 +543,22 @@ class ApiClient {
       method: 'POST',
       body: JSON.stringify(request),
     }, 180000); // 3 минуты таймаут для генерации изображений (соответствует бэкенду)
+  }
+
+  // Queue Generation API
+  async submitToQueue(request: ImageRequest): Promise<ApiResponse<QueueRequestStatus>> {
+    return this.request<QueueRequestStatus>('/api/generate/submit', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    });
+  }
+
+  async getQueueStatus(id: number): Promise<ApiResponse<QueueRequestStatus>> {
+    return this.request<QueueRequestStatus>(`/api/generate/status/${id}`);
+  }
+
+  async getUserActiveRequests(): Promise<ApiResponse<QueueRequestStatus[]>> {
+    return this.request<QueueRequestStatus[]>('/api/generate/user/active');
   }
 
   // File Upload API

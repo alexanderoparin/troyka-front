@@ -27,7 +27,7 @@ import {
 import { cn } from "@/lib/utils"
 import { useToast } from "@/components/ui/use-toast"
 import { useAuth } from "@/contexts/auth-context"
-import { apiClient, ArtStyle, EnhancePromptRequest } from "@/lib/api-client"
+import { apiClient, ArtStyle, EnhancePromptRequest, QueueRequestStatus } from "@/lib/api-client"
 import { formatApiError } from "@/lib/errors"
 import {
   Tooltip,
@@ -115,6 +115,8 @@ export function StudioChat({
   const [isEditingMode, setIsEditingMode] = useState(false)
   const [artStyles, setArtStyles] = useState<ArtStyle[]>([])
   const isInitializingStyleRef = useRef(false) // Флаг для предотвращения дублирующих запросов при инициализации
+  const [activeQueueRequests, setActiveQueueRequests] = useState<Map<number, QueueRequestStatus>>(new Map())
+  const pollingIntervalsRef = useRef<Map<number, NodeJS.Timeout>>(new Map())
   
   // Загружаем стили из базы данных и сохраненный стиль пользователя при монтировании компонента
   useEffect(() => {
@@ -181,6 +183,131 @@ export function StudioChat({
     loadArtStyles()
   }, [])
   
+  const { toast } = useToast()
+  
+  const {
+    history,
+    hasMore,
+    isLoading,
+    loadMoreHistory,
+    updateHistoryAfterGeneration,
+  } = useSessionHistory(sessionId || null, 20)
+
+  // Функция для остановки polling
+  const stopPolling = useCallback((requestId: number) => {
+    const interval = pollingIntervalsRef.current.get(requestId)
+    if (interval) {
+      clearInterval(interval)
+      pollingIntervalsRef.current.delete(requestId)
+    }
+  }, [])
+
+  // Функция для правильного склонения слова "изображение"
+  const getImageText = useCallback((count: number) => {
+    if (count === 1) return 'изображение'
+    if (count >= 2 && count <= 4) return 'изображения'
+    return 'изображений'
+  }, [])
+
+  // Функция для запуска polling статуса запроса
+  const startPolling = useCallback((requestId: number) => {
+    // Останавливаем предыдущий polling, если есть
+    const existingInterval = pollingIntervalsRef.current.get(requestId)
+    if (existingInterval) {
+      clearInterval(existingInterval)
+    }
+
+    const pollStatus = async () => {
+      try {
+        const response = await apiClient.getQueueStatus(requestId)
+        if (response.data) {
+          const request = response.data
+          setActiveQueueRequests(prev => {
+            const updated = new Map(prev)
+            updated.set(requestId, request)
+            return updated
+          })
+
+          // Если запрос завершен, останавливаем polling
+          if (request.queueStatus === 'COMPLETED') {
+            stopPolling(requestId)
+            // Обрабатываем завершенный запрос
+            if (request.imageUrls && request.imageUrls.length > 0) {
+              onGenerationComplete(request.imageUrls, request.prompt)
+              updateHistoryAfterGeneration()
+              toast({
+                title: "Изображения созданы!",
+                description: `Создано ${request.imageUrls.length} ${getImageText(request.imageUrls.length)}`,
+                duration: 1500,
+              })
+              // Обновляем баланс
+              setTimeout(() => {
+                refreshPoints().catch(() => {})
+              }, 500)
+            }
+            // Удаляем из активных запросов через небольшую задержку
+            setTimeout(() => {
+              setActiveQueueRequests(prev => {
+                const updated = new Map(prev)
+                updated.delete(requestId)
+                return updated
+              })
+            }, 2000)
+          } else if (request.queueStatus === 'FAILED') {
+            stopPolling(requestId)
+            toast({
+              title: "Ошибка генерации",
+              description: "Не удалось создать изображения. Попробуйте еще раз.",
+              variant: "destructive",
+            })
+            // Удаляем из активных запросов
+            setTimeout(() => {
+              setActiveQueueRequests(prev => {
+                const updated = new Map(prev)
+                updated.delete(requestId)
+                return updated
+              })
+            }, 2000)
+          }
+        }
+      } catch (error) {
+        // Игнорируем ошибки polling
+      }
+    }
+
+    // Опрашиваем сразу, затем каждые 3 секунды
+    pollStatus()
+    const interval = setInterval(pollStatus, 3000)
+    pollingIntervalsRef.current.set(requestId, interval)
+  }, [onGenerationComplete, updateHistoryAfterGeneration, toast, refreshPoints, stopPolling, getImageText])
+
+  // Загружаем активные запросы при монтировании компонента
+  useEffect(() => {
+    const loadActiveRequests = async () => {
+      try {
+        const response = await apiClient.getUserActiveRequests()
+        if (response.data && response.data.length > 0) {
+          const requestsMap = new Map<number, QueueRequestStatus>()
+          response.data.forEach(request => {
+            requestsMap.set(request.id, request)
+            // Запускаем polling для каждого активного запроса
+            startPolling(request.id)
+          })
+          setActiveQueueRequests(requestsMap)
+        }
+      } catch (error) {
+        // Игнорируем ошибки при загрузке активных запросов
+      }
+    }
+    loadActiveRequests()
+
+    // Очищаем интервалы при размонтировании
+    return () => {
+      pollingIntervalsRef.current.forEach(interval => clearInterval(interval))
+      pollingIntervalsRef.current.clear()
+    }
+  }, [startPolling])
+
   // Очищаем промпт и изображения при смене сессии
   useEffect(() => {
     setPrompt("")
@@ -241,7 +368,6 @@ export function StudioChat({
   
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const { toast } = useToast()
 
   // Сохраняем промпт в localStorage при изменении
   const handlePromptChange = (value: string) => {
@@ -253,27 +379,12 @@ export function StudioChat({
     }
   }
 
-  // Функция для правильного склонения слова "изображение"
-  const getImageText = (count: number) => {
-    if (count === 1) return 'изображение'
-    if (count >= 2 && count <= 4) return 'изображения'
-    return 'изображений'
-  }
-
   // Функция для правильного склонения слова "входное изображение"
   const getInputImageText = (count: number) => {
     if (count === 1) return 'входное изображение'
     if (count >= 2 && count <= 4) return 'входных изображения'
     return 'входных изображений'
   }
-
-  const {
-    history,
-    hasMore,
-    isLoading,
-    loadMoreHistory,
-    updateHistoryAfterGeneration,
-  } = useSessionHistory(sessionId || null, 20)
 
   // Автоматическая прокрутка к низу при новых сообщениях
   useEffect(() => {
@@ -284,6 +395,19 @@ export function StudioChat({
       }
     }
   }, [history.length])
+
+  // Автоматическая прокрутка к низу при добавлении нового активного запроса
+  useEffect(() => {
+    if (scrollAreaRef.current && activeQueueRequests.size > 0) {
+      const scrollElement = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]')
+      if (scrollElement) {
+        // Небольшая задержка для того, чтобы DOM успел обновиться
+        setTimeout(() => {
+          scrollElement.scrollTop = scrollElement.scrollHeight
+        }, 100)
+      }
+    }
+  }, [activeQueueRequests.size])
 
   // Очищаем localStorage при размонтировании компонента (перезагрузка страницы)
   useEffect(() => {
@@ -499,7 +623,7 @@ export function StudioChat({
       const selectedStyle = artStyles.find(style => style.name === artStyle)
       const styleId = selectedStyle?.id || 1 // По умолчанию id = 1 (Без стиля)
       
-      // Вызываем API для генерации (передаем styleId, на бэке промпт стиля будет добавлен к промпту перед отправкой в FalAI)
+      // Вызываем API для отправки в очередь (передаем styleId, на бэке промпт стиля будет добавлен к промпту перед отправкой в FalAI)
       const request = {
         prompt: prompt, // Оригинальный промпт пользователя
         inputImageUrls: uploadedImages.length > 0 ? uploadedImages : [],
@@ -510,39 +634,27 @@ export function StudioChat({
         aspectRatio: aspectRatio
       }
       
-      const response = await apiClient.generateImage(request)
+      const response = await apiClient.submitToQueue(request)
       
       if (response.data) {
-        onGenerationComplete(response.data.imageUrls, prompt)
-        // НЕ очищаем промпт - он остается в поле ввода
+        const queueRequest = response.data
+        // Сохраняем запрос в активные
+        setActiveQueueRequests(prev => {
+          const updated = new Map(prev)
+          updated.set(queueRequest.id, queueRequest)
+          return updated
+        })
+        // Запускаем polling статуса
+        startPolling(queueRequest.id)
         
-        // Логика прикрепления изображений после генерации:
-        // - Если НЕТ прикрепленных изображений → прикрепляем первое сгенерированное
-        // - Если БЫЛО прикрепленное изображение → оставляем его (не заменяем на результат)
-        const hadUploadedImages = uploadedImages.length > 0
-        if (!hadUploadedImages && response.data.imageUrls.length > 0) {
-          // Прикрепляем первое сгенерированное изображение
-          setUploadedImages([response.data.imageUrls[0]])
-        }
-        // Если были прикрепленные изображения, оставляем их как есть
-        
-        // Обновляем баланс из ответа API, если он есть
-        if (response.data.balance !== undefined) {
-          setBalance(response.data.balance)
-        } else {
-          // Fallback: запрашиваем баланс если его нет в ответе
-          setTimeout(() => {
-            refreshPoints().catch(err => console.error('Ошибка обновления баланса:', err))
-          }, 500)
-        }
-        
-        // Обновляем историю после успешной генерации
-        updateHistoryAfterGeneration()
-        
+        // Показываем уведомление о начале генерации
+        const statusText = queueRequest.queueStatus === 'IN_QUEUE' 
+          ? (queueRequest.queuePosition ? `В очереди (позиция ${queueRequest.queuePosition})` : 'В очереди')
+          : 'Обрабатывается'
         toast({
-          title: "Изображения созданы!",
-          description: `Создано ${response.data.imageUrls.length} ${getImageText(response.data.imageUrls.length)} в формате ${outputFormat} (${artStyle})`,
-          duration: 1500,
+          title: "Генерация начата",
+          description: `Запрос отправлен в очередь. Статус: ${statusText}`,
+          duration: 3000,
         })
       } else {
         throw { status: response.status, message: response.error }
@@ -567,7 +679,7 @@ export function StudioChat({
     } finally {
       setIsGenerating(false)
     }
-  }, [prompt, numImages, outputFormat, aspectRatio, onGenerationComplete, toast, artStyle, sessionId, uploadedImages, updateHistoryAfterGeneration, isEditingMode, artStyles])
+  }, [prompt, numImages, outputFormat, aspectRatio, toast, artStyle, sessionId, uploadedImages, artStyles, startPolling])
 
   const handleImageExpand = (imageUrl: string) => {
     setSelectedImageForModal(imageUrl)
@@ -742,14 +854,15 @@ export function StudioChat({
               <Loader2 className="h-8 w-8 mx-auto mb-2 animate-spin" />
               <p>Загрузка диалога...</p>
             </div>
-          ) : history.length === 0 ? (
+          ) : history.length === 0 && Array.from(activeQueueRequests.values()).length === 0 ? (
             <div className="text-center text-muted-foreground py-8">
               <Bot className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p className="text-lg font-medium">Начните диалог</p>
               <p className="text-sm">Опишите изображение, которое хотите создать</p>
             </div>
           ) : (
-            history.map((message) => (
+            <>
+              {history.map((message) => (
               <div key={message.id} className="mb-4">
                 {/* Промпт слева, изображения справа */}
                 <div className="flex flex-col lg:flex-row gap-3 lg:gap-4">
@@ -946,7 +1059,87 @@ export function StudioChat({
                   </div>
                 </div>
               </div>
-            ))
+            ))}
+
+              {/* Активные запросы в очереди (показываются внизу диалога) */}
+              {Array.from(activeQueueRequests.values()).length > 0 && (
+                <div className="mt-4 space-y-3">
+                  {Array.from(activeQueueRequests.values()).map((request) => (
+                    <div key={request.id} className="mb-4">
+                      <div className="flex flex-col lg:flex-row gap-3 lg:gap-4">
+                        {/* Левая часть - промпт и статус */}
+                        <div className="flex-1 lg:max-w-64">
+                          <div className="flex gap-3">
+                            <div className="flex-shrink-0 relative z-0">
+                              {avatar ? (
+                                <div className="w-8 h-8 rounded-full overflow-hidden relative">
+                                  <NextImage
+                                    src={avatar}
+                                    alt="Аватар пользователя"
+                                    width={32}
+                                    height={32}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                              ) : (
+                                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center relative">
+                                  <User className="h-4 w-4 text-primary" />
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex-1">
+                              <Card className="p-3 bg-muted/50 dark:bg-muted/20">
+                                <p className="text-sm leading-relaxed text-foreground mb-3">
+                                  {request.prompt}
+                                </p>
+                                <div className="flex items-center gap-2">
+                                  {request.queueStatus === 'IN_QUEUE' && (
+                                    <Badge variant="outline" className="bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20">
+                                      <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                      {request.queuePosition ? `В очереди (${request.queuePosition})` : 'В очереди'}
+                                    </Badge>
+                                  )}
+                                  {request.queueStatus === 'IN_PROGRESS' && (
+                                    <Badge variant="outline" className="bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20">
+                                      <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                      Обрабатывается
+                                    </Badge>
+                                  )}
+                                </div>
+                              </Card>
+                            </div>
+                          </div>
+                        </div>
+                        {/* Правая часть - плейсхолдер для изображений */}
+                        <div className="flex-1">
+                          <div className="flex gap-3">
+                            <div className="flex-shrink-0">
+                              <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
+                                <Bot className="h-4 w-4 text-secondary-foreground" />
+                              </div>
+                            </div>
+                            <div className="flex-1">
+                              <Card className="p-3 bg-muted/50 dark:bg-muted/20">
+                                <div className="flex items-center justify-center py-8">
+                                  <div className="text-center">
+                                    <Loader2 className="h-8 w-8 mx-auto mb-2 animate-spin text-muted-foreground" />
+                                    <p className="text-sm text-muted-foreground">
+                                      {request.queueStatus === 'IN_QUEUE' 
+                                        ? (request.queuePosition ? `Ожидание в очереди (позиция ${request.queuePosition})` : 'Ожидание в очереди')
+                                        : 'Генерация изображений...'}
+                                    </p>
+                                  </div>
+                                </div>
+                              </Card>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
       </ScrollArea>
