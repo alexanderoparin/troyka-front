@@ -233,8 +233,36 @@ export function StudioChat({
             stopPolling(requestId)
             // Обрабатываем завершенный запрос
             if (request.imageUrls && request.imageUrls.length > 0) {
+              // Обновляем запрос в активных с актуальными imageUrls перед обработкой
+              setActiveQueueRequests(prev => {
+                const updated = new Map(prev)
+                updated.set(requestId, request)
+                return updated
+              })
+              
               onGenerationComplete(request.imageUrls, request.prompt)
               updateHistoryAfterGeneration()
+              
+              // Если не было прикрепленных изображений - прикрепляем сгенерированные
+              // Используем функциональную форму setState для доступа к актуальному состоянию
+              setUploadedImages(prev => {
+                if (prev.length === 0 && request.imageUrls && request.imageUrls.length > 0) {
+                  // Прикрепляем первое сгенерированное изображение
+                  return [request.imageUrls[0]]
+                }
+                // Если были прикрепленные - оставляем их как есть
+                return prev
+              })
+              
+              setSelectedImages(prev => {
+                if (prev.length === 0 && request.imageUrls && request.imageUrls.length > 0) {
+                  // Прикрепляем первое сгенерированное изображение
+                  return [request.imageUrls[0]]
+                }
+                // Если были прикрепленные - оставляем их как есть
+                return prev
+              })
+              
               toast({
                 title: "Изображения созданы!",
                 description: `Создано ${request.imageUrls.length} ${getImageText(request.imageUrls.length)}`,
@@ -244,15 +272,25 @@ export function StudioChat({
               setTimeout(() => {
                 refreshPoints().catch(() => {})
               }, 500)
+              
+              // Удаляем из активных запросов через задержку, чтобы пользователь успел увидеть изображения
+              setTimeout(() => {
+                setActiveQueueRequests(prev => {
+                  const updated = new Map(prev)
+                  updated.delete(requestId)
+                  return updated
+                })
+              }, 5000) // Увеличиваем задержку до 5 секунд, чтобы изображения успели отобразиться
+            } else {
+              // Если изображений нет, удаляем сразу
+              setTimeout(() => {
+                setActiveQueueRequests(prev => {
+                  const updated = new Map(prev)
+                  updated.delete(requestId)
+                  return updated
+                })
+              }, 2000)
             }
-            // Удаляем из активных запросов через небольшую задержку
-            setTimeout(() => {
-              setActiveQueueRequests(prev => {
-                const updated = new Map(prev)
-                updated.delete(requestId)
-                return updated
-              })
-            }, 2000)
           } else if (request.queueStatus === 'FAILED') {
             stopPolling(requestId)
             toast({
@@ -623,10 +661,13 @@ export function StudioChat({
       const selectedStyle = artStyles.find(style => style.name === artStyle)
       const styleId = selectedStyle?.id || 1 // По умолчанию id = 1 (Без стиля)
       
+      // Фильтруем blob URL - они не могут быть использованы на сервере
+      const validImageUrls = uploadedImages.filter(url => url && !url.startsWith('blob:'))
+      
       // Вызываем API для отправки в очередь (передаем styleId, на бэке промпт стиля будет добавлен к промпту перед отправкой в FalAI)
       const request = {
         prompt: prompt, // Оригинальный промпт пользователя
-        inputImageUrls: uploadedImages.length > 0 ? uploadedImages : [],
+        inputImageUrls: validImageUrls.length > 0 ? validImageUrls : [],
         numImages: numImages,
         outputFormat: outputFormat,
         sessionId: sessionId,
