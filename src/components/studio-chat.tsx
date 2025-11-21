@@ -827,10 +827,10 @@ export function StudioChat({
       />
       {/* История диалога */}
       <ScrollArea ref={scrollAreaRef} className="flex-1">
-        <div className="space-y-4 pb-48 p-3 sm:pb-32 sm:p-6">
+        <div className="pb-48 p-3 sm:pb-32 sm:p-6">
           {/* Кнопка загрузки предыдущих сообщений */}
           {hasMore && (
-            <div className="flex justify-center">
+            <div className="flex justify-center mb-4">
               <Button
                 variant="outline"
                 size="sm"
@@ -861,9 +861,9 @@ export function StudioChat({
               <p className="text-sm">Опишите изображение, которое хотите создать</p>
             </div>
           ) : (
-            <>
-              {history.map((message) => (
-              <div key={message.id} className="mb-4">
+            <div className="space-y-4">
+              {history.map((message, index) => (
+              <div key={message.id} className={index === 0 ? "-mt-4 sm:mt-0" : ""}>
                 {/* Промпт слева, изображения справа */}
                 <div className="flex flex-col lg:flex-row gap-3 lg:gap-4">
                   {/* Левая часть - промпт */}
@@ -969,19 +969,20 @@ export function StudioChat({
                           <div
                             key={index}
                             className={cn(
-                              "relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all",
+                              "relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all w-full",
                               selectedImages.includes(imageUrl) 
                                 ? "border-primary ring-2 ring-primary/20" 
                                 : "border-border hover:border-primary/50"
                             )}
                             onClick={() => handleImageExpand(imageUrl)}
                           >
-                            <div className="w-full aspect-square relative">
+                            <div className="w-full aspect-square relative overflow-hidden">
                               <Image
                                 src={imageUrl}
                                 alt={`Сгенерированное изображение ${index + 1}`}
                                 fill
                                 className="object-cover"
+                                sizes="(max-width: 640px) 100vw, 50vw"
                               />
                               
                               {/* Overlay с действиями в левом нижнем углу - показываем всегда на мобилке, при hover на десктопе */}
@@ -1059,17 +1060,17 @@ export function StudioChat({
                   </div>
                 </div>
               </div>
-            ))}
-
+              ))}
+              
               {/* Активные запросы в очереди (показываются внизу диалога) */}
               {Array.from(activeQueueRequests.values()).length > 0 && (
                 <div className="mt-4 space-y-3">
                   {Array.from(activeQueueRequests.values()).map((request) => (
-                    <div key={request.id} className="mb-4">
+                    <div key={request.id}>
                       <div className="flex flex-col lg:flex-row gap-3 lg:gap-4">
                         {/* Левая часть - промпт и статус */}
                         <div className="flex-1 lg:max-w-64 min-w-0">
-                          <div className="flex gap-3">
+                          <div className="flex gap-2 sm:gap-3">
                             <div className="flex-shrink-0 relative z-0">
                               {avatar ? (
                                 <div className="w-8 h-8 rounded-full overflow-hidden relative">
@@ -1088,8 +1089,8 @@ export function StudioChat({
                               )}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <Card className="p-3 bg-muted/50 dark:bg-muted/20">
-                                <p className="text-sm leading-relaxed text-foreground mb-3 break-words">
+                              <Card className="p-2 sm:p-3 bg-muted/50 dark:bg-muted/20">
+                                <p className="text-xs sm:text-sm leading-relaxed text-foreground mb-2 sm:mb-3 break-words">
                                   {request.prompt}
                                 </p>
                                 <div className="flex items-center gap-2">
@@ -1110,26 +1111,50 @@ export function StudioChat({
                             </div>
                           </div>
                         </div>
-                        {/* Правая часть - плейсхолдер для изображений */}
+                        {/* Правая часть - изображения или плейсхолдер */}
                         <div className="flex-1 min-w-0">
-                          <div className="flex gap-3">
+                          <div className="flex gap-2 sm:gap-3">
                             <div className="flex-shrink-0">
                               <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
                                 <Bot className="h-4 w-4 text-secondary-foreground" />
                               </div>
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <Card className="p-3 bg-muted/50 dark:bg-muted/20">
-                                <div className="flex items-center justify-center py-6 sm:py-8">
-                                  <div className="text-center px-2">
-                                    <Loader2 className="h-8 w-8 mx-auto mb-2 animate-spin text-muted-foreground" />
-                                    <p className="text-xs sm:text-sm text-muted-foreground break-words">
-                                      {request.queueStatus === 'IN_QUEUE' 
-                                        ? (request.queuePosition ? `Ожидание в очереди (позиция ${request.queuePosition})` : 'Ожидание в очереди')
-                                        : 'Генерация изображений...'}
-                                    </p>
+                            <div className="flex-1 min-w-0 max-w-full">
+                              <Card className="p-2 sm:p-3 bg-muted/50 dark:bg-muted/20">
+                                {/* Если есть изображения - показываем их */}
+                                {request.imageUrls && request.imageUrls.length > 0 ? (
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
+                                    {request.imageUrls.map((imageUrl, index) => (
+                                      <div
+                                        key={index}
+                                        className="relative group cursor-pointer rounded-lg overflow-hidden border-2 border-border hover:border-primary/50 transition-all w-full"
+                                        onClick={() => handleImageExpand(imageUrl)}
+                                      >
+                                        <div className="w-full aspect-square relative overflow-hidden">
+                                          <Image
+                                            src={imageUrl}
+                                            alt={`Сгенерированное изображение ${index + 1}`}
+                                            fill
+                                            className="object-cover"
+                                            sizes="(max-width: 640px) 100vw, 50vw"
+                                          />
+                                        </div>
+                                      </div>
+                                    ))}
                                   </div>
-                                </div>
+                                ) : (
+                                  /* Иначе показываем плейсхолдер */
+                                  <div className="flex items-center justify-center py-6 sm:py-8">
+                                    <div className="text-center px-2">
+                                      <Loader2 className="h-8 w-8 mx-auto mb-2 animate-spin text-muted-foreground" />
+                                      <p className="text-xs sm:text-sm text-muted-foreground break-words">
+                                        {request.queueStatus === 'IN_QUEUE' 
+                                          ? (request.queuePosition ? `Ожидание в очереди (позиция ${request.queuePosition})` : 'Ожидание в очереди')
+                                          : 'Генерация изображений...'}
+                                      </p>
+                                    </div>
+                                  </div>
+                                )}
                               </Card>
                             </div>
                           </div>
@@ -1139,7 +1164,7 @@ export function StudioChat({
                   ))}
                 </div>
               )}
-            </>
+            </div>
           )}
         </div>
       </ScrollArea>
