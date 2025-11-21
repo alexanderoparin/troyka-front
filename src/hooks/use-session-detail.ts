@@ -1,3 +1,4 @@
+import React from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient, SessionDetail } from '@/lib/api-client';
 
@@ -69,6 +70,9 @@ export function useSessionDetail(sessionId: number | null, page: number = 0, siz
  */
 export function useSessionHistory(sessionId: number | null, initialPageSize: number = 20) {
   const queryClient = useQueryClient();
+  
+  // Ref для хранения таймера дебаунса
+  const debounceTimerRef = React.useRef<NodeJS.Timeout | null>(null);
 
   // Получаем первую страницу истории
   const firstPage = useSessionDetail(sessionId, 0, initialPageSize);
@@ -107,11 +111,32 @@ export function useSessionHistory(sessionId: number | null, initialPageSize: num
     },
 
     // Метод для обновления истории после генерации
+    // Используем дебаунс для предотвращения множественных запросов
     updateHistoryAfterGeneration: () => {
-      // Обновляем все страницы истории
-      queryClient.invalidateQueries({ queryKey: ['sessionDetail', sessionId] });
-      // Обновляем список сессий (для обновления времени последнего обновления)
-      queryClient.invalidateQueries({ queryKey: ['sessions'] });
+      // Очищаем предыдущий таймер, если он есть
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+      
+      // Устанавливаем новый таймер
+      debounceTimerRef.current = setTimeout(() => {
+        // Обновляем все страницы истории
+        queryClient.invalidateQueries({ queryKey: ['sessionDetail', sessionId] });
+        
+        // Обновляем список сессий (для обновления времени последнего обновления)
+        // Сначала отменяем все активные запросы, чтобы избежать дублирования
+        queryClient.cancelQueries({ queryKey: ['sessions'], exact: false });
+        
+        // Затем делаем один refetch для всех активных запросов
+        // React Query автоматически дедуплицирует запросы с одинаковыми ключами и параметрами
+        queryClient.refetchQueries({ 
+          queryKey: ['sessions'], 
+          type: 'active',
+          exact: false // Обновляем все запросы с этим ключом, независимо от параметров
+        });
+        
+        debounceTimerRef.current = null;
+      }, 200); // Дебаунс 200мс для группировки множественных вызовов
     },
   };
 }
