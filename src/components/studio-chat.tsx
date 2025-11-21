@@ -827,7 +827,7 @@ export function StudioChat({
       />
       {/* История диалога */}
       <ScrollArea ref={scrollAreaRef} className="flex-1">
-        <div className="space-y-4 pb-40 p-3 sm:pb-32 sm:p-6">
+        <div className="space-y-4 pb-48 p-3 sm:pb-32 sm:p-6">
           {/* Кнопка загрузки предыдущих сообщений */}
           {hasMore && (
             <div className="flex justify-center">
@@ -867,8 +867,8 @@ export function StudioChat({
                 {/* Промпт слева, изображения справа */}
                 <div className="flex flex-col lg:flex-row gap-3 lg:gap-4">
                   {/* Левая часть - промпт */}
-                  <div className="flex-1 lg:max-w-64">
-                    <div className="flex gap-3">
+                  <div className="flex-1 lg:max-w-64 min-w-0">
+                    <div className="flex gap-2 sm:gap-3">
                       <div className="flex-shrink-0 relative z-0">
                         {avatar ? (
                           <div className="w-8 h-8 rounded-full overflow-hidden relative">
@@ -886,15 +886,15 @@ export function StudioChat({
                           </div>
                         )}
                       </div>
-                      <div className="flex-1">
-                        <Card className="p-3 bg-muted/50 dark:bg-muted/20">
-                          <p className="text-sm leading-relaxed text-foreground">
+                      <div className="flex-1 min-w-0">
+                        <Card className="p-2 sm:p-3 bg-muted/50 dark:bg-muted/20">
+                          <p className="text-xs sm:text-sm leading-relaxed text-foreground break-words">
                             {message.prompt}
                           </p>
                           
                           {/* Миниатюры входных изображений */}
                           {message.inputImageUrls && message.inputImageUrls.length > 0 && (
-                            <div className="mt-3 flex gap-2">
+                            <div className="mt-2 sm:mt-3 flex gap-2 flex-wrap">
                               {message.inputImageUrls.map((imageUrl, index) => (
                                 <div 
                                   key={index} 
@@ -935,12 +935,12 @@ export function StudioChat({
                           
                           {/* Информация о стиле, если есть */}
                           {message.styleName && (
-                            <div className="mt-3 text-xs text-muted-foreground">
+                            <div className="mt-2 sm:mt-3 text-xs text-muted-foreground">
                               {message.styleName}
                             </div>
                           )}
                           
-                          <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-2 mt-2 sm:mt-3 text-xs text-muted-foreground">
                             <span>{formatDate(message.createdAt)}</span>
                           </div>
                         </Card>
@@ -949,18 +949,18 @@ export function StudioChat({
                   </div>
 
                   {/* Правая часть - изображения */}
-                  <div className="flex-1">
-                    <div className="flex gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex gap-2 sm:gap-3">
                       <div className="flex-shrink-0">
                         <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
                           <Bot className="h-4 w-4 text-secondary-foreground" />
                         </div>
                       </div>
-                      <div className="flex-1">
-                        <Card className="p-3 bg-muted/50 dark:bg-muted/20">
+                      <div className="flex-1 min-w-0">
+                        <Card className="p-2 sm:p-3 bg-muted/50 dark:bg-muted/20">
                           {/* Описание от ИИ (если есть) */}
                           {message.description && message.description.trim() && (
-                            <p className="mb-3 text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                            <p className="mb-2 sm:mb-3 text-xs sm:text-sm text-foreground leading-relaxed whitespace-pre-wrap break-words">
                               {message.description}
                             </p>
                           )}
@@ -984,20 +984,20 @@ export function StudioChat({
                                 className="object-cover"
                               />
                               
-                              {/* Overlay с действиями в левом нижнем углу */}
-                              <div className="absolute bottom-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                              {/* Overlay с действиями в левом нижнем углу - показываем всегда на мобилке, при hover на десктопе */}
+                              <div className="absolute bottom-2 left-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex gap-1">
                                 <Tooltip>
                                   <TooltipTrigger asChild>
                                 <Button
                                   size="sm"
                                   variant="secondary"
-                                      className="h-7 w-7 p-0 bg-black/50 hover:bg-black/70 text-white border-0"
+                                      className="h-8 w-8 sm:h-7 sm:w-7 p-0 bg-black/70 hover:bg-black/80 text-white border-0"
                                   onClick={(e) => {
                                     e.stopPropagation()
                                         handleImageSelect(imageUrl)
                                   }}
                                 >
-                                      <Pencil className="h-3 w-3" />
+                                      <Pencil className="h-4 w-4 sm:h-3 sm:w-3" />
                                 </Button>
                                   </TooltipTrigger>
                                   <TooltipContent className="z-[140]">
@@ -1009,13 +1009,13 @@ export function StudioChat({
                                 <Button
                                   size="sm"
                                   variant="secondary"
-                                      className="h-7 w-7 p-0 bg-black/50 hover:bg-black/70 text-white border-0"
+                                      className="h-8 w-8 sm:h-7 sm:w-7 p-0 bg-black/70 hover:bg-black/80 text-white border-0"
                                   onClick={(e) => {
                                     e.stopPropagation()
                                     handleImageDownload(imageUrl)
                                   }}
                                 >
-                                      <Download className="h-3 w-3" />
+                                      <Download className="h-4 w-4 sm:h-3 sm:w-3" />
                                 </Button>
                                   </TooltipTrigger>
                                   <TooltipContent className="z-[140]">
@@ -1027,8 +1027,8 @@ export function StudioChat({
                               {/* Индикатор выбора */}
                               {selectedImages.includes(imageUrl) && (
                                 <div className="absolute top-2 right-2">
-                                  <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                                    <span className="text-primary-foreground text-xs font-bold">
+                                  <div className="w-7 h-7 sm:w-6 sm:h-6 bg-primary rounded-full flex items-center justify-center">
+                                    <span className="text-primary-foreground text-xs sm:text-xs font-bold">
                                       {selectedImages.indexOf(imageUrl) + 1}
                                     </span>
                                   </div>
@@ -1040,8 +1040,8 @@ export function StudioChat({
                       </div>
                       
                           {message.imageUrls && Array.isArray(message.imageUrls) && message.imageUrls.length > 0 && (
-                            <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
-                              <ImageIcon className="h-3 w-3" />
+                            <div className="flex items-center gap-1.5 sm:gap-2 mt-2 sm:mt-3 text-xs text-muted-foreground flex-wrap">
+                              <ImageIcon className="h-3 w-3 flex-shrink-0" />
                               <span>{message.imageUrls.length} {getImageText(message.imageUrls.length)}</span>
                               <span>•</span>
                               <span>{message.outputFormat || 'JPEG'}</span>
@@ -1068,7 +1068,7 @@ export function StudioChat({
                     <div key={request.id} className="mb-4">
                       <div className="flex flex-col lg:flex-row gap-3 lg:gap-4">
                         {/* Левая часть - промпт и статус */}
-                        <div className="flex-1 lg:max-w-64">
+                        <div className="flex-1 lg:max-w-64 min-w-0">
                           <div className="flex gap-3">
                             <div className="flex-shrink-0 relative z-0">
                               {avatar ? (
@@ -1087,9 +1087,9 @@ export function StudioChat({
                                 </div>
                               )}
                             </div>
-                            <div className="flex-1">
+                            <div className="flex-1 min-w-0">
                               <Card className="p-3 bg-muted/50 dark:bg-muted/20">
-                                <p className="text-sm leading-relaxed text-foreground mb-3">
+                                <p className="text-sm leading-relaxed text-foreground mb-3 break-words">
                                   {request.prompt}
                                 </p>
                                 <div className="flex items-center gap-2">
@@ -1111,19 +1111,19 @@ export function StudioChat({
                           </div>
                         </div>
                         {/* Правая часть - плейсхолдер для изображений */}
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-0">
                           <div className="flex gap-3">
                             <div className="flex-shrink-0">
                               <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
                                 <Bot className="h-4 w-4 text-secondary-foreground" />
                               </div>
                             </div>
-                            <div className="flex-1">
+                            <div className="flex-1 min-w-0">
                               <Card className="p-3 bg-muted/50 dark:bg-muted/20">
-                                <div className="flex items-center justify-center py-8">
-                                  <div className="text-center">
+                                <div className="flex items-center justify-center py-6 sm:py-8">
+                                  <div className="text-center px-2">
                                     <Loader2 className="h-8 w-8 mx-auto mb-2 animate-spin text-muted-foreground" />
-                                    <p className="text-sm text-muted-foreground">
+                                    <p className="text-xs sm:text-sm text-muted-foreground break-words">
                                       {request.queueStatus === 'IN_QUEUE' 
                                         ? (request.queuePosition ? `Ожидание в очереди (позиция ${request.queuePosition})` : 'Ожидание в очереди')
                                         : 'Генерация изображений...'}
@@ -1145,10 +1145,10 @@ export function StudioChat({
       </ScrollArea>
 
             {/* Плавающее окно ввода промпта */}
-            <div className="fixed bottom-2 left-0 right-0" style={{ zIndex: 10 }}>
+            <div className="fixed bottom-0 left-0 right-0 ios-safe-bottom sm:pb-2" style={{ zIndex: 10 }}>
               <div className="flex justify-center px-2 sm:px-6">
                 <div 
-                  className={`${isFocused ? 'bg-background/95' : 'bg-background/60'} backdrop-blur-md border border-border/40 rounded-lg shadow-lg px-2 py-1 w-full max-w-[700px] sm:max-w-[1000px] transition-all duration-200 ${
+                  className={`${isFocused ? 'bg-background/95' : 'bg-background/60'} backdrop-blur-md border border-border/40 rounded-lg shadow-lg px-2 py-2 sm:py-1 w-full max-w-[700px] sm:max-w-[1000px] transition-all duration-200 ${
                     isDragOver ? 'border-primary/60 bg-primary/5' : ''
                   }`}
                   onDragOver={handleDragOver}
@@ -1197,14 +1197,14 @@ export function StudioChat({
                   {/* Поле ввода промпта */}
                   <div className="mb-0">
                     {/* Мобильная версия - минималистичный layout */}
-                    <div className="flex items-start gap-2 sm:hidden">
+                    <div className="flex items-stretch gap-2 sm:hidden">
                       {/* Поле ввода - полная ширина */}
-                      <div className="flex-1 relative">
+                      <div className="flex-1 relative min-w-0 flex flex-col">
                         <Textarea
                           value={prompt}
                           onChange={(e) => handlePromptChange(e.target.value)}
                           placeholder={isDragOver ? "Отпустите файл для загрузки..." : isEditingMode ? "Опишите изменения для прикрепленного изображения..." : "Опишите изображение, которое хотите создать..."}
-                          className="h-12 resize-none text-sm flex-1 bg-muted/80 border border-border/80 focus:border-primary/80 focus:bg-muted/95 pr-12"
+                          className="h-[96px] resize-none text-sm flex-1 bg-muted/80 border border-border/80 focus:border-primary/80 focus:bg-muted/95 pr-12 min-w-0"
                           onFocus={() => setIsFocused(true)}
                           onBlur={() => setIsFocused(false)}
                           maxLength={5000}
@@ -1221,18 +1221,18 @@ export function StudioChat({
                       </div>
                       
                       {/* Кнопки управления и генерации */}
-                      <div className="flex items-end gap-1">
+                      <div className="flex gap-1.5 flex-shrink-0">
                         {/* Слева колонка: настройки + загрузка */}
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-1.5">
                           {/* Кнопка настроек */}
                           <DropdownMenu open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                             <DropdownMenuTrigger asChild>
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-10 w-10 p-0 bg-muted/80 hover:bg-muted/95 border border-border/80"
+                                className="h-12 w-12 p-0 bg-muted/80 hover:bg-muted/95 border border-border/80"
                               >
-                                <Settings className="h-4 w-4" />
+                                <Settings className="h-5 w-5" />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-56 z-[150]" align="end">
@@ -1299,7 +1299,7 @@ export function StudioChat({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-10 w-10 p-0 bg-muted/80 hover:bg-muted/95 border border-border/80"
+                                className="h-12 w-12 p-0 bg-muted/80 hover:bg-muted/95 border border-border/80"
                                 onClick={() => {
                                   if (fileInputRef.current) {
                                     fileInputRef.current.click()
@@ -1309,7 +1309,7 @@ export function StudioChat({
                                   }
                                 }}
                               >
-                                <ImageIcon className="h-4 w-4" />
+                                <ImageIcon className="h-5 w-5" />
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent className="z-[9998]">
@@ -1319,22 +1319,22 @@ export function StudioChat({
                         </div>
 
                         {/* Справа колонка: улучшение + генерация */}
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-1.5">
                           {/* Кнопка улучшения промпта */}
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-10 w-14 p-0 bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 border border-purple-500/20"
+                                className="h-12 w-12 p-0 bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 border border-purple-500/20"
                                 onClick={handleEnhancePrompt}
                                 disabled={isEnhancing || isGenerating || !prompt?.trim()}
                                 title="Улучшить промпт с помощью ИИ"
                               >
                                 {isEnhancing ? (
-                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                  <Loader2 className="h-5 w-5 animate-spin" />
                                 ) : (
-                                  <Lightbulb className="h-4 w-4" />
+                                  <Lightbulb className="h-5 w-5" />
                                 )}
                               </Button>
                             </TooltipTrigger>
@@ -1348,14 +1348,14 @@ export function StudioChat({
                             <TooltipTrigger asChild>
                               <Button
                                 size="sm"
-                                className="h-10 w-14 p-0 bg-primary hover:bg-primary/90 text-primary-foreground"
+                                className="h-12 w-12 p-0 bg-primary hover:bg-primary/90 text-primary-foreground"
                                 onClick={handleGenerate}
                                 disabled={isGenerating || !prompt.trim()}
                               >
                                 {isGenerating ? (
-                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                  <Loader2 className="h-5 w-5 animate-spin" />
                                 ) : (
-                                  <Sparkles className="h-4 w-4" />
+                                  <Sparkles className="h-5 w-5" />
                                 )}
                               </Button>
                             </TooltipTrigger>
