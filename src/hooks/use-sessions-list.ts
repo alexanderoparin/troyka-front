@@ -96,6 +96,62 @@ export function useSessionsList(page: number = 0, size: number = 10) {
 }
 
 /**
+ * Хук только для мутаций сессий (без запроса данных).
+ * Используется когда нужны только методы создания/переименования/удаления без загрузки списка.
+ */
+export function useSessionMutations() {
+  const queryClient = useQueryClient();
+
+  // Создание новой сессии
+  const createSessionMutation = useMutation({
+    mutationFn: (request: CreateSessionRequest) => apiClient.createSession(request),
+    onSuccess: async (newSession) => {
+      // Полностью очищаем кеш сессий
+      await queryClient.cancelQueries({ queryKey: ['sessions'] });
+      queryClient.removeQueries({ queryKey: ['sessions'] });
+      
+      // Принудительно обновляем первую страницу
+      await queryClient.refetchQueries({ 
+        queryKey: ['sessions', 0, 20],
+        type: 'active'
+      });
+    },
+  });
+
+  // Переименование сессии
+  const renameSessionMutation = useMutation({
+    mutationFn: ({ sessionId, request }: { sessionId: number; request: RenameSessionRequest }) =>
+      apiClient.renameSession(sessionId, request),
+    onSuccess: () => {
+      // Обновляем список сессий и детали сессии после переименования
+      queryClient.invalidateQueries({ queryKey: ['sessions'] });
+      queryClient.invalidateQueries({ queryKey: ['sessionDetail'] });
+    },
+  });
+
+  // Удаление сессии
+  const deleteSessionMutation = useMutation({
+    mutationFn: (sessionId: number) => apiClient.deleteSession(sessionId),
+    onSuccess: () => {
+      // Обновляем список сессий после удаления
+      queryClient.invalidateQueries({ queryKey: ['sessions'] });
+    },
+  });
+
+  return {
+    createSession: createSessionMutation.mutate,
+    renameSession: renameSessionMutation.mutate,
+    deleteSession: deleteSessionMutation.mutate,
+    isCreating: createSessionMutation.isPending,
+    isRenaming: renameSessionMutation.isPending,
+    isDeleting: deleteSessionMutation.isPending,
+    createSessionResult: createSessionMutation.data,
+    renameSessionResult: renameSessionMutation.data,
+    deleteSessionResult: deleteSessionMutation.data,
+  };
+}
+
+/**
  * Хук для получения дефолтной сессии пользователя.
  * Используется для получения или создания первой сессии.
  */

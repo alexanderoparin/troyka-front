@@ -12,7 +12,7 @@ import { getPointsText } from "@/lib/grammar"
 import Link from "next/link"
 import { useState, useCallback, useEffect, useRef } from "react"
 import Image from "next/image"
-import { useDefaultSession, useSessionsList } from "@/hooks/use-sessions-list"
+import { useDefaultSession, useSessionMutations } from "@/hooks/use-sessions-list"
 import { useToast } from "@/components/ui/use-toast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
@@ -41,8 +41,8 @@ export default function StudioPage() {
   // Получаем дефолтную сессию
   const { defaultSession, isLoading: isLoadingDefaultSession } = useDefaultSession()
   
-  // Хук для работы с сессиями
-  const { createSession, isCreating, renameSession, deleteSession, isRenaming, isDeleting } = useSessionsList(0, 20)
+  // Хук для мутаций сессий (без запроса данных, чтобы избежать дублирования запросов)
+  const { createSession, isCreating, renameSession, deleteSession, isRenaming, isDeleting } = useSessionMutations()
   
   // Автоматически отправляем письмо при заходе на студию без доступа
   useEffect(() => {
