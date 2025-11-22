@@ -259,7 +259,7 @@ export function StudioSessions({
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-0.5">
-              {sessions.map((session) => (
+              {sessions.map((session, index) => (
                 <Tooltip key={session.id}>
                     <TooltipTrigger asChild>
                       <Card
@@ -270,7 +270,7 @@ export function StudioSessions({
                         onClick={() => onSessionSelect(session.id)}
                       >
                         {/* Миниатюра сессии - занимает всю ширину */}
-                        <div className="aspect-square relative rounded-lg overflow-hidden">
+                        <div className="relative aspect-square rounded-lg overflow-hidden">
                           {session.lastImageUrl ? (
                             <Image
                               src={session.lastImageUrl}

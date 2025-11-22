@@ -462,16 +462,6 @@ export function StudioChat({
     }
   }, [])
 
-  // Проверяем, что input рендерится
-  useEffect(() => {
-    console.log('StudioChat mounted, fileInputRef:', fileInputRef.current)
-  }, [])
-
-  // Проверяем ref после каждого рендера
-  useEffect(() => {
-    console.log('After render, fileInputRef:', fileInputRef.current)
-  })
-
   const handleFileUpload = useCallback(async (file: File) => {
     // Проверяем тип файла
     if (!file.type.startsWith('image/')) {
@@ -1023,7 +1013,7 @@ export function StudioChat({
                             )}
                             onClick={() => handleImageExpand(imageUrl)}
                           >
-                            <div className="w-full aspect-square relative overflow-hidden">
+                            <div className="relative w-full aspect-square overflow-hidden">
                               <Image
                                 src={imageUrl}
                                 alt={`Сгенерированное изображение ${index + 1}`}
@@ -1177,7 +1167,7 @@ export function StudioChat({
                                         className="relative group cursor-pointer rounded-lg overflow-hidden border-2 border-border hover:border-primary/50 transition-all w-full"
                                         onClick={() => handleImageExpand(imageUrl)}
                                       >
-                                        <div className="w-full aspect-square relative overflow-hidden">
+                                        <div className="relative w-full aspect-square overflow-hidden">
                                           <Image
                                             src={imageUrl}
                                             alt={`Сгенерированное изображение ${index + 1}`}
@@ -1674,7 +1664,7 @@ export function StudioChat({
             >
               <X className="h-5 w-5" />
             </Button>
-            <div className="w-full h-full flex items-center justify-center">
+            <div className="relative w-full h-full flex items-center justify-center">
               <Image
                 src={selectedImageForModal}
                 alt="Полноразмерное изображение"

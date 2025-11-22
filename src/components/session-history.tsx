@@ -274,7 +274,7 @@ export function SessionHistory({
               <p className="text-sm">Начните диалог с генерации изображения</p>
             </div>
           ) : (
-            history.map((message) => (
+            history.map((message, messageIndex) => (
               <div key={message.id} className="space-y-4">
                 {/* Сообщение пользователя (промпт) */}
                 <div className="flex gap-3">

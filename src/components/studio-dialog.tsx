@@ -125,7 +125,7 @@ export function StudioDialog({
                 )}
                 onClick={() => handleImageSelect(imageUrl)}
               >
-                <div className="w-full aspect-square relative">
+                <div className="relative w-full aspect-square">
                   <Image
                     src={imageUrl}
                     alt={`Сгенерированное изображение ${index + 1}`}
@@ -253,7 +253,7 @@ export function StudioDialog({
             >
               <X className="h-5 w-5" />
             </Button>
-            <div className="w-full h-full flex items-center justify-center">
+            <div className="relative w-full h-full flex items-center justify-center">
               <Image
                 src={selectedImageForModal}
                 alt="Полноразмерное изображение"
