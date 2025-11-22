@@ -41,6 +41,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isCheckingAuthRef = useRef(false)
   // Ref для отслеживания инициализации (не вызывает ре-рендеры)
   const hasInitializedRef = useRef(false)
+  // Ref для предотвращения одновременных вызовов refreshPoints
+  const isRefreshingPointsRef = useRef(false)
+  // Ref для хранения времени последнего вызова (для debounce)
+  const lastRefreshTimeRef = useRef(0)
+  const REFRESH_DEBOUNCE_MS = 1000 // Минимальный интервал между вызовами - 1 секунда
 
   // Устанавливаем callback для обработки 401 ошибок
   useEffect(() => {
@@ -295,19 +300,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const refreshPoints = useCallback(async () => {
-    if (state.isAuthenticated && !isLoggingOut) {
-      try {
-        const response = await apiClient.getUserPoints()
-        if (response.data !== undefined) {
-          setState(prev => ({
-            ...prev,
-            points: response.data || 0,
-          }))
-          // Поинты обновлены
-        }
-      } catch (error) {
-        console.error('Ошибка обновления поинтов:', error)
+    // Защита от одновременных вызовов
+    if (isRefreshingPointsRef.current) {
+      return
+    }
+    
+    // Debounce: проверяем, не слишком ли рано после последнего вызова
+    const now = Date.now()
+    const timeSinceLastCall = now - lastRefreshTimeRef.current
+    if (timeSinceLastCall < REFRESH_DEBOUNCE_MS) {
+      return
+    }
+    
+    if (!state.isAuthenticated || isLoggingOut) {
+      return
+    }
+    
+    isRefreshingPointsRef.current = true
+    lastRefreshTimeRef.current = now
+    
+    try {
+      const response = await apiClient.getUserPoints()
+      if (response.data !== undefined) {
+        setState(prev => ({
+          ...prev,
+          points: response.data || 0,
+        }))
       }
+    } catch (error) {
+      console.error('Ошибка обновления поинтов:', error)
+    } finally {
+      // Сбрасываем флаг через небольшую задержку, чтобы предотвратить слишком частые вызовы
+      setTimeout(() => {
+        isRefreshingPointsRef.current = false
+      }, 500)
     }
   }, [state.isAuthenticated, isLoggingOut])
 

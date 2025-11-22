@@ -59,6 +59,12 @@ export function StudioChat({
   className 
 }: StudioChatProps) {
   const { avatar, setBalance, refreshPoints } = useAuth()
+  // Используем ref для стабильной ссылки на refreshPoints, чтобы избежать пересоздания startPolling
+  const refreshPointsRef = useRef(refreshPoints)
+  useEffect(() => {
+    refreshPointsRef.current = refreshPoints
+  }, [refreshPoints])
+  
   const [prompt, setPrompt] = useState(() => {
     // Загружаем промпт из localStorage только при инициализации
     if (typeof window !== 'undefined') {
@@ -268,9 +274,9 @@ export function StudioChat({
                 description: `Создано ${request.imageUrls.length} ${getImageText(request.imageUrls.length)}`,
                 duration: 1500,
               })
-              // Обновляем баланс
+              // Обновляем баланс (используем ref для избежания зависимостей)
               setTimeout(() => {
-                refreshPoints().catch(() => {})
+                refreshPointsRef.current().catch(() => {})
               }, 500)
               
               // Удаляем из активных запросов через задержку, чтобы пользователь успел увидеть изображения
@@ -317,7 +323,7 @@ export function StudioChat({
     pollStatus()
     const interval = setInterval(pollStatus, 3000)
     pollingIntervalsRef.current.set(requestId, interval)
-  }, [onGenerationComplete, updateHistoryAfterGeneration, toast, refreshPoints, stopPolling, getImageText])
+  }, [onGenerationComplete, updateHistoryAfterGeneration, toast, stopPolling, getImageText])
 
   // Загружаем активные запросы при монтировании компонента
   useEffect(() => {

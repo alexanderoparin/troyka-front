@@ -327,6 +327,12 @@ class ApiClient {
   private baseUrl: string;
   private timeout: number;
   private onUnauthorizedCallback: (() => void) | null = null;
+  // Защита от множественных одновременных вызовов getUserPoints
+  private isGettingUserPoints: boolean = false;
+  private lastGetUserPointsTime: number = 0;
+  private getUserPointsDebounceMs: number = 1000; // 1 секунда
+  private pendingGetUserPointsPromise: Promise<ApiResponse<number>> | null = null;
+  private lastUserPointsResult: ApiResponse<number> | null = null; // Кэш последнего результата
 
   constructor() {
     // На продакшене используем HTTPS через домен, на локальной разработке - HTTP
@@ -469,6 +475,8 @@ class ApiClient {
   private removeToken(): void {
     if (typeof window === 'undefined') return;
     localStorage.removeItem('auth_token');
+    // Очищаем кэш баланса при logout
+    this.lastUserPointsResult = null;
   }
 
   // Auth API
@@ -901,6 +909,24 @@ class ApiClient {
 
   // Get user points/balance
   async getUserPoints(): Promise<ApiResponse<number>> {
+    // Проверяем debounce и наличие активного запроса
+    const now = Date.now();
+    const timeSinceLastCall = now - this.lastGetUserPointsTime;
+    
+    // Если есть активный промис, возвращаем его
+    if (this.pendingGetUserPointsPromise) {
+      return this.pendingGetUserPointsPromise;
+    }
+    
+    // Проверяем debounce (только если нет активного запроса)
+    if (timeSinceLastCall < this.getUserPointsDebounceMs) {
+      // Возвращаем последний известный результат, если он есть
+      if (this.lastUserPointsResult) {
+        return this.lastUserPointsResult;
+      }
+      // Если результата нет, все равно выполняем запрос (первый раз)
+    }
+    
     const url = `${this.baseUrl}/api/fal/user/points`;
     const token = this.getToken();
     
@@ -909,52 +935,70 @@ class ApiClient {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+    // Создаем промис и сохраняем его
+    this.isGettingUserPoints = true;
+    this.lastGetUserPointsTime = now;
+    this.pendingGetUserPointsPromise = (async () => {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
-      const response = await fetch(url, {
-        method: 'GET',
-        headers,
-        signal: controller.signal,
-      });
+        const response = await fetch(url, {
+          method: 'GET',
+          headers,
+          signal: controller.signal,
+        });
 
-      clearTimeout(timeoutId);
+        clearTimeout(timeoutId);
 
-      if (!response.ok) {
-        // Если получили 401 (Unauthorized), токен истек или недействителен
-        if (response.status === 401) {
-          this.removeToken();
-          if (this.onUnauthorizedCallback) {
-            this.onUnauthorizedCallback();
+        if (!response.ok) {
+          // Если получили 401 (Unauthorized), токен истек или недействителен
+          if (response.status === 401) {
+            this.removeToken();
+            // Очищаем кэш при logout
+            this.lastUserPointsResult = null;
+            if (this.onUnauthorizedCallback) {
+              this.onUnauthorizedCallback();
+            }
           }
+          
+          const errorData = await response.json().catch(() => ({}));
+          return {
+            error: errorData.message || errorData.error || 'Ошибка получения баланса',
+            status: response.status,
+          };
         }
-        
-        const errorData = await response.json().catch(() => ({}));
-        return {
-          error: errorData.message || errorData.error || 'Ошибка получения баланса',
+
+        const points = await response.json();
+        const result = {
+          data: points,
           status: response.status,
         };
-      }
-
-      const points = await response.json();
-      return {
-        data: points,
-        status: response.status,
-      };
-    } catch (error: any) {
-      if (error.name === 'AbortError') {
+        // Сохраняем результат в кэш для использования при debounce
+        this.lastUserPointsResult = result;
+        return result;
+      } catch (error: any) {
+        if (error.name === 'AbortError') {
+          return {
+            error: 'Превышено время ожидания запроса',
+            status: 408,
+          };
+        }
+        
         return {
-          error: 'Превышено время ожидания запроса',
-          status: 408,
+          error: error.message || 'Ошибка сети',
+          status: 0,
         };
+      } finally {
+        // Сбрасываем флаги через небольшую задержку
+        setTimeout(() => {
+          this.isGettingUserPoints = false;
+          this.pendingGetUserPointsPromise = null;
+        }, 500);
       }
-
-      return {
-        error: error.message || 'Ошибка получения баланса',
-        status: 0,
-      };
-    }
+    })();
+    
+    return this.pendingGetUserPointsPromise;
   }
 
   // Password Reset API
