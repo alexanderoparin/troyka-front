@@ -1173,7 +1173,16 @@ class ApiClient {
 
   // System status methods
   async getSystemStatus(): Promise<ApiResponse<SystemStatusResponse>> {
-    return this.request<SystemStatusResponse>('/api/system/status');
+    // Добавляем заголовки для предотвращения кэширования
+    return this.request<SystemStatusResponse>('/api/system/status', {
+      method: 'GET',
+      cache: 'no-store',
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    });
   }
 
   // Admin system status methods
