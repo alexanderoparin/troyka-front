@@ -15,38 +15,26 @@ export function SystemStatusBanner() {
 
   useEffect(() => {
     const loadStatus = () => {
-      // Добавляем timestamp для предотвращения кэширования
-      const url = '/api/system/status?' + new Date().getTime()
       apiClient.getSystemStatus()
         .then(response => {
-          console.log('[SystemStatusBanner] Ответ от API:', JSON.stringify(response, null, 2))
-          console.log('[SystemStatusBanner] response.data:', response.data)
-          console.log('[SystemStatusBanner] response.status:', response.status)
-          console.log('[SystemStatusBanner] response.error:', response.error)
-          
           if (response.data) {
             // Если поле status отсутствует или undefined, считаем что статус ACTIVE
             const currentStatus = response.data.status || 'ACTIVE'
-            console.log('[SystemStatusBanner] Статус:', currentStatus, 'Сообщение:', response.data.message)
             
             // Если статус изменился с ACTIVE на проблемный, сбрасываем флаг dismissed
             const dismissedStatus = localStorage.getItem(`${STORAGE_KEY}_status`)
             if (dismissedStatus && dismissedStatus !== currentStatus) {
-              console.log('[SystemStatusBanner] Статус изменился, сбрасываем dismissed')
               localStorage.removeItem(STORAGE_KEY)
               setIsDismissed(false)
             }
             
             // Показываем баннер только если статус не ACTIVE
             if (currentStatus !== 'ACTIVE') {
-              console.log('[SystemStatusBanner] Устанавливаем статус:', response.data)
               setStatus(response.data)
             } else {
-              console.log('[SystemStatusBanner] Статус ACTIVE, скрываем баннер')
               setStatus(null)
             }
           } else {
-            console.log('[SystemStatusBanner] Нет данных в ответе, response:', response)
             // Если нет данных, считаем что статус ACTIVE
             setStatus(null)
           }
@@ -54,7 +42,6 @@ export function SystemStatusBanner() {
         })
         .catch(error => {
           console.error('[SystemStatusBanner] Ошибка загрузки статуса системы:', error)
-          console.error('[SystemStatusBanner] Детали ошибки:', JSON.stringify(error, null, 2))
           setIsLoading(false)
           // При ошибке не показываем баннер
           setStatus(null)
@@ -63,15 +50,11 @@ export function SystemStatusBanner() {
 
     // Проверяем, был ли баннер закрыт пользователем для текущего статуса
     const dismissed = localStorage.getItem(STORAGE_KEY)
-    const dismissedStatus = localStorage.getItem(`${STORAGE_KEY}_status`)
-    
-    console.log('[SystemStatusBanner] Инициализация. dismissed:', dismissed, 'dismissedStatus:', dismissedStatus)
     
     loadStatus()
     
     // Если баннер был закрыт, проверяем, не изменился ли статус
     if (dismissed) {
-      console.log('[SystemStatusBanner] Баннер был закрыт для статуса:', dismissedStatus)
       setIsDismissed(true)
     }
 
@@ -91,9 +74,7 @@ export function SystemStatusBanner() {
   }
 
   // Не показываем баннер если загрузка, закрыт пользователем или статус ACTIVE
-  console.log('[SystemStatusBanner] Рендер. isLoading:', isLoading, 'isDismissed:', isDismissed, 'status:', status)
   if (isLoading || isDismissed || !status || status.status === 'ACTIVE') {
-    console.log('[SystemStatusBanner] Баннер скрыт. Причина:', isLoading ? 'загрузка' : isDismissed ? 'закрыт пользователем' : !status ? 'нет статуса' : 'статус ACTIVE')
     return null
   }
 
