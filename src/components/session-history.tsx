@@ -312,12 +312,6 @@ export function SessionHistory({
                   </div>
                   <div className="flex-1">
                     <Card className="p-3 bg-muted/50 dark:bg-muted/20">
-                      {/* Описание от ИИ (если есть) */}
-                      {message.description && message.description.trim() && (
-                        <p className="mb-3 text-sm text-foreground leading-relaxed whitespace-pre-wrap">
-                          {message.description}
-                        </p>
-                      )}
                       <div className="flex flex-wrap gap-2">
                         {message.imageUrls.map((imageUrl, index) => (
                           <div

@@ -36,7 +36,6 @@ export interface ImageRequest {
 }
 
 export interface ImageResponse {
-  description: string;
   imageUrls: string[];
   balance?: number;
 }
@@ -49,7 +48,6 @@ export interface QueueRequestStatus {
   queuePosition?: number;
   prompt: string;
   imageUrls: string[];
-  description?: string;
   sessionId: number;
   createdAt: string;
   updatedAt: string;
@@ -73,7 +71,6 @@ export interface SessionMessage {
   createdAt: string;
   imageCount: number;
   outputFormat: string;
-  description?: string;
   styleId?: number;
   styleName?: string;
   aspectRatio?: string;

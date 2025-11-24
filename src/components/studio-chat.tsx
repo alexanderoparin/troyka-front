@@ -995,12 +995,6 @@ export function StudioChat({
                       </div>
                       <div className="flex-1 min-w-0">
                         <Card className="p-2 sm:p-3 bg-muted/50 dark:bg-muted/20">
-                          {/* Описание от ИИ (если есть) */}
-                          {message.description && message.description.trim() && (
-                            <p className="mb-2 sm:mb-3 text-xs sm:text-sm text-foreground leading-relaxed whitespace-pre-wrap break-words">
-                              {message.description}
-                            </p>
-                          )}
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
                         {message.imageUrls.map((imageUrl, index) => (
                           <div
