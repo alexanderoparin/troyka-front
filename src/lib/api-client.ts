@@ -29,10 +29,11 @@ export interface ImageRequest {
   prompt: string;
   inputImageUrls?: string[];
   numImages?: number;
-  outputFormat?: 'JPEG' | 'PNG';
   sessionId?: number;
   styleId?: number;
   aspectRatio?: string;
+  model?: 'nano-banana' | 'nano-banana-pro';
+  resolution?: '1K' | '2K' | '4K';
 }
 
 export interface ImageResponse {
@@ -70,10 +71,10 @@ export interface SessionMessage {
   inputImageUrls: string[];
   createdAt: string;
   imageCount: number;
-  outputFormat: string;
   styleId?: number;
   styleName?: string;
   aspectRatio?: string;
+  modelType?: string;
 }
 
 export interface SessionDetail {
@@ -542,19 +543,40 @@ class ApiClient {
     return !!this.getToken();
   }
 
+  // Функции конвертации для отправки на бэкенд
+  private convertModelToEnum(model: 'nano-banana' | 'nano-banana-pro' | undefined): 'NANO_BANANA' | 'NANO_BANANA_PRO' | undefined {
+    if (!model) return undefined;
+    return model === 'nano-banana' ? 'NANO_BANANA' : 'NANO_BANANA_PRO';
+  }
+
+  private convertResolutionToEnum(resolution: '1K' | '2K' | '4K' | undefined): 'RESOLUTION_1K' | 'RESOLUTION_2K' | 'RESOLUTION_4K' | undefined {
+    if (!resolution) return undefined;
+    return `RESOLUTION_${resolution}` as 'RESOLUTION_1K' | 'RESOLUTION_2K' | 'RESOLUTION_4K';
+  }
+
   // Image Generation API
   async generateImage(request: ImageRequest): Promise<ApiResponse<ImageResponse>> {
+    const backendRequest = {
+      ...request,
+      model: this.convertModelToEnum(request.model),
+      resolution: this.convertResolutionToEnum(request.resolution),
+    };
     return this.request<ImageResponse>('/api/fal/image/run/create', {
       method: 'POST',
-      body: JSON.stringify(request),
+      body: JSON.stringify(backendRequest),
     }, 180000); // 3 минуты таймаут для генерации изображений (соответствует бэкенду)
   }
 
   // Queue Generation API
   async submitToQueue(request: ImageRequest): Promise<ApiResponse<QueueRequestStatus>> {
+    const backendRequest = {
+      ...request,
+      model: this.convertModelToEnum(request.model),
+      resolution: this.convertResolutionToEnum(request.resolution),
+    };
     return this.request<QueueRequestStatus>('/api/generate/submit', {
       method: 'POST',
-      body: JSON.stringify(request),
+      body: JSON.stringify(backendRequest),
     });
   }
 

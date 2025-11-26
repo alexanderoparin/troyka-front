@@ -400,8 +400,23 @@ export function SessionHistory({
                       <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
                         <ImageIcon className="h-3 w-3" />
                         <span>{message.imageCount} {getImageText(message.imageCount)}</span>
-                        <span>•</span>
-                        <span>{message.outputFormat}</span>
+                        {(() => {
+                          const modelName = message.modelType 
+                            ? (message.modelType === 'nano-banana' ? 'Nano Banana' : 'Nano Banana PRO')
+                            : 'Nano Banana';
+                          return (
+                            <>
+                              <span>•</span>
+                              <span>{modelName}</span>
+                            </>
+                          );
+                        })()}
+                        {message.aspectRatio && (
+                          <>
+                            <span>•</span>
+                            <span>{message.aspectRatio}</span>
+                          </>
+                        )}
                       </div>
                     </Card>
                   </div>

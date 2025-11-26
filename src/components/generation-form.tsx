@@ -18,7 +18,6 @@ import { formatApiError } from "@/lib/errors"
 const generationSchema = z.object({
   prompt: z.string().min(10, "Описание должно содержать минимум 10 символов"),
   numImages: z.number().min(1).max(4).default(1),
-  outputFormat: z.enum(['JPEG', 'PNG']).default('JPEG'),
 })
 
 type GenerationFormData = z.infer<typeof generationSchema>
@@ -85,7 +84,6 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
     defaultValues: {
       prompt: initialPrompt,
       numImages: 1,
-      outputFormat: 'JPEG',
     },
   })
 
@@ -98,7 +96,6 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
 
   const prompt = watch("prompt")
   const numImages = watch("numImages")
-  const outputFormat = watch("outputFormat")
   const canGenerate = true // Пока что убираем проверку поинтов
 
   const onSubmit = async (data: GenerationFormData) => {
@@ -111,8 +108,8 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
       return
     }
 
-    // Проверяем баланс
-    const requiredPoints = getRequiredPoints(data.numImages)
+    // Проверяем баланс (используем дефолтную модель nano-banana)
+    const requiredPoints = getRequiredPoints(data.numImages, 'nano-banana', '1K')
     if (points < requiredPoints) {
       toast({
         title: "Недостаточно поинтов",
@@ -165,9 +162,9 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
         prompt: data.prompt, // Оригинальный промпт пользователя (промпт стиля добавится на бэке перед отправкой в FalAI)
         inputImageUrls: processedImageUrls,
         numImages: data.numImages,
-        outputFormat: data.outputFormat,
         sessionId: sessionId,
-        styleId: styleId
+        styleId: styleId,
+        model: 'nano-banana' // Дефолтная модель
       }
 
       const response = await apiClient.generateImage(request)
@@ -433,21 +430,6 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
                       <span className="text-sm font-medium">Улучшить</span>
                     </>
                   )}
-                </Button>
-                
-                {/* Format Button */}
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const newFormat = outputFormat === 'JPEG' ? 'PNG' : 'JPEG'
-                    setValue("outputFormat", newFormat)
-                  }}
-                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/10 hover:bg-accent/20 text-accent-foreground border border-accent/20 transition-colors"
-                >
-                  <FileImage className="w-4 h-4" />
-                  <span className="text-sm font-medium">{outputFormat}</span>
                 </Button>
                 
                 {/* Image Count Button */}

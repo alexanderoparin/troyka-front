@@ -22,8 +22,24 @@ export const config = {
 
 /**
  * Возвращает количество поинтов для генерации N изображений
+ * @param numImages количество изображений
+ * @param model тип модели (nano-banana или nano-banana-pro)
+ * @param resolution разрешение (только для nano-banana-pro)
  */
-export function getRequiredPoints(numImages: number): number {
+export function getRequiredPoints(
+  numImages: number,
+  model: 'nano-banana' | 'nano-banana-pro' = 'nano-banana',
+  resolution: '1K' | '2K' | '4K' = '1K'
+): number {
+  if (model === 'nano-banana-pro') {
+    const pointsPerImage = {
+      '1K': 8,
+      '2K': 9,
+      '4K': 15,
+    }[resolution] || 8;
+    return numImages * pointsPerImage;
+  }
+  // Для nano-banana всегда 2 поинта за изображение
   return numImages * config.GENERATION_POINTS_PER_IMAGE;
 }
 

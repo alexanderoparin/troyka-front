@@ -33,7 +33,6 @@ export function ImageEditButton({
   const [isEditing, setIsEditing] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [numImages, setNumImages] = useState(1);
-  const [outputFormat, setOutputFormat] = useState<'JPEG' | 'PNG'>('JPEG');
   const { toast } = useToast();
   const { points, refreshPoints, setBalance } = useAuth();
 
@@ -47,8 +46,8 @@ export function ImageEditButton({
       return;
     }
 
-    // Проверяем баланс
-    const requiredPoints = getRequiredPoints(numImages);
+    // Проверяем баланс (используем дефолтную модель nano-banana)
+    const requiredPoints = getRequiredPoints(numImages, 'nano-banana', '1K');
     if (points < requiredPoints) {
       toast({
         title: "Недостаточно поинтов",
@@ -84,7 +83,7 @@ export function ImageEditButton({
         prompt: prompt.trim(),
         inputImageUrls: [processedImageUrl],
         numImages,
-        outputFormat
+        model: 'nano-banana' // Дефолтная модель для редактирования
       };
 
       const response = await apiClient.generateImage(request);
@@ -187,7 +186,7 @@ export function ImageEditButton({
               <span className="text-sm font-bold text-primary">{getPointsText(points)}</span>
             </div>
             <div className="text-sm text-muted-foreground">
-              Стоимость: {getPointsText(getRequiredPoints(numImages))}
+              Стоимость: {getPointsText(getRequiredPoints(numImages, 'nano-banana', '1K'))}
             </div>
           </div>
 
@@ -209,44 +208,24 @@ export function ImageEditButton({
           </div>
 
           {/* Настройки генерации */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="edit-num-images" className="text-sm font-medium">
-                Количество вариантов
-              </Label>
-              <Select
-                value={numImages.toString()}
-                onValueChange={(value) => setNumImages(parseInt(value))}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">1 вариант</SelectItem>
-                  <SelectItem value="2">2 варианта</SelectItem>
-                  <SelectItem value="3">3 варианта</SelectItem>
-                  <SelectItem value="4">4 варианта</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="edit-format" className="text-sm font-medium">
-                Формат изображения
-              </Label>
-              <Select
-                value={outputFormat}
-                onValueChange={(value) => setOutputFormat(value as 'JPEG' | 'PNG')}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="JPEG">JPEG</SelectItem>
-                  <SelectItem value="PNG">PNG</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="edit-num-images" className="text-sm font-medium">
+              Количество вариантов
+            </Label>
+            <Select
+              value={numImages.toString()}
+              onValueChange={(value) => setNumImages(parseInt(value))}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">1 вариант</SelectItem>
+                <SelectItem value="2">2 варианта</SelectItem>
+                <SelectItem value="3">3 варианта</SelectItem>
+                <SelectItem value="4">4 варианта</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Кнопки действий */}

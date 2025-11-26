@@ -46,6 +46,8 @@ import {
 import { useSessionHistory } from "@/hooks/use-session-detail"
 import Image from "next/image"
 import { ASPECT_RATIOS, DEFAULT_ASPECT_RATIO, type AspectRatio } from "@/lib/constants"
+import { getRequiredPoints } from "@/lib/config"
+import { getPointsText } from "@/lib/grammar"
 
 interface StudioChatProps {
   sessionId?: number
@@ -86,13 +88,6 @@ export function StudioChat({
     }
     return 1
   })
-  const [outputFormat, setOutputFormat] = useState<'JPEG' | 'PNG'>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('studio-outputFormat')
-      return (saved as 'JPEG' | 'PNG') || 'JPEG'
-    }
-    return 'JPEG'
-  })
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('studio-aspectRatio')
@@ -113,6 +108,36 @@ export function StudioChat({
     }
     return 'Реалистичный'
   })
+  const [model, setModel] = useState<'nano-banana' | 'nano-banana-pro'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('studio-model')
+      if (saved) {
+        // Конвертируем старые enum значения в новые
+        if (saved === 'NANO_BANANA' || saved === 'nano-banana') return 'nano-banana'
+        if (saved === 'NANO_BANANA_PRO' || saved === 'nano-banana-pro') return 'nano-banana-pro'
+        // Если значение не распознано, возвращаем дефолт
+        return 'nano-banana'
+      }
+      return 'nano-banana'
+    }
+    return 'nano-banana'
+  })
+  const [resolution, setResolution] = useState<'1K' | '2K' | '4K'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('studio-resolution')
+      if (saved) {
+        // Конвертируем старые enum значения в новые
+        if (saved === 'RESOLUTION_1K' || saved === '1K') return '1K'
+        if (saved === 'RESOLUTION_2K' || saved === '2K') return '2K'
+        if (saved === 'RESOLUTION_4K' || saved === '4K') return '4K'
+        // Если значение не распознано, возвращаем дефолт
+        return '1K'
+      }
+      return '1K'
+    }
+    return '1K'
+  })
+  
   const [uploadedImages, setUploadedImages] = useState<string[]>([])
   const [isFocused, setIsFocused] = useState(false)
   const [selectedImageForModal, setSelectedImageForModal] = useState<string | null>(null)
@@ -381,15 +406,21 @@ export function StudioChat({
   
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('studio-outputFormat', outputFormat)
-    }
-  }, [outputFormat])
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
       localStorage.setItem('studio-aspectRatio', aspectRatio)
     }
   }, [aspectRatio])
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('studio-model', model)
+    }
+  }, [model])
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('studio-resolution', resolution)
+    }
+  }, [resolution])
   
   useEffect(() => {
     // Пропускаем сохранение во время инициализации (чтобы избежать дублирования запросов)
@@ -665,10 +696,11 @@ export function StudioChat({
         prompt: prompt, // Оригинальный промпт пользователя
         inputImageUrls: validImageUrls.length > 0 ? validImageUrls : [],
         numImages: numImages,
-        outputFormat: outputFormat,
         sessionId: sessionId,
         styleId: styleId,
-        aspectRatio: aspectRatio
+        aspectRatio: aspectRatio,
+        model: model,
+        resolution: model === 'nano-banana-pro' ? resolution : undefined
       }
       
       const response = await apiClient.submitToQueue(request)
@@ -716,7 +748,7 @@ export function StudioChat({
     } finally {
       setIsGenerating(false)
     }
-  }, [prompt, numImages, outputFormat, aspectRatio, toast, artStyle, sessionId, uploadedImages, artStyles, startPolling])
+  }, [prompt, numImages, aspectRatio, toast, artStyle, sessionId, uploadedImages, artStyles, startPolling, model, resolution])
 
   const handleImageExpand = (imageUrl: string) => {
     setSelectedImageForModal(imageUrl)
@@ -1075,8 +1107,17 @@ export function StudioChat({
                             <div className="flex items-center gap-1.5 sm:gap-2 mt-2 sm:mt-3 text-xs text-muted-foreground flex-wrap">
                               <ImageIcon className="h-3 w-3 flex-shrink-0" />
                               <span>{message.imageUrls.length} {getImageText(message.imageUrls.length)}</span>
-                              <span>•</span>
-                              <span>{message.outputFormat || 'JPEG'}</span>
+                              {(() => {
+                                const modelName = message.modelType 
+                                  ? (message.modelType === 'nano-banana' ? 'Nano Banana' : 'Nano Banana PRO')
+                                  : 'Nano Banana';
+                                return (
+                                  <>
+                                    <span>•</span>
+                                    <span>{modelName}</span>
+                                  </>
+                                );
+                              })()}
                               {message.aspectRatio && (
                                 <>
                                   <span>•</span>
@@ -1280,6 +1321,18 @@ export function StudioChat({
                       <div className="flex gap-1.5 flex-shrink-0">
                         {/* Слева колонка: настройки + загрузка */}
                         <div className="flex flex-col gap-1.5">
+                          {/* Бейджи модели и разрешения (только для PRO) */}
+                          {model === 'nano-banana-pro' && (
+                            <div className="flex items-center gap-1">
+                              <Badge variant="outline" className="bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20 text-xs px-1.5 py-0.5">
+                                Pro
+                              </Badge>
+                              <Badge variant="outline" className="bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20 text-xs px-1.5 py-0.5">
+                                {resolution}
+                              </Badge>
+                            </div>
+                          )}
+                          
                           {/* Кнопка настроек */}
                           <DropdownMenu open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                             <DropdownMenuTrigger asChild>
@@ -1295,18 +1348,6 @@ export function StudioChat({
                               <DropdownMenuLabel>Настройки генерации</DropdownMenuLabel>
                               <DropdownMenuSeparator />
                             
-                              {/* Формат изображения */}
-                              <DropdownMenuItem
-                                onClick={(e) => {
-                                  e.preventDefault()
-                                  setOutputFormat(prev => prev === 'JPEG' ? 'PNG' : 'JPEG')
-                                }}
-                                className="flex items-center justify-between"
-                              >
-                                <span>Формат</span>
-                                <span className="text-muted-foreground">{outputFormat}</span>
-                              </DropdownMenuItem>
-                              
                               {/* Количество изображений */}
                               <DropdownMenuItem
                                 onClick={(e) => {
@@ -1346,6 +1387,41 @@ export function StudioChat({
                                 <span>Стиль</span>
                                 <span className="text-muted-foreground text-xs">{artStyle}</span>
                               </DropdownMenuItem>
+                              
+                              <DropdownMenuSeparator />
+                              
+                              {/* Модель */}
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  setModel(prev => prev === 'nano-banana' ? 'nano-banana-pro' : 'nano-banana')
+                                }}
+                                className="flex items-center justify-between"
+                              >
+                                <span>Модель</span>
+                                <span className="text-muted-foreground text-xs">
+                                  {model === 'nano-banana' ? 'Nano Banana' : 'PRO'}
+                                </span>
+                              </DropdownMenuItem>
+                              
+                              {/* Разрешение (только для PRO) */}
+                              {model === 'nano-banana-pro' && (
+                                <DropdownMenuItem
+                                  onClick={(e) => {
+                                    e.preventDefault()
+                                    const resolutions: Array<'1K' | '2K' | '4K'> = ['1K', '2K', '4K']
+                                    const currentIndex = resolutions.indexOf(resolution)
+                                    const nextIndex = (currentIndex + 1) % resolutions.length
+                                    setResolution(resolutions[nextIndex])
+                                  }}
+                                  className="flex items-center justify-between"
+                                >
+                                  <span>Разрешение</span>
+                                  <span className="text-muted-foreground text-xs">
+                                    {resolution}
+                                  </span>
+                                </DropdownMenuItem>
+                              )}
                             </DropdownMenuContent>
                           </DropdownMenu>
 
@@ -1416,7 +1492,9 @@ export function StudioChat({
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent className="z-[9998]">
-                              <p>{isGenerating ? "Генерация..." : "Генерировать"}</p>
+                              <p>
+                                {isGenerating ? "Генерация..." : `Генерировать (${getPointsText(getRequiredPoints(numImages, model, resolution))})`}
+                              </p>
                             </TooltipContent>
                           </Tooltip>
                         </div>
@@ -1475,34 +1553,6 @@ export function StudioChat({
                             </TooltipContent>
                           </Tooltip>
 
-                          {/* Формат изображения */}
-                          <DropdownMenu>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="h-10 w-14 p-0 text-sm bg-muted/80 hover:bg-muted/95 border border-border/80"
-                                  >
-                                    {outputFormat}
-                                  </Button>
-                                </DropdownMenuTrigger>
-                              </TooltipTrigger>
-                              <TooltipContent className="z-[140]">
-                                <p>Формат изображения</p>
-                              </TooltipContent>
-                            </Tooltip>
-                            <DropdownMenuContent className="w-32 z-[150]" align="start">
-                              <DropdownMenuItem onClick={() => setOutputFormat('JPEG')}>
-                                JPEG
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => setOutputFormat('PNG')}>
-                                PNG
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                          
                           {/* Количество изображений */}
                           <DropdownMenu>
                             <Tooltip>
@@ -1555,6 +1605,67 @@ export function StudioChat({
                               ))}
                             </DropdownMenuContent>
                           </DropdownMenu>
+                          
+                          {/* Модель */}
+                          <DropdownMenu>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-10 px-2 text-xs bg-muted/80 hover:bg-muted/95 border border-border/80 whitespace-nowrap"
+                                  >
+                                    {model === 'nano-banana' ? 'Nano Banana' : 'PRO'}
+                                  </Button>
+                                </DropdownMenuTrigger>
+                              </TooltipTrigger>
+                              <TooltipContent className="z-[140]">
+                                <p>Модель генерации</p>
+                              </TooltipContent>
+                            </Tooltip>
+                            <DropdownMenuContent className="w-40 z-[150]" align="start">
+                              <DropdownMenuItem onClick={() => setModel('nano-banana')}>
+                                Nano Banana
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => setModel('nano-banana-pro')}>
+                                Nano Banana PRO
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                          
+                          {/* Разрешение (только для PRO) */}
+                          {model === 'nano-banana-pro' && (
+                            <DropdownMenu>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="h-10 w-12 p-0 text-xs bg-muted/80 hover:bg-muted/95 border border-border/80"
+                                    >
+                                      {resolution}
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent className="z-[140]">
+                                  <p>Разрешение изображения</p>
+                                </TooltipContent>
+                              </Tooltip>
+                              <DropdownMenuContent className="w-32 z-[150]" align="start">
+                                <DropdownMenuItem onClick={() => setResolution('1K')}>
+                                  1K
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setResolution('2K')}>
+                                  2K
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setResolution('4K')}>
+                                  4K
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
                         </div>
                         
                         {/* Второй ряд - кнопка стиля (короче) + загрузка изображения */}
@@ -1635,7 +1746,9 @@ export function StudioChat({
                             </span>
                           </TooltipTrigger>
                           <TooltipContent className="z-[140]">
-                            <p>{isGenerating ? "Генерация изображений..." : "Генерировать изображения"}</p>
+                            <p>
+                              {isGenerating ? "Генерация изображений..." : `Генерировать изображения (${getPointsText(getRequiredPoints(numImages, model, resolution))})`}
+                            </p>
                           </TooltipContent>
                         </Tooltip>
                     </div>
