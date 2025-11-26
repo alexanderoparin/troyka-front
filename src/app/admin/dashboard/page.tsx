@@ -564,11 +564,6 @@ export default function AdminDashboardPage() {
               <div className="space-y-4 w-full">
                 {filteredUsers.map((user) => {
                   const avatarUrl = user.telegramPhotoUrl;
-                  // Формируем строку с информацией о пользователе (без Telegram username)
-                  const userInfoParts = [
-                    user.username,
-                    user.email && user.email.trim() ? `(${user.email})` : null
-                  ].filter(Boolean);
                   
                   return (
                     <div key={user.id} className="w-full max-w-full border rounded-lg p-3 sm:p-4 hover:bg-muted/50 transition-colors overflow-hidden">
@@ -584,9 +579,14 @@ export default function AdminDashboardPage() {
                           </Avatar>
                           <div className="flex-1 min-w-0 overflow-hidden">
                             <h3 className="font-medium text-sm sm:text-base break-words overflow-wrap-anywhere">{user.username}</h3>
-                            <p className="text-xs sm:text-sm text-muted-foreground break-words overflow-wrap-anywhere">
-                              {userInfoParts.join(' ')} • ID: {user.id}
+                            <p className="text-xs sm:text-sm text-muted-foreground break-words overflow-wrap-anywhere mt-1">
+                              ID: {user.id}
                             </p>
+                            {user.email && user.email.trim() && (
+                              <p className="text-xs text-muted-foreground mt-1 break-words overflow-wrap-anywhere">
+                                email: {user.email}
+                              </p>
+                            )}
                             {user.telegramFirstName && (
                               <p className="text-xs text-muted-foreground mt-1 break-words overflow-wrap-anywhere">
                                 Telegram: {user.telegramFirstName}
