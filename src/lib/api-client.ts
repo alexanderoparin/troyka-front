@@ -282,6 +282,7 @@ export interface AdminUserDTO {
 export interface AdminStatsDTO {
   totalUsers: number;
   totalPayments: number;
+  todayPayments: number;
   totalRevenue: number;
   todayRevenue: number;
   weekRevenue: number;
