@@ -18,6 +18,7 @@ import {
   ArrowUp,
   Plus
 } from "lucide-react"
+import { apiClient } from "@/lib/api-client"
 import { cn } from "@/lib/utils"
 import { useSessionHistory } from "@/hooks/use-session-detail"
 
@@ -156,8 +157,22 @@ export function SessionHistory({
 
   const downloadImage = async (imageUrl: string, filename?: string) => {
     try {
-      const response = await fetch(imageUrl)
+      // Проксируем URL для корректного скачивания в браузерах
+      const proxiedUrl = apiClient.proxyFalMediaUrl(imageUrl)
+      const response = await fetch(proxiedUrl)
+      
+      // Проверяем успешность ответа
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+      
       const blob = await response.blob()
+      
+      // Проверяем, что blob не пустой
+      if (blob.size === 0) {
+        throw new Error('Получен пустой файл. Возможно, проблема с загрузкой изображения с сервера.')
+      }
+      
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
@@ -181,9 +196,10 @@ export function SessionHistory({
         description: "Изображение сохранено на устройство",
       })
     } catch (error) {
+      console.error('Ошибка скачивания изображения:', error)
       toast({
         title: "Ошибка",
-        description: "Не удалось скачать изображение",
+        description: error instanceof Error ? error.message : "Не удалось скачать изображение",
         variant: "destructive",
       })
     }
@@ -325,12 +341,13 @@ export function SessionHistory({
                             <div className="w-36 h-44 sm:w-40 sm:h-48 bg-muted flex items-center justify-center rounded-lg relative">
                               {!imageErrors.has(imageUrl) ? (
                                 <Image
-                                  src={imageUrl}
+                                  src={apiClient.getFileUrl(imageUrl)}
                                   alt={`Сгенерированное изображение ${index + 1}`}
                                   width={160}
                                   height={192}
                                   className="w-full h-full object-cover rounded-lg"
                                   sizes="(max-width: 640px) 144px, 160px"
+                                  quality={85}
                                   onError={() => {
                                     console.error('Image load error:', imageUrl);
                                     setImageErrors(prev => new Set(prev).add(imageUrl));

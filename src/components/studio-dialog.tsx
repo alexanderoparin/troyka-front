@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils"
 import { useToast } from "@/components/ui/use-toast"
 import Image from "next/image"
 import { formatApiError } from "@/lib/errors"
+import { apiClient } from "@/lib/api-client"
 
 interface StudioDialogProps {
   onGenerationComplete: (images: string[]) => void
@@ -127,10 +128,12 @@ export function StudioDialog({
               >
                 <div className="relative w-full aspect-square">
                   <Image
-                    src={imageUrl}
+                    src={apiClient.getFileUrl(imageUrl)}
                     alt={`Сгенерированное изображение ${index + 1}`}
                     fill
                     className="object-cover"
+                    sizes="(max-width: 640px) 100vw, 50vw"
+                    quality={90}
                   />
                   
                   {/* Overlay с действиями */}

@@ -31,8 +31,28 @@ export default function HistoryPage() {
   // Функция для скачивания изображения
   const handleImageDownload = async (imageUrl: string) => {
     try {
-      const response = await fetch(imageUrl)
+      // getFileUrl уже проксирует FAL AI URLs, но для скачивания нужно убедиться что используется проксирование
+      let finalUrl = apiClient.getFileUrl(imageUrl)
+      
+      // Если URL еще не проксирован (содержит v3.fal.media или v3b.fal.media), проксируем его
+      if (finalUrl.includes('v3.fal.media') || finalUrl.includes('v3b.fal.media')) {
+        finalUrl = apiClient.proxyFalMediaUrl(finalUrl)
+      }
+      
+      const response = await fetch(finalUrl)
+      
+      // Проверяем успешность ответа
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+      
       const blob = await response.blob()
+      
+      // Проверяем, что blob не пустой
+      if (blob.size === 0) {
+        throw new Error('Получен пустой файл. Возможно, проблема с загрузкой изображения с сервера.')
+      }
+      
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
@@ -45,6 +65,7 @@ export default function HistoryPage() {
       window.URL.revokeObjectURL(url)
     } catch (error) {
       console.error('Ошибка при скачивании изображения:', error)
+      // Можно добавить toast уведомление, если нужно
     }
   }
 

@@ -759,7 +759,19 @@ export function StudioChat({
       // Проксируем URL для корректного скачивания в браузерах
       const proxiedUrl = apiClient.proxyFalMediaUrl(imageUrl)
       const response = await fetch(proxiedUrl)
+      
+      // Проверяем успешность ответа
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+      
       const blob = await response.blob()
+      
+      // Проверяем, что blob не пустой
+      if (blob.size === 0) {
+        throw new Error('Получен пустой файл. Возможно, проблема с загрузкой изображения с сервера.')
+      }
+      
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
@@ -776,9 +788,10 @@ export function StudioChat({
         description: "Файл сохранен в папку загрузок",
       })
     } catch (error) {
+      console.error('Ошибка скачивания изображения:', error)
       toast({
         title: "Ошибка скачивания",
-        description: "Не удалось скачать изображение",
+        description: error instanceof Error ? error.message : "Не удалось скачать изображение",
         variant: "destructive",
       })
     }
@@ -830,8 +843,22 @@ export function StudioChat({
 
   const downloadImage = async (imageUrl: string, filename?: string) => {
     try {
-      const response = await fetch(imageUrl)
+      // Проксируем URL для корректного скачивания в браузерах
+      const proxiedUrl = apiClient.proxyFalMediaUrl(imageUrl)
+      const response = await fetch(proxiedUrl)
+      
+      // Проверяем успешность ответа
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+      
       const blob = await response.blob()
+      
+      // Проверяем, что blob не пустой
+      if (blob.size === 0) {
+        throw new Error('Получен пустой файл. Возможно, проблема с загрузкой изображения с сервера.')
+      }
+      
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
@@ -852,9 +879,10 @@ export function StudioChat({
         description: "Изображение сохранено на устройство",
       })
     } catch (error) {
+      console.error('Ошибка скачивания изображения:', error)
       toast({
         title: "Ошибка",
-        description: "Не удалось скачать изображение",
+        description: error instanceof Error ? error.message : "Не удалось скачать изображение",
         variant: "destructive",
       })
     }
@@ -971,10 +999,12 @@ export function StudioChat({
                                   onClick={() => handleImageExpand(imageUrl)}
                                 >
                                   <Image
-                                    src={imageUrl}
+                                    src={apiClient.getFileUrl(imageUrl)}
                                     alt={`Входное изображение ${index + 1}`}
                                     fill
                                     className="object-cover"
+                                    sizes="80px"
+                                    quality={85}
                                   />
                                   {/* Кнопка редактирования в правом верхнем углу */}
                                   <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -1041,11 +1071,12 @@ export function StudioChat({
                           >
                             <div className="relative w-full aspect-square overflow-hidden">
                               <Image
-                                src={imageUrl}
+                                src={apiClient.getFileUrl(imageUrl)}
                                 alt={`Сгенерированное изображение ${index + 1}`}
                                 fill
                                 className="object-cover"
-                                sizes="(max-width: 640px) 100vw, 50vw"
+                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                quality={90}
                               />
                               
                               {/* Overlay с действиями в левом нижнем углу - показываем всегда на мобилке, при hover на десктопе */}
@@ -1204,11 +1235,12 @@ export function StudioChat({
                                       >
                                         <div className="relative w-full aspect-square overflow-hidden">
                                           <Image
-                                            src={imageUrl}
+                                            src={apiClient.getFileUrl(imageUrl)}
                                             alt={`Сгенерированное изображение ${index + 1}`}
                                             fill
                                             className="object-cover"
-                                            sizes="(max-width: 640px) 100vw, 50vw"
+                                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                            quality={90}
                                           />
                                         </div>
                                       </div>
@@ -1263,10 +1295,12 @@ export function StudioChat({
                     {uploadedImages.map((imageUrl, index) => (
                       <div key={index} className="relative w-16 h-16 rounded-lg overflow-hidden border border-border/50 group">
                         <Image
-                          src={imageUrl}
+                          src={apiClient.getFileUrl(imageUrl)}
                           alt={`Прикрепленное изображение ${index + 1}`}
                           fill
                           className="object-cover"
+                          sizes="64px"
+                          quality={85}
                         />
                         <Button
                           onClick={() => {
@@ -1773,11 +1807,13 @@ export function StudioChat({
             </Button>
             <div className="relative w-full h-full flex items-center justify-center">
               <Image
-                src={selectedImageForModal}
+                src={apiClient.getFileUrl(selectedImageForModal)}
                 alt="Полноразмерное изображение"
                 fill
                 className="object-contain"
                 priority
+                sizes="100vw"
+                quality={95}
               />
             </div>
           </div>
