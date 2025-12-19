@@ -1,9 +1,9 @@
 "use client"
 
 import { useAuth } from "@/contexts/auth-context"
-import { apiClient, AdminPaymentDTO, AdminUserDTO, AdminStatsDTO, SystemStatus, SystemStatusRequest, SystemStatusHistoryDTO, SystemStatusWithMetadata } from "@/lib/api-client"
+import { apiClient, AdminPaymentDTO, AdminUserDTO, AdminStatsDTO, UserStatisticsDTO, SystemStatus, SystemStatusRequest, SystemStatusHistoryDTO, SystemStatusWithMetadata } from "@/lib/api-client"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -27,7 +27,8 @@ import {
   XCircle,
   Settings,
   AlertTriangle,
-  Server
+  Server,
+  BarChart3
 } from "lucide-react"
 import { formatDate, cn } from "@/lib/utils"
 import Link from "next/link"
@@ -52,6 +53,15 @@ export default function AdminDashboardPage() {
   const [statusMessage, setStatusMessage] = useState("")
   const [selectedStatus, setSelectedStatus] = useState<SystemStatus>('ACTIVE')
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false)
+  const [selectedUserForStats, setSelectedUserForStats] = useState<AdminUserDTO | null>(null)
+  const [userStatistics, setUserStatistics] = useState<UserStatisticsDTO | null>(null)
+  const [isLoadingStatistics, setIsLoadingStatistics] = useState(false)
+  const [statisticsStartDate, setStatisticsStartDate] = useState<string>("")
+  const [statisticsEndDate, setStatisticsEndDate] = useState<string>("")
+  const [userSearchQuery, setUserSearchQuery] = useState<string>("")
+  const [searchResults, setSearchResults] = useState<AdminUserDTO[]>([])
+  const [isSearchingUsers, setIsSearchingUsers] = useState(false)
+  const [showSearchResults, setShowSearchResults] = useState(false)
 
   useEffect(() => {
     if (!isLoading && (!isAuthenticated || user?.role !== 'ADMIN')) {
@@ -70,11 +80,18 @@ export default function AdminDashboardPage() {
 
     try {
       if (activeTab === 'stats') {
-        const response = await apiClient.getAdminStats()
-        if (response.data) {
-          setStats(response.data)
+        const statsResponse = await apiClient.getAdminStats()
+        if (statsResponse.data) {
+          setStats(statsResponse.data)
         } else {
-          setError(response.error || 'Ошибка загрузки статистики')
+          setError(statsResponse.error || 'Ошибка загрузки статистики')
+        }
+        // Загружаем пользователей, если еще не загружены
+        if (users.length === 0) {
+          const usersResponse = await apiClient.getAdminUsers()
+          if (usersResponse.data) {
+            setUsers(usersResponse.data)
+          }
         }
       } else if (activeTab === 'payments') {
         const response = await apiClient.getAdminPayments()
@@ -118,8 +135,44 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     if (isAuthenticated && user?.role === 'ADMIN') {
       loadData()
+      // Сбрасываем статистику пользователя при смене вкладки
+      if (activeTab !== 'stats') {
+        setSelectedUserForStats(null)
+        setUserStatistics(null)
+        setStatisticsStartDate("")
+        setStatisticsEndDate("")
+        setUserSearchQuery("")
+        setSearchResults([])
+        setShowSearchResults(false)
+      }
     }
   }, [activeTab])
+
+  // Cleanup timeout при размонтировании
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  // Закрываем выпадающий список при клике вне области
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement
+      if (!target.closest('.user-search-container')) {
+        setShowSearchResults(false)
+      }
+    }
+
+    if (showSearchResults) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside)
+      }
+    }
+  }, [showSearchResults])
 
   const getStatusIcon = (status: string) => {
     switch (status.toUpperCase()) {
@@ -182,6 +235,90 @@ export default function AdminDashboardPage() {
     (u.telegramUsername && u.telegramUsername.toLowerCase().includes(userSearch.toLowerCase())) ||
     u.id.toString().includes(userSearch)
   )
+
+  const loadUserStatistics = async (user: AdminUserDTO) => {
+    setSelectedUserForStats(user)
+    setUserStatistics(null)
+    setIsLoadingStatistics(true)
+    setError(null)
+
+    try {
+      const startDate = statisticsStartDate ? new Date(statisticsStartDate).toISOString() : null
+      const endDate = statisticsEndDate ? new Date(statisticsEndDate).toISOString() : null
+      
+      const response = await apiClient.getUserStatistics(user.id, startDate, endDate)
+      if (response.data) {
+        setUserStatistics(response.data)
+      } else {
+        setError(response.error || 'Ошибка загрузки статистики')
+        toast({
+          title: "Ошибка",
+          description: response.error || 'Не удалось загрузить статистику',
+          variant: "destructive",
+        })
+      }
+    } catch (err) {
+      setError('Произошла ошибка при загрузке статистики')
+      toast({
+        title: "Ошибка",
+        description: 'Произошла ошибка при загрузке статистики',
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoadingStatistics(false)
+    }
+  }
+
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  const searchUsers = useCallback(async (query: string) => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current)
+    }
+
+    if (!query.trim()) {
+      setSearchResults([])
+      setShowSearchResults(false)
+      return
+    }
+
+    setIsSearchingUsers(true)
+    setShowSearchResults(true)
+
+    searchTimeoutRef.current = setTimeout(async () => {
+      try {
+        const response = await apiClient.searchAdminUsers(query.trim(), 10)
+        if (response.data) {
+          setSearchResults(response.data)
+        } else {
+          setSearchResults([])
+        }
+      } catch (err) {
+        console.error('Ошибка поиска пользователей:', err)
+        setSearchResults([])
+      } finally {
+        setIsSearchingUsers(false)
+      }
+    }, 300) // Debounce 300ms
+  }, [])
+
+  const handleUserSearchChange = (value: string) => {
+    setUserSearchQuery(value)
+    if (value.trim()) {
+      searchUsers(value)
+    } else {
+      setSearchResults([])
+      setShowSearchResults(false)
+      setSelectedUserForStats(null)
+    }
+  }
+
+  const handleUserSelect = (user: AdminUserDTO) => {
+    setSelectedUserForStats(user)
+    setUserSearchQuery(`${user.username} (ID: ${user.id})`)
+    setShowSearchResults(false)
+    setUserStatistics(null)
+  }
 
   if (isLoading) {
     return (
@@ -320,6 +457,7 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
       ) : activeTab === 'stats' && stats ? (
+        <>
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -430,6 +568,192 @@ export default function AdminDashboardPage() {
             </CardContent>
           </Card>
         </div>
+        
+        {/* Статистика пользователя */}
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5" />
+              Статистика генераций пользователя
+            </CardTitle>
+            <CardDescription>
+              Выберите пользователя и период для просмотра статистики генераций
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="relative user-search-container">
+                <Label htmlFor="userSearch">Пользователь</Label>
+                <div className="relative">
+                  <Input
+                    id="userSearch"
+                    type="text"
+                    placeholder="Поиск по ID, username, email, telegram..."
+                    value={userSearchQuery}
+                    onChange={(e) => handleUserSearchChange(e.target.value)}
+                    onFocus={() => {
+                      if (searchResults.length > 0) {
+                        setShowSearchResults(true)
+                      }
+                    }}
+                    className="w-full"
+                  />
+                  {isSearchingUsers && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <RefreshCw className="h-4 w-4 animate-spin text-muted-foreground" />
+                    </div>
+                  )}
+                  {showSearchResults && searchResults.length > 0 && (
+                    <div className="absolute z-50 w-full mt-1 bg-popover border rounded-md shadow-lg max-h-60 overflow-auto">
+                      {searchResults.map((user) => (
+                        <div
+                          key={user.id}
+                          onClick={() => handleUserSelect(user)}
+                          className="px-3 py-2 hover:bg-accent cursor-pointer border-b last:border-b-0"
+                        >
+                          <div className="font-medium">{user.username}</div>
+                          <div className="text-sm text-muted-foreground">
+                            ID: {user.id}
+                            {user.email && ` • ${user.email}`}
+                            {user.telegramUsername && ` • @${user.telegramUsername}`}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {showSearchResults && !isSearchingUsers && searchResults.length === 0 && userSearchQuery.trim() && (
+                    <div className="absolute z-50 w-full mt-1 bg-popover border rounded-md shadow-lg px-3 py-2 text-sm text-muted-foreground">
+                      Пользователи не найдены
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="statisticsStartDate">Начало периода</Label>
+                <Input
+                  id="statisticsStartDate"
+                  type="datetime-local"
+                  value={statisticsStartDate}
+                  onChange={(e) => setStatisticsStartDate(e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="statisticsEndDate">Конец периода</Label>
+                <Input
+                  id="statisticsEndDate"
+                  type="datetime-local"
+                  value={statisticsEndDate}
+                  onChange={(e) => setStatisticsEndDate(e.target.value)}
+                />
+              </div>
+            </div>
+            <Button 
+              onClick={() => selectedUserForStats && loadUserStatistics(selectedUserForStats)}
+              disabled={isLoadingStatistics || !selectedUserForStats}
+              className="w-full md:w-auto"
+            >
+              {isLoadingStatistics ? (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  Загрузка...
+                </>
+              ) : (
+                'Загрузить статистику'
+              )}
+            </Button>
+            
+            {userStatistics && (
+              <div className="space-y-4 mt-6 pt-6 border-t">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">Общая статистика</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Всего генераций:</span>
+                        <span className="font-semibold text-lg">{userStatistics.totalCount}</span>
+                      </div>
+                      <div className="flex justify-between pt-2 border-t">
+                        <span className="text-muted-foreground">Потрачено поинтов:</span>
+                        <span className="font-semibold text-lg text-primary">{userStatistics.totalPointsSpent || 0}</span>
+                      </div>
+                      {userStatistics.startDate && (
+                        <div className="flex flex-col gap-1 text-sm text-muted-foreground pt-2 border-t">
+                          <span>Период:</span>
+                          <span className="font-medium">
+                            {formatDate(new Date(userStatistics.startDate))} - {userStatistics.endDate ? formatDate(new Date(userStatistics.endDate)) : 'настоящее время'}
+                          </span>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">Обычная модель</CardTitle>
+                      <CardDescription>Nano Banana</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <div>
+                        <div className="text-3xl font-bold">{userStatistics.regularModelCount}</div>
+                        <p className="text-sm text-muted-foreground mt-1">генераций</p>
+                      </div>
+                      <div className="pt-2 border-t">
+                        <div className="text-xl font-semibold text-primary">{userStatistics.regularModelPointsSpent || 0}</div>
+                        <p className="text-sm text-muted-foreground">поинтов потрачено</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">ПРО модель</CardTitle>
+                      <CardDescription>Nano Banana PRO</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div>
+                        <div className="text-3xl font-bold">{userStatistics.proModelCount}</div>
+                        <p className="text-sm text-muted-foreground">всего генераций</p>
+                      </div>
+                      <div className="pt-2 border-t">
+                        <div className="text-xl font-semibold text-primary">{userStatistics.proModelPointsSpent || 0}</div>
+                        <p className="text-sm text-muted-foreground">поинтов потрачено</p>
+                      </div>
+                      {userStatistics.proModelCount > 0 && (
+                        <div className="space-y-2 pt-3 border-t">
+                          <div className="text-sm font-medium mb-2">По разрешениям:</div>
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-muted-foreground">1K:</span>
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold">{userStatistics.proModelByResolution['1K'] || 0} генераций</span>
+                                <span className="text-xs text-muted-foreground">({userStatistics.proModelPointsByResolution?.['1K'] || 0} поинтов)</span>
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-muted-foreground">2K:</span>
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold">{userStatistics.proModelByResolution['2K'] || 0} генераций</span>
+                                <span className="text-xs text-muted-foreground">({userStatistics.proModelPointsByResolution?.['2K'] || 0} поинтов)</span>
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-muted-foreground">4K:</span>
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold">{userStatistics.proModelByResolution['4K'] || 0} генераций</span>
+                                <span className="text-xs text-muted-foreground">({userStatistics.proModelPointsByResolution?.['4K'] || 0} поинтов)</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+        </>
       ) : activeTab === 'payments' ? (
         <Card className="w-full max-w-full overflow-hidden">
           <CardHeader className="w-full max-w-full">

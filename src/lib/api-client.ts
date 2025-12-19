@@ -294,6 +294,25 @@ export interface AdminStatsDTO {
   yearRegistrations: number;
 }
 
+export interface UserStatisticsDTO {
+  userId: number;
+  username: string;
+  startDate: string | null;
+  endDate: string | null;
+  regularModelCount: number;
+  proModelCount: number;
+  proModelByResolution: {
+    [key: string]: number;
+  };
+  totalCount: number;
+  totalPointsSpent: number;
+  regularModelPointsSpent: number;
+  proModelPointsSpent: number;
+  proModelPointsByResolution: {
+    [key: string]: number;
+  };
+}
+
 // System status interfaces
 export type SystemStatus = 'ACTIVE' | 'DEGRADED' | 'MAINTENANCE';
 
@@ -1187,8 +1206,35 @@ class ApiClient {
     return this.request<AdminUserDTO[]>('/api/admin/users');
   }
 
+  async searchAdminUsers(query?: string, limit: number = 20): Promise<ApiResponse<AdminUserDTO[]>> {
+    const params = new URLSearchParams();
+    if (query) {
+      params.append('query', query);
+    }
+    params.append('limit', limit.toString());
+    const queryString = params.toString();
+    return this.request<AdminUserDTO[]>(`/api/admin/users/search?${queryString}`);
+  }
+
   async getAdminStats(): Promise<ApiResponse<AdminStatsDTO>> {
     return this.request<AdminStatsDTO>('/api/admin/stats');
+  }
+
+  async getUserStatistics(
+    userId: number,
+    startDate?: string | null,
+    endDate?: string | null
+  ): Promise<ApiResponse<UserStatisticsDTO>> {
+    const params = new URLSearchParams();
+    if (startDate) {
+      params.append('startDate', startDate);
+    }
+    if (endDate) {
+      params.append('endDate', endDate);
+    }
+    const queryString = params.toString();
+    const url = `/api/admin/users/${userId}/statistics${queryString ? `?${queryString}` : ''}`;
+    return this.request<UserStatisticsDTO>(url);
   }
 
   // System status methods
