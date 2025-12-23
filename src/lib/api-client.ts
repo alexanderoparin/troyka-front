@@ -311,6 +311,12 @@ export interface UserStatisticsDTO {
   proModelPointsByResolution: {
     [key: string]: number;
   };
+  totalCostUsd: number | null;
+  regularModelCostUsd: number | null;
+  proModelCostUsd: number | null;
+  proModelCostUsdByResolution: {
+    [key: string]: number | null;
+  } | null;
 }
 
 // System status interfaces

@@ -671,13 +671,19 @@ export default function AdminDashboardPage() {
                     </CardHeader>
                     <CardContent className="space-y-2">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Всего генераций:</span>
+                        <span className="text-muted-foreground">Всего сгенерировано:</span>
                         <span className="font-semibold text-lg">{userStatistics.totalCount}</span>
                       </div>
                       <div className="flex justify-between pt-2 border-t">
                         <span className="text-muted-foreground">Потрачено поинтов:</span>
                         <span className="font-semibold text-lg text-primary">{userStatistics.totalPointsSpent || 0}</span>
                       </div>
+                      {userStatistics.totalCostUsd !== null && userStatistics.totalCostUsd !== undefined && (
+                        <div className="flex justify-between pt-2 border-t">
+                          <span className="text-muted-foreground">Себестоимость:</span>
+                          <span className="font-semibold text-lg text-green-600">${userStatistics.totalCostUsd.toFixed(3)}</span>
+                        </div>
+                      )}
                       {userStatistics.startDate && (
                         <div className="flex flex-col gap-1 text-sm text-muted-foreground pt-2 border-t">
                           <span>Период:</span>
@@ -696,12 +702,18 @@ export default function AdminDashboardPage() {
                     <CardContent className="space-y-2">
                       <div>
                         <div className="text-3xl font-bold">{userStatistics.regularModelCount}</div>
-                        <p className="text-sm text-muted-foreground mt-1">генераций</p>
+                        <p className="text-sm text-muted-foreground mt-1">сгенерировано</p>
                       </div>
                       <div className="pt-2 border-t">
                         <div className="text-xl font-semibold text-primary">{userStatistics.regularModelPointsSpent || 0}</div>
                         <p className="text-sm text-muted-foreground">поинтов потрачено</p>
                       </div>
+                      {userStatistics.regularModelCostUsd !== null && userStatistics.regularModelCostUsd !== undefined && (
+                        <div className="pt-2 border-t">
+                          <div className="text-xl font-semibold text-green-600">${userStatistics.regularModelCostUsd.toFixed(3)}</div>
+                          <p className="text-sm text-muted-foreground">себестоимость</p>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                   <Card>
@@ -712,35 +724,50 @@ export default function AdminDashboardPage() {
                     <CardContent className="space-y-3">
                       <div>
                         <div className="text-3xl font-bold">{userStatistics.proModelCount}</div>
-                        <p className="text-sm text-muted-foreground">всего генераций</p>
+                        <p className="text-sm text-muted-foreground">сгенерировано</p>
                       </div>
                       <div className="pt-2 border-t">
                         <div className="text-xl font-semibold text-primary">{userStatistics.proModelPointsSpent || 0}</div>
                         <p className="text-sm text-muted-foreground">поинтов потрачено</p>
                       </div>
+                      {userStatistics.proModelCostUsd !== null && userStatistics.proModelCostUsd !== undefined && (
+                        <div className="pt-2 border-t">
+                          <div className="text-xl font-semibold text-green-600">${userStatistics.proModelCostUsd.toFixed(3)}</div>
+                          <p className="text-sm text-muted-foreground">себестоимость</p>
+                        </div>
+                      )}
                       {userStatistics.proModelCount > 0 && (
                         <div className="space-y-2 pt-3 border-t">
                           <div className="text-sm font-medium mb-2">По разрешениям:</div>
                           <div className="space-y-2">
                             <div className="flex justify-between items-center">
                               <span className="text-muted-foreground">1K:</span>
-                              <div className="flex items-center gap-2">
-                                <span className="font-semibold">{userStatistics.proModelByResolution['1K'] || 0} генераций</span>
+                              <div className="flex flex-col items-end gap-1">
+                                <span className="font-semibold">{userStatistics.proModelByResolution['1K'] || 0} сгенерировано</span>
                                 <span className="text-xs text-muted-foreground">({userStatistics.proModelPointsByResolution?.['1K'] || 0} поинтов)</span>
+                                {userStatistics.proModelCostUsdByResolution?.['1K'] !== null && userStatistics.proModelCostUsdByResolution?.['1K'] !== undefined && (
+                                  <span className="text-xs text-green-600 font-medium">${userStatistics.proModelCostUsdByResolution['1K'].toFixed(3)}</span>
+                                )}
                               </div>
                             </div>
                             <div className="flex justify-between items-center">
                               <span className="text-muted-foreground">2K:</span>
-                              <div className="flex items-center gap-2">
-                                <span className="font-semibold">{userStatistics.proModelByResolution['2K'] || 0} генераций</span>
+                              <div className="flex flex-col items-end gap-1">
+                                <span className="font-semibold">{userStatistics.proModelByResolution['2K'] || 0} сгенерировано</span>
                                 <span className="text-xs text-muted-foreground">({userStatistics.proModelPointsByResolution?.['2K'] || 0} поинтов)</span>
+                                {userStatistics.proModelCostUsdByResolution?.['2K'] !== null && userStatistics.proModelCostUsdByResolution?.['2K'] !== undefined && (
+                                  <span className="text-xs text-green-600 font-medium">${userStatistics.proModelCostUsdByResolution['2K'].toFixed(3)}</span>
+                                )}
                               </div>
                             </div>
                             <div className="flex justify-between items-center">
                               <span className="text-muted-foreground">4K:</span>
-                              <div className="flex items-center gap-2">
-                                <span className="font-semibold">{userStatistics.proModelByResolution['4K'] || 0} генераций</span>
+                              <div className="flex flex-col items-end gap-1">
+                                <span className="font-semibold">{userStatistics.proModelByResolution['4K'] || 0} сгенерировано</span>
                                 <span className="text-xs text-muted-foreground">({userStatistics.proModelPointsByResolution?.['4K'] || 0} поинтов)</span>
+                                {userStatistics.proModelCostUsdByResolution?.['4K'] !== null && userStatistics.proModelCostUsdByResolution?.['4K'] !== undefined && (
+                                  <span className="text-xs text-green-600 font-medium">${userStatistics.proModelCostUsdByResolution['4K'].toFixed(3)}</span>
+                                )}
                               </div>
                             </div>
                           </div>
