@@ -3,7 +3,7 @@
 import { useAuth } from "@/contexts/auth-context"
 import { apiClient, AdminPaymentDTO, AdminUserDTO, AdminStatsDTO, UserStatisticsDTO, SystemStatus, SystemStatusRequest, SystemStatusHistoryDTO, SystemStatusWithMetadata } from "@/lib/api-client"
 import { useRouter } from "next/navigation"
-import { useEffect, useState, useCallback, useRef } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -11,6 +11,8 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/components/ui/use-toast"
 import { 
   Shield,
@@ -28,7 +30,8 @@ import {
   Settings,
   AlertTriangle,
   Server,
-  BarChart3
+  BarChart3,
+  Check
 } from "lucide-react"
 import { formatDate, cn } from "@/lib/utils"
 import Link from "next/link"
@@ -53,15 +56,13 @@ export default function AdminDashboardPage() {
   const [statusMessage, setStatusMessage] = useState("")
   const [selectedStatus, setSelectedStatus] = useState<SystemStatus>('ACTIVE')
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false)
-  const [selectedUserForStats, setSelectedUserForStats] = useState<AdminUserDTO | null>(null)
+  const [selectedUserIdsForStats, setSelectedUserIdsForStats] = useState<number[]>([])
   const [userStatistics, setUserStatistics] = useState<UserStatisticsDTO | null>(null)
   const [isLoadingStatistics, setIsLoadingStatistics] = useState(false)
   const [statisticsStartDate, setStatisticsStartDate] = useState<string>("")
   const [statisticsEndDate, setStatisticsEndDate] = useState<string>("")
-  const [userSearchQuery, setUserSearchQuery] = useState<string>("")
-  const [searchResults, setSearchResults] = useState<AdminUserDTO[]>([])
-  const [isSearchingUsers, setIsSearchingUsers] = useState(false)
-  const [showSearchResults, setShowSearchResults] = useState(false)
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false)
+  const [userSearchFilter, setUserSearchFilter] = useState<string>("")
 
   useEffect(() => {
     if (!isLoading && (!isAuthenticated || user?.role !== 'ADMIN')) {
@@ -137,42 +138,14 @@ export default function AdminDashboardPage() {
       loadData()
       // Сбрасываем статистику пользователя при смене вкладки
       if (activeTab !== 'stats') {
-        setSelectedUserForStats(null)
+        setSelectedUserIdsForStats([])
         setUserStatistics(null)
         setStatisticsStartDate("")
         setStatisticsEndDate("")
-        setUserSearchQuery("")
-        setSearchResults([])
-        setShowSearchResults(false)
       }
     }
   }, [activeTab])
 
-  // Cleanup timeout при размонтировании
-  useEffect(() => {
-    return () => {
-      if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current)
-      }
-    }
-  }, [])
-
-  // Закрываем выпадающий список при клике вне области
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement
-      if (!target.closest('.user-search-container')) {
-        setShowSearchResults(false)
-      }
-    }
-
-    if (showSearchResults) {
-      document.addEventListener('mousedown', handleClickOutside)
-      return () => {
-        document.removeEventListener('mousedown', handleClickOutside)
-      }
-    }
-  }, [showSearchResults])
 
   const getStatusIcon = (status: string) => {
     switch (status.toUpperCase()) {
@@ -236,8 +209,16 @@ export default function AdminDashboardPage() {
     u.id.toString().includes(userSearch)
   )
 
-  const loadUserStatistics = async (user: AdminUserDTO) => {
-    setSelectedUserForStats(user)
+  const loadUserStatistics = async () => {
+    if (selectedUserIdsForStats.length === 0) {
+      toast({
+        title: "Ошибка",
+        description: 'Выберите хотя бы одного пользователя',
+        variant: "destructive",
+      })
+      return
+    }
+
     setUserStatistics(null)
     setIsLoadingStatistics(true)
     setError(null)
@@ -246,7 +227,7 @@ export default function AdminDashboardPage() {
       const startDate = statisticsStartDate ? new Date(statisticsStartDate).toISOString() : null
       const endDate = statisticsEndDate ? new Date(statisticsEndDate).toISOString() : null
       
-      const response = await apiClient.getUserStatistics(user.id, startDate, endDate)
+      const response = await apiClient.getUserStatistics(selectedUserIdsForStats, startDate, endDate)
       if (response.data) {
         setUserStatistics(response.data)
       } else {
@@ -269,56 +250,59 @@ export default function AdminDashboardPage() {
     }
   }
 
-  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-
-  const searchUsers = useCallback(async (query: string) => {
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current)
-    }
-
-    if (!query.trim()) {
-      setSearchResults([])
-      setShowSearchResults(false)
-      return
-    }
-
-    setIsSearchingUsers(true)
-    setShowSearchResults(true)
-
-    searchTimeoutRef.current = setTimeout(async () => {
-      try {
-        const response = await apiClient.searchAdminUsers(query.trim(), 10)
-        if (response.data) {
-          setSearchResults(response.data)
-        } else {
-          setSearchResults([])
-        }
-      } catch (err) {
-        console.error('Ошибка поиска пользователей:', err)
-        setSearchResults([])
-      } finally {
-        setIsSearchingUsers(false)
+  const toggleUserSelection = (userId: number) => {
+    setSelectedUserIdsForStats(prev => {
+      if (prev.includes(userId)) {
+        return prev.filter(id => id !== userId)
+      } else {
+        return [...prev, userId]
       }
-    }, 300) // Debounce 300ms
-  }, [])
-
-  const handleUserSearchChange = (value: string) => {
-    setUserSearchQuery(value)
-    if (value.trim()) {
-      searchUsers(value)
-    } else {
-      setSearchResults([])
-      setShowSearchResults(false)
-      setSelectedUserForStats(null)
-    }
+    })
   }
 
-  const handleUserSelect = (user: AdminUserDTO) => {
-    setSelectedUserForStats(user)
-    setUserSearchQuery(`${user.username} (ID: ${user.id})`)
-    setShowSearchResults(false)
-    setUserStatistics(null)
+  const selectAllFilteredUsers = () => {
+    const filteredIds = filteredUsersForSelection.map(u => u.id)
+    setSelectedUserIdsForStats(prev => {
+      const newIds = filteredIds.filter(id => !prev.includes(id))
+      return [...prev, ...newIds]
+    })
   }
+
+  const deselectAllFilteredUsers = () => {
+    const filteredIds = filteredUsersForSelection.map(u => u.id)
+    setSelectedUserIdsForStats(prev => prev.filter(id => !filteredIds.includes(id)))
+  }
+
+  const selectUsersWithPayment = () => {
+    const usersWithPayment = filteredUsersForSelection
+      .filter(u => u.hasSuccessfulPayment)
+      .map(u => u.id)
+    setSelectedUserIdsForStats(prev => {
+      const newIds = usersWithPayment.filter(id => !prev.includes(id))
+      return [...prev, ...newIds]
+    })
+  }
+
+  const selectUsersWithoutPayment = () => {
+    const usersWithoutPayment = filteredUsersForSelection
+      .filter(u => !u.hasSuccessfulPayment)
+      .map(u => u.id)
+    setSelectedUserIdsForStats(prev => {
+      const newIds = usersWithoutPayment.filter(id => !prev.includes(id))
+      return [...prev, ...newIds]
+    })
+  }
+
+  const filteredUsersForSelection = users.filter(u => {
+    if (!userSearchFilter.trim()) return true
+    const searchLower = userSearchFilter.toLowerCase()
+    return (
+      (u.username && u.username.toLowerCase().includes(searchLower)) ||
+      (u.email && u.email.toLowerCase().includes(searchLower)) ||
+      (u.telegramUsername && u.telegramUsername.toLowerCase().includes(searchLower)) ||
+      u.id.toString().includes(userSearchFilter)
+    )
+  })
 
   if (isLoading) {
     return (
@@ -577,56 +561,130 @@ export default function AdminDashboardPage() {
               Статистика генераций пользователя
             </CardTitle>
             <CardDescription>
-              Выберите пользователя и период для просмотра статистики генераций
+              Выберите пользователей и период для просмотра статистики генераций
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="relative user-search-container">
-                <Label htmlFor="userSearch">Пользователь</Label>
-                <div className="relative">
-                  <Input
-                    id="userSearch"
-                    type="text"
-                    placeholder="Поиск по ID, username, email, telegram..."
-                    value={userSearchQuery}
-                    onChange={(e) => handleUserSearchChange(e.target.value)}
-                    onFocus={() => {
-                      if (searchResults.length > 0) {
-                        setShowSearchResults(true)
-                      }
-                    }}
-                    className="w-full"
-                  />
-                  {isSearchingUsers && (
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                      <RefreshCw className="h-4 w-4 animate-spin text-muted-foreground" />
-                    </div>
-                  )}
-                  {showSearchResults && searchResults.length > 0 && (
-                    <div className="absolute z-50 w-full mt-1 bg-popover border rounded-md shadow-lg max-h-60 overflow-auto">
-                      {searchResults.map((user) => (
-                        <div
-                          key={user.id}
-                          onClick={() => handleUserSelect(user)}
-                          className="px-3 py-2 hover:bg-accent cursor-pointer border-b last:border-b-0"
-                        >
-                          <div className="font-medium">{user.username}</div>
-                          <div className="text-sm text-muted-foreground">
-                            ID: {user.id}
-                            {user.email && ` • ${user.email}`}
-                            {user.telegramUsername && ` • @${user.telegramUsername}`}
+              <div>
+                <Label>Пользователи</Label>
+                <DropdownMenu open={isUserDropdownOpen} onOpenChange={setIsUserDropdownOpen}>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="w-full justify-between">
+                      <span className="truncate">
+                        {selectedUserIdsForStats.length === 0
+                          ? "Выберите пользователей"
+                          : `Выбрано: ${selectedUserIdsForStats.length}`}
+                      </span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-[400px] max-h-[400px] overflow-hidden flex flex-col" onCloseAutoFocus={(e) => e.preventDefault()}>
+                    <div className="p-2 border-b space-y-2">
+                      <Input
+                        placeholder="Поиск по ID, username, email, telegram..."
+                        value={userSearchFilter}
+                        onChange={(e) => setUserSearchFilter(e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-full"
+                      />
+                      {filteredUsersForSelection.length > 0 && (
+                        <div className="space-y-2">
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="flex-1 text-xs h-7"
+                              onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                selectAllFilteredUsers()
+                              }}
+                            >
+                              Выбрать все
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="flex-1 text-xs h-7"
+                              onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                deselectAllFilteredUsers()
+                              }}
+                            >
+                              Снять все
+                            </Button>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="flex-1 text-xs h-7"
+                              onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                selectUsersWithPayment()
+                              }}
+                            >
+                              С оплатой
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="flex-1 text-xs h-7"
+                              onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                selectUsersWithoutPayment()
+                              }}
+                            >
+                              Без оплаты
+                            </Button>
                           </div>
                         </div>
-                      ))}
+                      )}
                     </div>
-                  )}
-                  {showSearchResults && !isSearchingUsers && searchResults.length === 0 && userSearchQuery.trim() && (
-                    <div className="absolute z-50 w-full mt-1 bg-popover border rounded-md shadow-lg px-3 py-2 text-sm text-muted-foreground">
-                      Пользователи не найдены
+                    <div className="overflow-y-auto max-h-[300px]">
+                      {filteredUsersForSelection.length > 0 ? (
+                        filteredUsersForSelection.map((user) => {
+                          const isSelected = selectedUserIdsForStats.includes(user.id)
+                          return (
+                            <div
+                              key={user.id}
+                              onClick={() => toggleUserSelection(user.id)}
+                              className="flex items-start gap-3 px-3 py-2 hover:bg-accent cursor-pointer transition-colors"
+                            >
+                              <div className="mt-0.5 flex-shrink-0">
+                                <div className={cn(
+                                  "w-4 h-4 border-2 rounded flex items-center justify-center transition-colors",
+                                  isSelected 
+                                    ? "bg-primary border-primary" 
+                                    : "border-input bg-background"
+                                )}>
+                                  {isSelected && (
+                                    <Check className="h-3 w-3 text-primary-foreground" />
+                                  )}
+                                </div>
+                              </div>
+                              <div className="flex flex-col flex-1 min-w-0">
+                                <span className="font-medium">{user.username}</span>
+                                <span className="text-xs text-muted-foreground">
+                                  ID: {user.id}
+                                  {user.email && ` • ${user.email}`}
+                                  {user.telegramUsername && ` • @${user.telegramUsername}`}
+                                </span>
+                              </div>
+                            </div>
+                          )
+                        })
+                      ) : (
+                        <div className="p-4 text-sm text-muted-foreground text-center">
+                          Пользователи не найдены
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
               <div>
                 <Label htmlFor="statisticsStartDate">Начало периода</Label>
@@ -648,8 +706,8 @@ export default function AdminDashboardPage() {
               </div>
             </div>
             <Button 
-              onClick={() => selectedUserForStats && loadUserStatistics(selectedUserForStats)}
-              disabled={isLoadingStatistics || !selectedUserForStats}
+              onClick={loadUserStatistics}
+              disabled={isLoadingStatistics || selectedUserIdsForStats.length === 0}
               className="w-full md:w-auto"
             >
               {isLoadingStatistics ? (

@@ -277,6 +277,7 @@ export interface AdminUserDTO {
   points: number;
   createdAt: string;
   updatedAt: string;
+  hasSuccessfulPayment: boolean;
 }
 
 export interface AdminStatsDTO {
@@ -295,8 +296,6 @@ export interface AdminStatsDTO {
 }
 
 export interface UserStatisticsDTO {
-  userId: number;
-  username: string;
   startDate: string | null;
   endDate: string | null;
   regularModelCount: number;
@@ -1227,11 +1226,14 @@ class ApiClient {
   }
 
   async getUserStatistics(
-    userId: number,
+    userIds: number[] | null,
     startDate?: string | null,
     endDate?: string | null
   ): Promise<ApiResponse<UserStatisticsDTO>> {
     const params = new URLSearchParams();
+    if (userIds && userIds.length > 0) {
+      userIds.forEach(userId => params.append('userIds', userId.toString()));
+    }
     if (startDate) {
       params.append('startDate', startDate);
     }
@@ -1239,7 +1241,7 @@ class ApiClient {
       params.append('endDate', endDate);
     }
     const queryString = params.toString();
-    const url = `/api/admin/users/${userId}/statistics${queryString ? `?${queryString}` : ''}`;
+    const url = `/api/admin/users/statistics${queryString ? `?${queryString}` : ''}`;
     return this.request<UserStatisticsDTO>(url);
   }
 
