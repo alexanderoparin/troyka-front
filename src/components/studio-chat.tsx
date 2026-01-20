@@ -756,8 +756,8 @@ export function StudioChat({
 
   const handleImageDownload = async (imageUrl: string) => {
     try {
-      // Проксируем URL для корректного скачивания в браузерах
-      const proxiedUrl = apiClient.proxyFalMediaUrl(imageUrl)
+      // Проксируем URL только для FAL AI изображений, для остальных используем оригинальный URL
+      const proxiedUrl = apiClient.proxyFalMediaUrlIfNeeded(imageUrl)
       const response = await fetch(proxiedUrl)
       
       // Проверяем успешность ответа
@@ -843,8 +843,8 @@ export function StudioChat({
 
   const downloadImage = async (imageUrl: string, filename?: string) => {
     try {
-      // Проксируем URL для корректного скачивания в браузерах
-      const proxiedUrl = apiClient.proxyFalMediaUrl(imageUrl)
+      // Проксируем URL только для FAL AI изображений, для остальных используем оригинальный URL
+      const proxiedUrl = apiClient.proxyFalMediaUrlIfNeeded(imageUrl)
       const response = await fetch(proxiedUrl)
       
       // Проверяем успешность ответа

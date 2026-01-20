@@ -34,10 +34,8 @@ export default function HistoryPage() {
       // getFileUrl уже проксирует FAL AI URLs, но для скачивания нужно убедиться что используется проксирование
       let finalUrl = apiClient.getFileUrl(imageUrl)
       
-      // Если URL еще не проксирован (содержит v3.fal.media или v3b.fal.media), проксируем его
-      if (finalUrl.includes('v3.fal.media') || finalUrl.includes('v3b.fal.media')) {
-        finalUrl = apiClient.proxyFalMediaUrl(finalUrl)
-      }
+      // Проксируем URL только для FAL AI изображений, для остальных используем оригинальный URL
+      finalUrl = apiClient.proxyFalMediaUrlIfNeeded(finalUrl)
       
       const response = await fetch(finalUrl)
       

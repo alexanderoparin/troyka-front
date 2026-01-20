@@ -915,11 +915,28 @@ class ApiClient {
   }
 
   /**
+   * Проксировать URL изображения от FAL AI через наш сервер, если это FAL AI URL.
+   * Для других URL возвращает оригинальный URL без изменений.
+   * Преобразует: https://v3.fal.media/files/kangaroo/file.jpg
+   *           -> https://24reshai.ru/images/v1/kangaroo/file.jpg
+   * Преобразует: https://v3b.fal.media/files/b/lion/file.jpg
+   *           -> https://24reshai.ru/images/v2/b/lion/file.jpg
+   * Для локальных URL (24reshai.ru/files/...) возвращает оригинальный URL.
+   */
+  public proxyFalMediaUrlIfNeeded(url: string): string {
+    if (this.isFalMediaUrl(url)) {
+      return this.proxyFalMediaUrl(url);
+    }
+    return url;
+  }
+
+  /**
    * Проксировать URL изображения от FAL AI через наш сервер.
    * Преобразует: https://v3.fal.media/files/kangaroo/file.jpg
    *           -> https://24reshai.ru/images/v1/kangaroo/file.jpg
    * Преобразует: https://v3b.fal.media/files/b/lion/file.jpg
    *           -> https://24reshai.ru/images/v2/b/lion/file.jpg
+   * ВНИМАНИЕ: Используйте proxyFalMediaUrlIfNeeded() для безопасного проксирования с проверкой.
    */
   public proxyFalMediaUrl(url: string): string {
     try {
