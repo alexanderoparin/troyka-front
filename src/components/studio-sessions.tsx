@@ -278,6 +278,7 @@ export function StudioSessions({
                               fill
                               className="object-cover"
                               sizes="96px"
+                              quality={95}
                               onError={(e) => {
                                 console.error('Session image load error:', session.lastImageUrl, e);
                               }}

@@ -346,8 +346,8 @@ export function SessionHistory({
                                   width={160}
                                   height={192}
                                   className="w-full h-full object-cover rounded-lg"
+                                  quality={95}
                                   sizes="(max-width: 640px) 144px, 160px"
-                                  quality={85}
                                   onError={() => {
                                     console.error('Image load error:', imageUrl);
                                     setImageErrors(prev => new Set(prev).add(imageUrl));

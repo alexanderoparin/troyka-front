@@ -1004,7 +1004,7 @@ export function StudioChat({
                                     fill
                                     className="object-cover"
                                     sizes="80px"
-                                    quality={85}
+                                    quality={95}
                                   />
                                   {/* Кнопка редактирования в правом верхнем углу */}
                                   <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -1076,7 +1076,7 @@ export function StudioChat({
                                 fill
                                 className="object-cover"
                                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                                quality={90}
+                                quality={95}
                               />
                               
                               {/* Overlay с действиями в левом нижнем углу - показываем всегда на мобилке, при hover на десктопе */}
@@ -1240,7 +1240,7 @@ export function StudioChat({
                                             fill
                                             className="object-cover"
                                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                                            quality={90}
+                                            quality={95}
                                           />
                                         </div>
                                       </div>
@@ -1300,7 +1300,7 @@ export function StudioChat({
                           fill
                           className="object-cover"
                           sizes="64px"
-                          quality={85}
+                          quality={95}
                         />
                         <Button
                           onClick={() => {
@@ -1812,8 +1812,8 @@ export function StudioChat({
                 fill
                 className="object-contain"
                 priority
+                quality={100}
                 sizes="100vw"
-                quality={95}
               />
             </div>
           </div>

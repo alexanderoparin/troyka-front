@@ -355,6 +355,7 @@ export function ImageGallery({ className, images, gridSize = 4 }: ImageGalleryPr
                     className="object-cover transition-transform duration-700 group-hover:scale-110"
                     sizes="(max-width: 768px) 50vw, 25vw"
                     loading={index < 4 ? "eager" : "lazy"}
+                    quality={95}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
@@ -372,6 +373,7 @@ export function ImageGallery({ className, images, gridSize = 4 }: ImageGalleryPr
                       src={apiClient.getExampleFileUrl(imageQueueRef.current.get(index)?.filename || image.filename)}
                       alt={`Пример генерации ${index + 1}`}
                       fill
+                      quality={95}
                       className="object-cover"
                       sizes="(max-width: 768px) 50vw, 25vw"
                       loading="lazy"

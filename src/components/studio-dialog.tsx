@@ -263,6 +263,8 @@ export function StudioDialog({
                 fill
                 className="object-contain"
                 priority
+                quality={100}
+                unoptimized={false}
               />
             </div>
           </div>

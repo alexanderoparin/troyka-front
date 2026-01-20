@@ -151,6 +151,8 @@ export const GenerationHistorySidebar: React.FC<GenerationHistorySidebarProps> =
                             alt={item.prompt || "Generated image"}
                             fill
                             className="object-cover group-hover:scale-105 transition-transform duration-200"
+                            quality={95}
+                            sizes="(max-width: 640px) 100vw, 300px"
                           />
                           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200"></div>
                           {selectedImages.includes(imageUrl) && (

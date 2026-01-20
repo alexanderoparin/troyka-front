@@ -164,6 +164,8 @@ export function ImageEditButton({
                 alt="Изображение для редактирования"
                 fill
                 className="object-cover"
+                quality={95}
+                sizes="192px"
               />
             </div>
           </div>
