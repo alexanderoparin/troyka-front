@@ -346,6 +346,14 @@ export interface SystemStatusWithMetadata {
   isSystem: boolean | null;
 }
 
+// Generation provider interfaces
+export interface GenerationProviderDTO {
+  code: string;
+  displayName: string;
+  available: boolean;
+  active: boolean;
+}
+
 class ApiClient {
   private baseUrl: string;
   private timeout: number;
@@ -1273,6 +1281,18 @@ class ApiClient {
 
   async getSystemStatusHistory(limit: number = 50): Promise<ApiResponse<SystemStatusHistoryDTO[]>> {
     return this.request<SystemStatusHistoryDTO[]>(`/api/admin/system/history?limit=${limit}`);
+  }
+
+  // Generation providers methods
+  async getGenerationProviders(): Promise<ApiResponse<GenerationProviderDTO[]>> {
+    return this.request<GenerationProviderDTO[]>('/api/admin/generation-providers');
+  }
+
+  async setActiveProvider(provider: string): Promise<ApiResponse<{ message: string }>> {
+    return this.request<{ message: string }>('/api/admin/generation-providers/active', {
+      method: 'PUT',
+      body: JSON.stringify({ provider }),
+    });
   }
 }
 

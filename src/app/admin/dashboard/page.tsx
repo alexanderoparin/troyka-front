@@ -1,7 +1,7 @@
 "use client"
 
 import { useAuth } from "@/contexts/auth-context"
-import { apiClient, AdminPaymentDTO, AdminUserDTO, AdminStatsDTO, UserStatisticsDTO, SystemStatus, SystemStatusRequest, SystemStatusHistoryDTO, SystemStatusWithMetadata } from "@/lib/api-client"
+import { apiClient, AdminPaymentDTO, AdminUserDTO, AdminStatsDTO, UserStatisticsDTO, SystemStatus, SystemStatusRequest, SystemStatusHistoryDTO, SystemStatusWithMetadata, GenerationProviderDTO } from "@/lib/api-client"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -31,13 +31,14 @@ import {
   AlertTriangle,
   Server,
   BarChart3,
-  Check
+  Check,
+  Zap
 } from "lucide-react"
 import { formatDate, cn } from "@/lib/utils"
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
-type TabType = 'stats' | 'payments' | 'users' | 'system'
+type TabType = 'stats' | 'payments' | 'users' | 'system' | 'providers'
 
 export default function AdminDashboardPage() {
   const { isAuthenticated, isLoading, user } = useAuth()
@@ -63,6 +64,8 @@ export default function AdminDashboardPage() {
   const [statisticsEndDate, setStatisticsEndDate] = useState<string>("")
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false)
   const [userSearchFilter, setUserSearchFilter] = useState<string>("")
+  const [providers, setProviders] = useState<GenerationProviderDTO[]>([])
+  const [isSwitchingProvider, setIsSwitchingProvider] = useState(false)
 
   useEffect(() => {
     if (!isLoading && (!isAuthenticated || user?.role !== 'ADMIN')) {
@@ -123,6 +126,13 @@ export default function AdminDashboardPage() {
         }
         if (statusResponse.error || historyResponse.error) {
           setError(statusResponse.error || historyResponse.error || 'Ошибка загрузки данных системы')
+        }
+      } else if (activeTab === 'providers') {
+        const response = await apiClient.getGenerationProviders()
+        if (response.data) {
+          setProviders(response.data)
+        } else {
+          setError(response.error || 'Ошибка загрузки провайдеров')
         }
       }
     } catch (err) {
@@ -417,6 +427,14 @@ export default function AdminDashboardPage() {
         >
           <Server className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
           <span className="whitespace-nowrap">Система</span>
+        </Button>
+        <Button
+          variant={activeTab === 'providers' ? 'default' : 'ghost'}
+          onClick={() => setActiveTab('providers')}
+          className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary flex-shrink-0 text-xs sm:text-sm px-2 sm:px-4"
+        >
+          <Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+          <span className="whitespace-nowrap">Провайдеры</span>
         </Button>
         </div>
       </div>
@@ -1254,6 +1272,130 @@ export default function AdminDashboardPage() {
             </CardContent>
           </Card>
         </div>
+      ) : activeTab === 'providers' ? (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Zap className="h-5 w-5" />
+              Управление провайдерами генерации
+            </CardTitle>
+            <CardDescription>
+              Выберите активного провайдера для генерации изображений
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {providers.length > 0 ? (
+              <div className="space-y-4">
+                {providers.map((provider) => (
+                  <div
+                    key={provider.code}
+                    className={cn(
+                      "border rounded-lg p-4 transition-colors",
+                      provider.active
+                        ? "border-primary bg-primary/5"
+                        : "hover:bg-muted/50"
+                    )}
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <h3 className="text-lg font-semibold">{provider.displayName}</h3>
+                          {provider.active && (
+                            <Badge variant="default" className="bg-green-500 hover:bg-green-600">
+                              Активен
+                            </Badge>
+                          )}
+                          {!provider.available && (
+                            <Badge variant="destructive">Недоступен</Badge>
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Код провайдера: <code className="px-1.5 py-0.5 bg-muted rounded text-xs">{provider.code}</code>
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            onClick={async () => {
+                              if (provider.active) {
+                                toast({
+                                  title: "Информация",
+                                  description: "Этот провайдер уже активен",
+                                })
+                                return
+                              }
+                              if (!provider.available) {
+                                toast({
+                                  title: "Ошибка",
+                                  description: "Провайдер недоступен",
+                                  variant: "destructive",
+                                })
+                                return
+                              }
+                              setIsSwitchingProvider(true)
+                              try {
+                                const response = await apiClient.setActiveProvider(provider.code)
+                                if (response.data) {
+                                  toast({
+                                    title: "Успешно",
+                                    description: `Провайдер ${provider.displayName} установлен как активный`,
+                                  })
+                                  // Обновляем список провайдеров
+                                  const providersResponse = await apiClient.getGenerationProviders()
+                                  if (providersResponse.data) {
+                                    setProviders(providersResponse.data)
+                                  }
+                                } else {
+                                  toast({
+                                    title: "Ошибка",
+                                    description: response.error || "Не удалось переключить провайдера",
+                                    variant: "destructive",
+                                  })
+                                }
+                              } catch (error) {
+                                toast({
+                                  title: "Ошибка",
+                                  description: "Произошла ошибка при переключении провайдера",
+                                  variant: "destructive",
+                                })
+                              } finally {
+                                setIsSwitchingProvider(false)
+                              }
+                            }}
+                            disabled={provider.active || !provider.available || isSwitchingProvider}
+                            variant={provider.active ? "default" : "outline"}
+                            className="w-full sm:w-auto"
+                          >
+                            {isSwitchingProvider ? (
+                              <>
+                                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                                Переключение...
+                              </>
+                            ) : provider.active ? (
+                              <>
+                                <CheckCircle className="w-4 h-4 mr-2" />
+                                Активен
+                              </>
+                            ) : (
+                              "Активировать"
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 text-muted-foreground">
+                <Zap className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p className="text-lg">Провайдеры не найдены</p>
+                <Button onClick={loadData} variant="outline" className="mt-4">
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Обновить
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       ) : null}
       </div>
     </div>
