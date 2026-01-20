@@ -597,7 +597,7 @@ class ApiClient {
     return this.request<ImageResponse>('/api/fal/image/run/create', {
       method: 'POST',
       body: JSON.stringify(backendRequest),
-    }, 180000); // 3 минуты таймаут для генерации изображений (соответствует бэкенду)
+    }, 720000); // 12 минут таймаут для генерации изображений (включая 4K)
   }
 
   // Queue Generation API
@@ -607,10 +607,11 @@ class ApiClient {
       model: this.convertModelToEnum(request.model),
       resolution: this.convertResolutionToEnum(request.resolution),
     };
+    // Увеличенный таймаут для поддержки генерации 4K (до 12 минут)
     return this.request<QueueRequestStatus>('/api/generate/submit', {
       method: 'POST',
       body: JSON.stringify(backendRequest),
-    });
+    }, 720000); // 12 минут для генерации 4K
   }
 
   async getQueueStatus(id: number): Promise<ApiResponse<QueueRequestStatus>> {
