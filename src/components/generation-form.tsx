@@ -158,11 +158,12 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
         processedImageUrls = await Promise.all(uploadPromises)
       }
       
+      // Валидация sessionId - если undefined, не включаем в запрос (бэкенд создаст новую сессию)
       const request: ImageRequest = {
         prompt: data.prompt, // Оригинальный промпт пользователя (промпт стиля добавится на бэке перед отправкой в FalAI)
         inputImageUrls: processedImageUrls,
         numImages: data.numImages,
-        sessionId: sessionId,
+        ...(sessionId != null && !isNaN(sessionId) ? { sessionId: sessionId } : {}),
         styleId: styleId,
         model: 'nano-banana' // Дефолтная модель
       }

@@ -615,6 +615,9 @@ class ApiClient {
   }
 
   async getQueueStatus(id: number): Promise<ApiResponse<QueueRequestStatus>> {
+    if (id == null || isNaN(id)) {
+      throw new Error('Request ID is required and must be a valid number');
+    }
     return this.request<QueueRequestStatus>(`/api/generate/status/${id}`);
   }
 
@@ -1141,10 +1144,16 @@ class ApiClient {
   }
 
   async getSessionDetail(sessionId: number, page: number = 0, size: number = 20): Promise<ApiResponse<SessionDetail>> {
+    if (sessionId == null || isNaN(sessionId)) {
+      throw new Error('Session ID is required and must be a valid number');
+    }
     return this.request<SessionDetail>(`/api/sessions/${sessionId}?page=${page}&size=${size}`);
   }
 
   async renameSession(sessionId: number, request: RenameSessionRequest): Promise<ApiResponse<RenameSessionResponse>> {
+    if (sessionId == null || isNaN(sessionId)) {
+      throw new Error('Session ID is required and must be a valid number');
+    }
     return this.request<RenameSessionResponse>(`/api/sessions/${sessionId}/rename`, {
       method: 'PUT',
       body: JSON.stringify(request),
@@ -1152,6 +1161,9 @@ class ApiClient {
   }
 
   async deleteSession(sessionId: number): Promise<ApiResponse<DeleteSessionResponse>> {
+    if (sessionId == null || isNaN(sessionId)) {
+      throw new Error('Session ID is required and must be a valid number');
+    }
     return this.request<DeleteSessionResponse>(`/api/sessions/${sessionId}`, {
       method: 'DELETE',
     });

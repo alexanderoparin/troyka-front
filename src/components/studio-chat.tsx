@@ -692,11 +692,12 @@ export function StudioChat({
       const validImageUrls = uploadedImages.filter(url => url && !url.startsWith('blob:'))
       
       // Вызываем API для отправки в очередь (передаем styleId, на бэке промпт стиля будет добавлен к промпту перед отправкой в FalAI)
+      // Валидация sessionId - если undefined, не включаем в запрос (бэкенд создаст новую сессию)
       const request = {
         prompt: prompt, // Оригинальный промпт пользователя
         inputImageUrls: validImageUrls.length > 0 ? validImageUrls : [],
         numImages: numImages,
-        sessionId: sessionId,
+        ...(sessionId != null && !isNaN(sessionId) ? { sessionId: sessionId } : {}),
         styleId: styleId,
         aspectRatio: aspectRatio,
         model: model,
