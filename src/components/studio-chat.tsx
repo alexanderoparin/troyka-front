@@ -707,24 +707,61 @@ export function StudioChat({
       
       if (response.data) {
         const queueRequest = response.data
-        // Сохраняем запрос в активные
-        setActiveQueueRequests(prev => {
-          const updated = new Map(prev)
-          updated.set(queueRequest.id, queueRequest)
-          return updated
-        })
-        // Запускаем polling статуса
-        startPolling(queueRequest.id)
         
-        // Показываем уведомление о начале генерации
-        const statusText = queueRequest.queueStatus === 'IN_QUEUE' 
-          ? (queueRequest.queuePosition ? `В очереди (позиция ${queueRequest.queuePosition})` : 'В очереди')
-          : 'Обрабатывается'
-        toast({
-          title: "Генерация начата",
-          description: `Запрос отправлен в очередь. Статус: ${statusText}`,
-          duration: 3000,
-        })
+        // Если генерация завершена сразу (синхронная генерация, например LaoZhang AI)
+        if (queueRequest.queueStatus === 'COMPLETED' && queueRequest.imageUrls && queueRequest.imageUrls.length > 0) {
+          // Обрабатываем завершенную генерацию
+          onGenerationComplete(queueRequest.imageUrls, queueRequest.prompt)
+          updateHistoryAfterGeneration()
+          
+          // Если не было прикрепленных изображений - прикрепляем сгенерированные
+          setUploadedImages(prev => {
+            if (prev.length === 0 && queueRequest.imageUrls && queueRequest.imageUrls.length > 0) {
+              return [queueRequest.imageUrls[0]]
+            }
+            return prev
+          })
+          
+          setSelectedImages(prev => {
+            if (prev.length === 0 && queueRequest.imageUrls && queueRequest.imageUrls.length > 0) {
+              return [queueRequest.imageUrls[0]]
+            }
+            return prev
+          })
+          
+          toast({
+            title: "Изображения созданы!",
+            description: `Создано ${queueRequest.imageUrls.length} ${getImageText(queueRequest.imageUrls.length)}`,
+            duration: 2000,
+          })
+          
+          // Обновляем баланс
+          setTimeout(() => {
+            refreshPointsRef.current().catch(() => {})
+          }, 500)
+        } else {
+          // Асинхронная генерация (FAL AI очередь)
+          // Сохраняем запрос в активные
+          setActiveQueueRequests(prev => {
+            const updated = new Map(prev)
+            updated.set(queueRequest.id, queueRequest)
+            return updated
+          })
+          // Запускаем polling статуса
+          startPolling(queueRequest.id)
+          
+          // Показываем уведомление о начале генерации
+          const statusText = queueRequest.queueStatus === 'IN_QUEUE' 
+            ? (queueRequest.queuePosition ? `В очереди (позиция ${queueRequest.queuePosition})` : 'В очереди')
+            : queueRequest.queueStatus === 'IN_PROGRESS'
+            ? 'Обрабатывается'
+            : 'Генерация начата'
+          toast({
+            title: "Генерация начата",
+            description: statusText === 'Генерация начата' ? 'Изображения генерируются...' : `Статус: ${statusText}`,
+            duration: 3000,
+          })
+        }
       } else {
         throw { status: response.status, message: response.error }
       }
@@ -748,7 +785,7 @@ export function StudioChat({
     } finally {
       setIsGenerating(false)
     }
-  }, [prompt, numImages, aspectRatio, toast, artStyle, sessionId, uploadedImages, artStyles, startPolling, model, resolution])
+  }, [prompt, numImages, aspectRatio, toast, artStyle, sessionId, uploadedImages, artStyles, startPolling, model, resolution, onGenerationComplete, updateHistoryAfterGeneration, getImageText])
 
   const handleImageExpand = (imageUrl: string) => {
     setSelectedImageForModal(imageUrl)
