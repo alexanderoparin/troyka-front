@@ -742,26 +742,26 @@ export function StudioChat({
           }, 500)
         } else {
           // Асинхронная генерация (FAL AI очередь)
-          // Сохраняем запрос в активные
-          setActiveQueueRequests(prev => {
-            const updated = new Map(prev)
-            updated.set(queueRequest.id, queueRequest)
-            return updated
-          })
-          // Запускаем polling статуса
-          startPolling(queueRequest.id)
-          
-          // Показываем уведомление о начале генерации
-          const statusText = queueRequest.queueStatus === 'IN_QUEUE' 
-            ? (queueRequest.queuePosition ? `В очереди (позиция ${queueRequest.queuePosition})` : 'В очереди')
+        // Сохраняем запрос в активные
+        setActiveQueueRequests(prev => {
+          const updated = new Map(prev)
+          updated.set(queueRequest.id, queueRequest)
+          return updated
+        })
+        // Запускаем polling статуса
+        startPolling(queueRequest.id)
+        
+        // Показываем уведомление о начале генерации
+        const statusText = queueRequest.queueStatus === 'IN_QUEUE' 
+          ? (queueRequest.queuePosition ? `В очереди (позиция ${queueRequest.queuePosition})` : 'В очереди')
             : queueRequest.queueStatus === 'IN_PROGRESS'
             ? 'Обрабатывается'
             : 'Генерация начата'
-          toast({
-            title: "Генерация начата",
+        toast({
+          title: "Генерация начата",
             description: statusText === 'Генерация начата' ? 'Изображения генерируются...' : `Статус: ${statusText}`,
-            duration: 3000,
-          })
+          duration: 3000,
+        })
         }
       } else {
         throw { status: response.status, message: response.error }

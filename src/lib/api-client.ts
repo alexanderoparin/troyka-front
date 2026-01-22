@@ -354,6 +354,19 @@ export interface GenerationProviderDTO {
   active: boolean;
 }
 
+// Provider fallback statistics interfaces
+export interface ProviderFallbackStatsDTO {
+  todayCount: number;
+  last7DaysCount: number;
+  last30DaysCount: number;
+  countByActiveProvider: {
+    [key: string]: number;
+  };
+  countByErrorType: {
+    [key: string]: number;
+  };
+}
+
 class ApiClient {
   private baseUrl: string;
   private timeout: number;
@@ -1323,6 +1336,10 @@ class ApiClient {
       method: 'PUT',
       body: JSON.stringify({ provider }),
     });
+  }
+
+  async getProviderFallbackStats(): Promise<ApiResponse<ProviderFallbackStatsDTO>> {
+    return this.request<ProviderFallbackStatsDTO>('/api/admin/provider-fallback-stats');
   }
 }
 

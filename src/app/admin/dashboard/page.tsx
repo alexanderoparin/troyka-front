@@ -1,7 +1,7 @@
 "use client"
 
 import { useAuth } from "@/contexts/auth-context"
-import { apiClient, AdminPaymentDTO, AdminUserDTO, AdminStatsDTO, UserStatisticsDTO, SystemStatus, SystemStatusRequest, SystemStatusHistoryDTO, SystemStatusWithMetadata, GenerationProviderDTO } from "@/lib/api-client"
+import { apiClient, AdminPaymentDTO, AdminUserDTO, AdminStatsDTO, UserStatisticsDTO, SystemStatus, SystemStatusRequest, SystemStatusHistoryDTO, SystemStatusWithMetadata, GenerationProviderDTO, ProviderFallbackStatsDTO } from "@/lib/api-client"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -66,6 +66,7 @@ export default function AdminDashboardPage() {
   const [userSearchFilter, setUserSearchFilter] = useState<string>("")
   const [providers, setProviders] = useState<GenerationProviderDTO[]>([])
   const [isSwitchingProvider, setIsSwitchingProvider] = useState(false)
+  const [fallbackStats, setFallbackStats] = useState<ProviderFallbackStatsDTO | null>(null)
 
   useEffect(() => {
     if (!isLoading && (!isAuthenticated || user?.role !== 'ADMIN')) {
@@ -128,11 +129,17 @@ export default function AdminDashboardPage() {
           setError(statusResponse.error || historyResponse.error || 'Ошибка загрузки данных системы')
         }
       } else if (activeTab === 'providers') {
-        const response = await apiClient.getGenerationProviders()
-        if (response.data) {
-          setProviders(response.data)
+        const [providersResponse, fallbackStatsResponse] = await Promise.all([
+          apiClient.getGenerationProviders(),
+          apiClient.getProviderFallbackStats()
+        ])
+        if (providersResponse.data) {
+          setProviders(providersResponse.data)
         } else {
-          setError(response.error || 'Ошибка загрузки провайдеров')
+          setError(providersResponse.error || 'Ошибка загрузки провайдеров')
+        }
+        if (fallbackStatsResponse.data) {
+          setFallbackStats(fallbackStatsResponse.data)
         }
       }
     } catch (err) {
@@ -1273,6 +1280,7 @@ export default function AdminDashboardPage() {
           </Card>
         </div>
       ) : activeTab === 'providers' ? (
+        <div className="space-y-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -1396,6 +1404,91 @@ export default function AdminDashboardPage() {
             )}
           </CardContent>
         </Card>
+        
+        {/* Статистика Fallback переключений */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <RefreshCw className="h-5 w-5" />
+              Статистика Fallback переключений
+            </CardTitle>
+            <CardDescription>
+              Автоматические переключения на резервный провайдер при ошибках
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {fallbackStats ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="border rounded-lg p-4">
+                    <div className="text-sm text-muted-foreground mb-1">Сегодня</div>
+                    <div className="text-2xl font-bold">{fallbackStats.todayCount}</div>
+                  </div>
+                  <div className="border rounded-lg p-4">
+                    <div className="text-sm text-muted-foreground mb-1">За 7 дней</div>
+                    <div className="text-2xl font-bold">{fallbackStats.last7DaysCount}</div>
+                  </div>
+                  <div className="border rounded-lg p-4">
+                    <div className="text-sm text-muted-foreground mb-1">За 30 дней</div>
+                    <div className="text-2xl font-bold">{fallbackStats.last30DaysCount}</div>
+                  </div>
+                </div>
+
+                {Object.keys(fallbackStats.countByActiveProvider).length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3">По активным провайдерам (30 дней)</h3>
+                    <div className="space-y-2">
+                      {Object.entries(fallbackStats.countByActiveProvider).map(([provider, count]) => (
+                        <div key={provider} className="flex items-center justify-between border rounded-lg p-3">
+                          <span className="font-medium">{provider === 'FAL_AI' ? 'FAL AI' : provider === 'LAOZHANG_AI' ? 'LaoZhang AI' : provider}</span>
+                          <Badge variant="outline">{count}</Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {Object.keys(fallbackStats.countByErrorType).length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3">По типам ошибок (30 дней)</h3>
+                    <div className="space-y-2">
+                      {Object.entries(fallbackStats.countByErrorType)
+                        .sort(([, a], [, b]) => b - a)
+                        .map(([errorType, count]) => (
+                          <div key={errorType} className="flex items-center justify-between border rounded-lg p-3">
+                            <span className="font-medium">
+                              {errorType === 'TIMEOUT' ? 'Таймаут' :
+                               errorType === 'CONNECTION_ERROR' ? 'Ошибка подключения' :
+                               errorType === 'HTTP_5XX' ? 'HTTP 5xx (серверная ошибка)' :
+                               errorType === 'PAYLOAD_TOO_LARGE' ? 'Payload Too Large (413)' :
+                               errorType === 'SERVICE_UNAVAILABLE' ? 'Service Unavailable (503)' :
+                               errorType === 'UNKNOWN_ERROR' ? 'Неизвестная ошибка' :
+                               errorType}
+                            </span>
+                            <Badge variant="outline">{count}</Badge>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
+
+                {fallbackStats.last30DaysCount === 0 && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <CheckCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p className="text-lg">Нет fallback переключений за последние 30 дней</p>
+                    <p className="text-sm mt-2">Все запросы успешно обрабатываются активным провайдером</p>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <RefreshCw className="h-12 w-12 mx-auto mb-4 opacity-50 animate-spin" />
+                <p>Загрузка статистики...</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+        </div>
       ) : null}
       </div>
     </div>
