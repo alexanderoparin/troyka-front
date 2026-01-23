@@ -78,6 +78,7 @@ export function StudioChat({
   const [isEnhancing, setIsEnhancing] = useState(false)
   const [selectedImages, setSelectedImages] = useState<string[]>([])
   const [copiedImageUrl, setCopiedImageUrl] = useState<string | null>(null)
+  const [loadingImages, setLoadingImages] = useState<Set<string>>(new Set())
   const [numImages, setNumImages] = useState(() => {
     if (typeof window !== 'undefined') {
       // Сохраняем выбор пользователя в localStorage
@@ -683,6 +684,17 @@ export function StudioChat({
     }
 
     setIsGenerating(true)
+    
+    // Прокручиваем к низу при начале генерации
+    setTimeout(() => {
+      if (scrollAreaRef.current) {
+        const scrollElement = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]')
+        if (scrollElement) {
+          scrollElement.scrollTop = scrollElement.scrollHeight
+        }
+      }
+    }, 100)
+    
     try {
       // Находим стиль по имени и получаем его id
       const selectedStyle = artStyles.find(style => style.name === artStyle)
@@ -1107,14 +1119,50 @@ export function StudioChat({
                             )}
                             onClick={() => handleImageExpand(imageUrl)}
                           >
-                            <div className="relative w-full aspect-square overflow-hidden">
+                            <div className="relative w-full aspect-square overflow-hidden bg-muted/50">
+                              {/* Skeleton loader пока изображение загружается */}
+                              {loadingImages.has(imageUrl) && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-muted via-muted/80 to-muted animate-pulse">
+                                  <div className="relative w-full h-full">
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent animate-shimmer" 
+                                         style={{ 
+                                           backgroundSize: '200% 100%',
+                                           animation: 'shimmer 2s infinite'
+                                         }}></div>
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                      <Loader2 className="h-8 w-8 text-primary/40 animate-spin" />
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                              
                               <Image
                                 src={apiClient.getFileUrl(imageUrl)}
                                 alt={`Сгенерированное изображение ${index + 1}`}
                                 fill
-                                className="object-cover"
+                                className={cn(
+                                  "object-cover transition-opacity duration-300",
+                                  loadingImages.has(imageUrl) ? "opacity-0" : "opacity-100"
+                                )}
                                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                                 quality={95}
+                                onLoadStart={() => {
+                                  setLoadingImages(prev => new Set(prev).add(imageUrl))
+                                }}
+                                onLoadingComplete={() => {
+                                  setLoadingImages(prev => {
+                                    const next = new Set(prev)
+                                    next.delete(imageUrl)
+                                    return next
+                                  })
+                                }}
+                                onError={() => {
+                                  setLoadingImages(prev => {
+                                    const next = new Set(prev)
+                                    next.delete(imageUrl)
+                                    return next
+                                  })
+                                }}
                               />
                               
                               {/* Overlay с действиями в левом нижнем углу - показываем всегда на мобилке, при hover на десктопе */}
@@ -1271,30 +1319,99 @@ export function StudioChat({
                                         className="relative group cursor-pointer rounded-lg overflow-hidden border-2 border-border hover:border-primary/50 transition-all w-full"
                                         onClick={() => handleImageExpand(imageUrl)}
                                       >
-                                        <div className="relative w-full aspect-square overflow-hidden">
+                                        <div className="relative w-full aspect-square overflow-hidden bg-muted/50">
+                                          {/* Skeleton loader пока изображение загружается */}
+                                          {loadingImages.has(imageUrl) && (
+                                            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-muted via-muted/80 to-muted animate-pulse">
+                                              <div className="relative w-full h-full">
+                                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent animate-shimmer" 
+                                                     style={{ 
+                                                       backgroundSize: '200% 100%',
+                                                       animation: 'shimmer 2s infinite'
+                                                     }}></div>
+                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                  <Loader2 className="h-8 w-8 text-primary/40 animate-spin" />
+                                                </div>
+                                              </div>
+                                            </div>
+                                          )}
+                                          
                                           <Image
                                             src={apiClient.getFileUrl(imageUrl)}
                                             alt={`Сгенерированное изображение ${index + 1}`}
                                             fill
-                                            className="object-cover"
+                                            className={cn(
+                                              "object-cover transition-opacity duration-300",
+                                              loadingImages.has(imageUrl) ? "opacity-0" : "opacity-100"
+                                            )}
                                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                                             quality={95}
+                                            onLoadStart={() => {
+                                              setLoadingImages(prev => new Set(prev).add(imageUrl))
+                                            }}
+                                            onLoadingComplete={() => {
+                                              setLoadingImages(prev => {
+                                                const next = new Set(prev)
+                                                next.delete(imageUrl)
+                                                return next
+                                              })
+                                            }}
+                                            onError={() => {
+                                              setLoadingImages(prev => {
+                                                const next = new Set(prev)
+                                                next.delete(imageUrl)
+                                                return next
+                                              })
+                                            }}
                                           />
                                         </div>
                                       </div>
                                     ))}
                                   </div>
                                 ) : (
-                                  /* Иначе показываем плейсхолдер */
-                                  <div className="flex items-center justify-center py-6 sm:py-8">
-                                    <div className="text-center px-2">
-                                      <Loader2 className="h-8 w-8 mx-auto mb-2 animate-spin text-muted-foreground" />
-                                      <p className="text-xs sm:text-sm text-muted-foreground break-words">
-                                        {request.queueStatus === 'IN_QUEUE' 
-                                          ? (request.queuePosition ? `Ожидание в очереди (позиция ${request.queuePosition})` : 'Ожидание в очереди')
-                                          : 'Генерация изображений...'}
-                                      </p>
+                                  /* Иначе показываем красивый плейсхолдер с анимацией */
+                                  <div className="relative w-full aspect-square rounded-lg overflow-hidden border-2 border-dashed border-primary/30 bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 dark:from-primary/10 dark:via-primary/20 dark:to-primary/10">
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
+                                      {/* Анимированный индикатор */}
+                                      <div className="relative mb-4">
+                                        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 border-primary/20 border-t-primary animate-spin"></div>
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                          <Sparkles className="h-6 w-6 sm:h-8 sm:w-8 text-primary animate-pulse" />
+                                        </div>
+                                      </div>
+                                      
+                                      {/* Текст статуса */}
+                                      <div className="text-center space-y-1">
+                                        <p className="text-sm sm:text-base font-medium text-foreground">
+                                          {request.queueStatus === 'IN_QUEUE' 
+                                            ? 'Ожидание в очереди'
+                                            : 'Генерация изображений'}
+                                        </p>
+                                        {request.queueStatus === 'IN_QUEUE' && request.queuePosition && (
+                                          <p className="text-xs text-muted-foreground">
+                                            Позиция: {request.queuePosition}
+                                          </p>
+                                        )}
+                                        {request.queueStatus === 'IN_PROGRESS' && (
+                                          <p className="text-xs text-muted-foreground animate-pulse">
+                                            Пожалуйста, подождите...
+                                          </p>
+                                        )}
+                                      </div>
+                                      
+                                      {/* Анимированные точки */}
+                                      <div className="flex gap-1 mt-4">
+                                        <div className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0s' }}></div>
+                                        <div className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                                        <div className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                                      </div>
                                     </div>
+                                    
+                                    {/* Декоративные элементы */}
+                                    <div className="absolute top-2 left-2 w-1 h-1 bg-primary/40 rounded-full animate-ping"></div>
+                                    <div className="absolute top-4 right-3 w-1.5 h-1.5 bg-primary/30 rounded-full animate-ping" style={{ animationDelay: '0.5s' }}></div>
+                                    <div className="absolute bottom-3 left-4 w-1 h-1 bg-primary/40 rounded-full animate-ping" style={{ animationDelay: '1s' }}></div>
+                                    <div className="absolute bottom-2 right-2 w-1.5 h-1.5 bg-primary/30 rounded-full animate-ping" style={{ animationDelay: '1.5s' }}></div>
                                   </div>
                                 )}
                               </Card>
