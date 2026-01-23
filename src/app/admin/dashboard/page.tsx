@@ -1072,7 +1072,7 @@ export default function AdminDashboardPage() {
                         </div>
                         <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
                           <Button
-                            variant={user.blocked ? "default" : "destructive"}
+                            variant="ghost"
                             size="sm"
                             onClick={async () => {
                               try {
