@@ -518,15 +518,6 @@ export function StudioChat({
       return
     }
     
-    // Предупреждение для файлов > 7MB (будет автоматически сжато, но лучше предупредить)
-    if (file.size > laoZhangLimit) {
-      toast({
-        title: "Большой файл",
-        description: `Файл превышает рекомендуемый размер (${(file.size / 1024 / 1024).toFixed(1)}MB). Изображение будет автоматически сжато перед отправкой.`,
-        duration: 5000,
-      })
-    }
-
     // Проверяем лимит изображений (максимум 4)
     if (uploadedImages.length >= 4) {
       toast({
@@ -537,15 +528,32 @@ export function StudioChat({
       return
     }
 
+    // Флаг для отслеживания большого файла
+    const isLargeFile = file.size > laoZhangLimit
+
     try {
       // Загружаем файл на сервер
       const response = await apiClient.uploadFile(file)
       if (response.data) {
         setUploadedImages(prev => [...prev, response.data!])
+        
+        // Сначала показываем уведомление об успешной загрузке
         toast({
           title: "Изображение загружено",
           description: "Изображение готово для использования",
+          duration: 2000,
         })
+        
+        // Если файл большой, показываем уведомление о сжатии после небольшой задержки
+        if (isLargeFile) {
+          setTimeout(() => {
+            toast({
+              title: "Большой файл",
+              description: `Файл превышает рекомендуемый размер (${(file.size / 1024 / 1024).toFixed(1)}MB). Изображение будет автоматически сжато перед отправкой.`,
+              duration: 4000,
+            })
+          }, 2500)
+        }
       } else {
         throw new Error(response.error || "Ошибка загрузки файла")
       }
@@ -1247,17 +1255,17 @@ export function StudioChat({
                                   </>
                                 );
                               })()}
-                              {message.aspectRatio && (
-                                <>
-                                  <span>•</span>
-                                  <span>{message.aspectRatio}</span>
-                                </>
-                              )}
-                              {/* Для PRO-модели показываем также разрешение, если оно есть */}
+                              {/* Для PRO-модели показываем разрешение сразу после модели */}
                               {message.modelType === 'nano-banana-pro' && message.resolution && (
                                 <>
                                   <span>•</span>
                                   <span>{message.resolution}</span>
+                                </>
+                              )}
+                              {message.aspectRatio && (
+                                <>
+                                  <span>•</span>
+                                  <span>{message.aspectRatio}</span>
                                 </>
                               )}
                             </div>
