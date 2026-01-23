@@ -1253,6 +1253,13 @@ export function StudioChat({
                                   <span>{message.aspectRatio}</span>
                                 </>
                               )}
+                              {/* Для PRO-модели показываем также разрешение, если оно есть */}
+                              {message.modelType === 'nano-banana-pro' && message.resolution && (
+                                <>
+                                  <span>•</span>
+                                  <span>{message.resolution}</span>
+                                </>
+                              )}
                             </div>
                           )}
                         </Card>

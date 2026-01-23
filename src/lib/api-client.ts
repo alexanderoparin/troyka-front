@@ -75,6 +75,11 @@ export interface SessionMessage {
   styleName?: string;
   aspectRatio?: string;
   modelType?: string;
+  /**
+   * Разрешение изображения (только для PRO-моделей).
+   * Возможные значения: 1K, 2K, 4K.
+   */
+  resolution?: string;
 }
 
 export interface SessionDetail {
