@@ -1,7 +1,7 @@
 "use client"
 
 import { useAuth } from "@/contexts/auth-context"
-import { apiClient, AdminPaymentDTO, AdminUserDTO, AdminStatsDTO, UserStatisticsDTO, SystemStatus, SystemStatusRequest, SystemStatusHistoryDTO, SystemStatusWithMetadata, GenerationProviderDTO, ProviderFallbackStatsDTO } from "@/lib/api-client"
+import { apiClient, AdminPaymentDTO, AdminUserDTO, AdminStatsDTO, UserStatisticsDTO, SystemStatus, SystemStatusRequest, SystemStatusHistoryDTO, SystemStatusWithMetadata, GenerationProviderDTO, ProviderFallbackStatsDTO, BlockedRegistrationStatsDTO } from "@/lib/api-client"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -40,7 +40,7 @@ import { formatDate, cn } from "@/lib/utils"
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
-type TabType = 'stats' | 'payments' | 'users' | 'system' | 'providers'
+type TabType = 'stats' | 'payments' | 'users' | 'system' | 'providers' | 'blocked-registrations'
 
 export default function AdminDashboardPage() {
   const { isAuthenticated, isLoading, user } = useAuth()
@@ -69,6 +69,7 @@ export default function AdminDashboardPage() {
   const [providers, setProviders] = useState<GenerationProviderDTO[]>([])
   const [isSwitchingProvider, setIsSwitchingProvider] = useState(false)
   const [fallbackStats, setFallbackStats] = useState<ProviderFallbackStatsDTO | null>(null)
+  const [blockedRegistrationStats, setBlockedRegistrationStats] = useState<BlockedRegistrationStatsDTO | null>(null)
 
   useEffect(() => {
     if (!isLoading && (!isAuthenticated || user?.role !== 'ADMIN')) {
@@ -142,6 +143,13 @@ export default function AdminDashboardPage() {
         }
         if (fallbackStatsResponse.data) {
           setFallbackStats(fallbackStatsResponse.data)
+        }
+      } else if (activeTab === 'blocked-registrations') {
+        const response = await apiClient.getBlockedRegistrationStats()
+        if (response.data) {
+          setBlockedRegistrationStats(response.data)
+        } else {
+          setError(response.error || 'Ошибка загрузки статистики блокированных регистраций')
         }
       }
     } catch (err) {
@@ -444,6 +452,14 @@ export default function AdminDashboardPage() {
         >
           <Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
           <span className="whitespace-nowrap">Провайдеры</span>
+        </Button>
+        <Button
+          variant={activeTab === 'blocked-registrations' ? 'default' : 'ghost'}
+          onClick={() => setActiveTab('blocked-registrations')}
+          className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary flex-shrink-0 text-xs sm:text-sm px-2 sm:px-4"
+        >
+          <Ban className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+          <span className="whitespace-nowrap">Блокировки</span>
         </Button>
         </div>
       </div>
@@ -1540,6 +1556,113 @@ export default function AdminDashboardPage() {
             )}
           </CardContent>
         </Card>
+        </div>
+      ) : activeTab === 'blocked-registrations' ? (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Ban className="h-5 w-5" />
+                Статистика блокированных регистраций
+              </CardTitle>
+              <CardDescription>
+                Попытки регистрации с временных email доменов
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {blockedRegistrationStats ? (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div className="border rounded-lg p-4">
+                      <div className="text-sm text-muted-foreground mb-1">Сегодня</div>
+                      <div className="text-2xl font-bold">{blockedRegistrationStats.todayCount}</div>
+                    </div>
+                    <div className="border rounded-lg p-4">
+                      <div className="text-sm text-muted-foreground mb-1">За 7 дней</div>
+                      <div className="text-2xl font-bold">{blockedRegistrationStats.last7DaysCount}</div>
+                    </div>
+                    <div className="border rounded-lg p-4">
+                      <div className="text-sm text-muted-foreground mb-1">За 30 дней</div>
+                      <div className="text-2xl font-bold">{blockedRegistrationStats.last30DaysCount}</div>
+                    </div>
+                  </div>
+
+                  {Object.keys(blockedRegistrationStats.countByDomain).length > 0 && (
+                    <div className="mb-6">
+                      <h3 className="text-lg font-semibold mb-3">По доменам (30 дней)</h3>
+                      <div className="space-y-2">
+                        {Object.entries(blockedRegistrationStats.countByDomain)
+                          .sort(([, a], [, b]) => b - a)
+                          .map(([domain, count]) => (
+                            <div key={domain} className="flex items-center justify-between border rounded-lg p-3">
+                              <span className="font-medium">{domain}</span>
+                              <Badge variant="outline">{count}</Badge>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {Object.keys(blockedRegistrationStats.countByIpAddress).length > 0 && (
+                    <div className="mb-6">
+                      <h3 className="text-lg font-semibold mb-3">По IP адресам (30 дней)</h3>
+                      <div className="space-y-2">
+                        {Object.entries(blockedRegistrationStats.countByIpAddress)
+                          .sort(([, a], [, b]) => b - a)
+                          .slice(0, 20)
+                          .map(([ip, count]) => (
+                            <div key={ip} className="flex items-center justify-between border rounded-lg p-3">
+                              <span className="font-mono text-sm">{ip}</span>
+                              <Badge variant="outline">{count}</Badge>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {blockedRegistrationStats.recentMetrics && blockedRegistrationStats.recentMetrics.length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-3">Последние попытки</h3>
+                      <div className="space-y-2">
+                        {blockedRegistrationStats.recentMetrics.map((metric) => (
+                          <div key={metric.id} className="border rounded-lg p-3 text-sm">
+                            <div className="flex items-start justify-between mb-2">
+                              <div>
+                                <div className="font-medium">{metric.email}</div>
+                                <div className="text-muted-foreground text-xs mt-1">
+                                  {metric.username && <span>Username: {metric.username} • </span>}
+                                  {metric.ipAddress && <span>IP: {metric.ipAddress} • </span>}
+                                  <span>Метод: {metric.registrationMethod}</span>
+                                </div>
+                              </div>
+                              <Badge variant="secondary" className="text-xs">
+                                {metric.emailDomain}
+                              </Badge>
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {formatDate(new Date(metric.createdAt))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {blockedRegistrationStats.last30DaysCount === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <CheckCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p className="text-lg">Нет блокированных регистраций за последние 30 дней</p>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="text-center py-12 text-muted-foreground">
+                  <Ban className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p className="text-lg">Загрузка статистики...</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       ) : null}
       </div>

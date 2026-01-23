@@ -365,6 +365,26 @@ export interface GenerationProviderDTO {
 }
 
 // Provider fallback statistics interfaces
+export interface BlockedRegistrationMetricDTO {
+  id: number;
+  email: string;
+  emailDomain: string;
+  username: string | null;
+  ipAddress: string | null;
+  userAgent: string | null;
+  registrationMethod: string;
+  createdAt: string;
+}
+
+export interface BlockedRegistrationStatsDTO {
+  todayCount: number;
+  last7DaysCount: number;
+  last30DaysCount: number;
+  countByDomain: Record<string, number>;
+  countByIpAddress: Record<string, number>;
+  recentMetrics: BlockedRegistrationMetricDTO[];
+}
+
 export interface ProviderFallbackStatsDTO {
   todayCount: number;
   last7DaysCount: number;
@@ -1356,6 +1376,10 @@ class ApiClient {
     return this.request<{ message: string }>(`/api/admin/users/${userId}/block?blocked=${blocked}`, {
       method: 'PUT',
     });
+  }
+
+  async getBlockedRegistrationStats(): Promise<ApiResponse<BlockedRegistrationStatsDTO>> {
+    return this.request<BlockedRegistrationStatsDTO>('/api/admin/blocked-registrations/stats');
   }
 }
 
