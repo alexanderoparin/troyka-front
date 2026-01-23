@@ -283,6 +283,11 @@ export interface AdminUserDTO {
   createdAt: string;
   updatedAt: string;
   hasSuccessfulPayment: boolean;
+  /**
+   * Флаг блокировки пользователя.
+   * true - пользователь заблокирован, false - активен.
+   */
+  blocked?: boolean;
 }
 
 export interface AdminStatsDTO {
@@ -1345,6 +1350,12 @@ class ApiClient {
 
   async getProviderFallbackStats(): Promise<ApiResponse<ProviderFallbackStatsDTO>> {
     return this.request<ProviderFallbackStatsDTO>('/api/admin/provider-fallback-stats');
+  }
+
+  async blockUser(userId: number, blocked: boolean): Promise<ApiResponse<{ message: string }>> {
+    return this.request<{ message: string }>(`/api/admin/users/${userId}/block?blocked=${blocked}`, {
+      method: 'PUT',
+    });
   }
 }
 

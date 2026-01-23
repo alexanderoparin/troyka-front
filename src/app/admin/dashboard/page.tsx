@@ -32,7 +32,9 @@ import {
   Server,
   BarChart3,
   Check,
-  Zap
+  Zap,
+  Ban,
+  Unlock
 } from "lucide-react"
 import { formatDate, cn } from "@/lib/utils"
 import Link from "next/link"
@@ -1042,10 +1044,15 @@ export default function AdminDashboardPage() {
                           <div className="font-semibold text-base sm:text-lg mb-1 break-words">
                             {user.points} поинтов
                           </div>
-                          <div className="w-fit">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <Badge variant={user.role === 'ADMIN' ? 'default' : 'secondary'} className="text-xs">
                               {user.role}
                             </Badge>
+                            {user.blocked && (
+                              <Badge variant="destructive" className="text-xs">
+                                Заблокирован
+                              </Badge>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -1062,6 +1069,51 @@ export default function AdminDashboardPage() {
                               <strong>Telegram ID:</strong> {user.telegramId}
                             </span>
                           )}
+                        </div>
+                        <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                          <Button
+                            variant={user.blocked ? "default" : "destructive"}
+                            size="sm"
+                            onClick={async () => {
+                              try {
+                                const newBlockedStatus = !user.blocked
+                                const response = await apiClient.blockUser(user.id, newBlockedStatus)
+                                if (response.data) {
+                                  toast({
+                                    title: newBlockedStatus ? "Пользователь заблокирован" : "Пользователь разблокирован",
+                                    description: response.data.message,
+                                  })
+                                  // Обновляем локальное состояние
+                                  setUsers(prevUsers => 
+                                    prevUsers.map(u => 
+                                      u.id === user.id ? { ...u, blocked: newBlockedStatus } : u
+                                    )
+                                  )
+                                } else {
+                                  throw new Error(response.error || "Ошибка изменения статуса")
+                                }
+                              } catch (error: any) {
+                                toast({
+                                  title: "Ошибка",
+                                  description: error.message || "Не удалось изменить статус блокировки",
+                                  variant: "destructive",
+                                })
+                              }
+                            }}
+                            className="text-xs"
+                          >
+                            {user.blocked ? (
+                              <>
+                                <Unlock className="h-3 w-3 mr-1" />
+                                Разблокировать
+                              </>
+                            ) : (
+                              <>
+                                <Ban className="h-3 w-3 mr-1" />
+                                Заблокировать
+                              </>
+                            )}
+                          </Button>
                         </div>
                       </div>
                     </div>
