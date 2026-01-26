@@ -19,12 +19,20 @@ import { Separator } from "@/components/ui/separator"
 
 const loginSchema = z.object({
   username: z.string()
-    .min(1, "Логин обязателен")
-    .refine((val) => val.trim().length >= 3, {
-      message: "Логин должен содержать минимум 3 символа (без учета пробелов)",
+    .min(1, "Логин или email обязателен")
+    .refine((val) => {
+      const trimmed = val.trim();
+      // Если это email, проверяем базовый формат
+      if (trimmed.includes('@')) {
+        return trimmed.length >= 5 && trimmed.includes('@') && trimmed.split('@').length === 2;
+      }
+      // Если это логин, проверяем минимальную длину
+      return trimmed.length >= 3;
+    }, {
+      message: "Логин должен содержать минимум 3 символа, email - минимум 5 символов",
     })
     .refine((val) => val.trim() === val, {
-      message: "Логин не может начинаться или заканчиваться пробелом",
+      message: "Логин или email не может начинаться или заканчиваться пробелом",
     })
     .transform((val) => val.trim()),
   password: z.string().min(6, "Пароль должен содержать минимум 6 символов"),
@@ -183,11 +191,11 @@ export default function LoginPage() {
                 {/* Login Form */}
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
                   <div className="space-y-1.5">
-                    <Label htmlFor="username" className="text-sm">Логин</Label>
+                    <Label htmlFor="username" className="text-sm">Логин или Email</Label>
                     <Input
                       id="username"
                       {...register("username")}
-                      placeholder="Введите логин"
+                      placeholder="Введите логин или email"
                       disabled={isLoading}
                     />
                     {errors.username && (
