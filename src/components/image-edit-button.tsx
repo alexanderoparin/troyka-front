@@ -9,11 +9,11 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { apiClient, ImageRequest } from "@/lib/api-client";
 import { useAuth } from "@/contexts/auth-context";
+import { useGenerationPoints } from "@/hooks/use-generation-points";
 import { Edit3, Wand2, Loader2, CreditCard } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { getPointsText } from "@/lib/grammar";
-import { getRequiredPoints } from "@/lib/config";
 import { formatApiError } from "@/lib/errors";
 
 interface ImageEditButtonProps {
@@ -35,6 +35,7 @@ export function ImageEditButton({
   const [numImages, setNumImages] = useState(1);
   const { toast } = useToast();
   const { points, refreshPoints, setBalance } = useAuth();
+  const { getRequiredPoints } = useGenerationPoints();
 
   const handleEdit = async () => {
     if (!prompt.trim()) {

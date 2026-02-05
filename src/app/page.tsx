@@ -4,12 +4,13 @@ import { Badge } from '@/components/ui/badge'
 import { Sparkles, Shield, ArrowRight, Star, Users, Clock, Target, Zap, Wand2, Brain, Rocket, CheckCircle2 } from 'lucide-react'
 import Link from 'next/link'
 import { useAuth } from '@/contexts/auth-context'
+import { useGenerationPoints } from '@/hooks/use-generation-points'
 import { ImageGallery } from '@/components/image-gallery'
-import { config } from '@/lib/config'
 import { getPointsText } from '@/lib/grammar'
 
 export default function HomePage() {
   const { isAuthenticated } = useAuth()
+  const { pointsPerImage, pointsOnRegistration } = useGenerationPoints()
 
   return (
     <div className="relative space-y-8 sm:space-y-12 lg:space-y-16 min-h-screen">
@@ -84,12 +85,12 @@ export default function HomePage() {
                 {!isAuthenticated && (
                   <div className="flex items-center justify-center gap-2 p-3 rounded-xl bg-muted/50 dark:bg-muted/20 border border-border/50">
                     <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                    <span className="text-sm font-medium">{getPointsText(config.REGISTRATION_POINTS)} за регистрацию</span>
+                    <span className="text-sm font-medium">{getPointsText(pointsOnRegistration)} за регистрацию</span>
                   </div>
                 )}
                 <div className="flex items-center justify-center gap-2 p-3 rounded-xl bg-muted/50 dark:bg-muted/20 border border-border/50">
                   <Zap className="w-4 h-4 text-blue-500" />
-                  <span className="text-sm font-medium">{config.GENERATION_POINTS_PER_IMAGE} поинта = 1 генерация</span>
+                  <span className="text-sm font-medium">{pointsPerImage} поинта = 1 генерация</span>
                 </div>
                 <div className="flex items-center justify-center gap-2 p-3 rounded-xl bg-muted/50 dark:bg-muted/20 border border-border/50">
                   <Clock className="w-4 h-4 text-green-500" />

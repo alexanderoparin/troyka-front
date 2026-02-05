@@ -2,11 +2,11 @@
 
 import { useState } from "react"
 import { useAuth } from "@/contexts/auth-context"
+import { useGenerationPoints } from "@/hooks/use-generation-points"
 import { useToast } from "@/components/ui/use-toast"
 import { Check, Star, Plus } from "lucide-react"
 import { cn, formatCurrency } from "@/lib/utils"
 import { PricingPlanResponse, apiClient } from "@/lib/api-client"
-import { config } from "@/lib/config"
 
 interface PricingCardProps {
   plan: PricingPlanResponse
@@ -16,10 +16,11 @@ interface PricingCardProps {
 
 export function PricingCard({ plan, isPopular = false, className }: PricingCardProps) {
   const { isAuthenticated } = useAuth()
+  const { pointsPerImage } = useGenerationPoints()
   const { toast } = useToast()
   const [isProcessing, setIsProcessing] = useState(false)
 
-  const generationsCount = Math.floor(plan.credits / config.GENERATION_POINTS_PER_IMAGE)
+  const generationsCount = Math.floor(plan.credits / pointsPerImage)
   // Используем unitPriceRubComputed с бэка (цена за генерацию в копейках), если есть, иначе считаем на фронте
   const pricePerGeneration = plan.unitPriceRubComputed ? plan.unitPriceRubComputed : (plan.priceRub / generationsCount)
   const isPlanPopular = isPopular || plan.isPopular

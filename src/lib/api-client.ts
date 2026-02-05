@@ -173,6 +173,13 @@ export interface PricingPlanResponse {
   sortOrder: number;
 }
 
+/** Стоимость генерации в поинтах и поинты за регистрацию (единственный источник с бэка). */
+export interface GenerationPointsResponse {
+  pointsPerImage: number;
+  pointsPerImagePro: Record<'1K' | '2K' | '4K', number>;
+  pointsOnRegistration: number;
+}
+
 export interface ContactRequest {
   name: string;
   email: string;
@@ -1141,6 +1148,13 @@ class ApiClient {
 
   async getAllPricingPlans(): Promise<ApiResponse<PricingPlanResponse[]>> {
     return this.request<PricingPlanResponse[]>('/api/pricing/plans/all', {
+      method: 'GET',
+    });
+  }
+
+  /** Единственный источник тарифов в поинтах — с бэка. Кэшируется на клиенте. */
+  async getGenerationPoints(): Promise<ApiResponse<GenerationPointsResponse>> {
+    return this.request<GenerationPointsResponse>('/api/pricing/generation-points', {
       method: 'GET',
     });
   }

@@ -9,10 +9,10 @@ import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
 import { apiClient, ImageRequest, EnhancePromptRequest, ArtStyle } from "@/lib/api-client"
 import { useAuth } from "@/contexts/auth-context"
+import { useGenerationPoints } from "@/hooks/use-generation-points"
 import { Wand2, UploadCloud, Layers, FileImage, Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { getPointsText } from "@/lib/grammar"
-import { getRequiredPoints } from "@/lib/config"
 import { formatApiError } from "@/lib/errors"
 
 const generationSchema = z.object({
@@ -61,6 +61,7 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
   const { points, refreshPoints, setBalance } = useAuth()
+  const { getRequiredPoints } = useGenerationPoints()
 
   // Загружаем стили из API при монтировании компонента
   React.useEffect(() => {

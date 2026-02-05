@@ -6,13 +6,14 @@ import { Button } from "@/components/ui/button"
 import { Check, Star, Sparkles, Target, Zap } from "lucide-react"
 import { PricingCard } from "@/components/pricing-card"
 import { usePricingPlans } from "@/hooks/use-pricing-plans"
+import { useGenerationPoints } from "@/hooks/use-generation-points"
 import { useAuth } from "@/contexts/auth-context"
-import { config } from "@/lib/config"
 import { getPointsText } from "@/lib/grammar"
 import Link from "next/link"
 
 export default function PricingPage() {
   const { data: plans = [], isLoading, error } = usePricingPlans()
+  const { pointsPerImage, pointsOnRegistration } = useGenerationPoints()
   const { isAuthenticated, points } = useAuth()
 
   return (
@@ -64,7 +65,7 @@ export default function PricingPage() {
         <h1 className="text-large-title sm:text-5xl font-bold text-foreground">Выберите ваш тариф</h1>
         <p className="text-headline text-muted-foreground max-w-3xl mx-auto">
           Платите только за то, что используете. Без скрытых комиссий и подписок.
-          {!isAuthenticated && ` Получите +${getPointsText(config.REGISTRATION_POINTS)} при регистрации!`}
+          {!isAuthenticated && ` Получите +${getPointsText(pointsOnRegistration)} при регистрации!`}
         </p>
       </div>
 
@@ -191,7 +192,7 @@ export default function PricingPage() {
           <div className="card-ios p-6 animate-ios-fade-in bg-slate-50 dark:bg-card border-slate-200 dark:border-border">
             <h3 className="text-title-3 text-foreground mb-4">Как работает система поинтов?</h3>
             <p className="text-body text-muted-foreground">
-              1 генерация изображения = {config.GENERATION_POINTS_PER_IMAGE} поинта. Поинты не сгорают и остаются на вашем счету навсегда.
+              1 генерация изображения = {pointsPerImage} поинта. Поинты не сгорают и остаются на вашем счету навсегда.
             </p>
           </div>
 
@@ -210,7 +211,7 @@ export default function PricingPage() {
           </div>
 
           <div className="card-ios p-6 animate-ios-fade-in bg-slate-50 dark:bg-card border-slate-200 dark:border-border" style={{ animationDelay: '0.3s' }}>
-            <h3 className="text-title-3 text-foreground mb-4">Как получить +{getPointsText(config.REGISTRATION_POINTS)} при регистрации?</h3>
+            <h3 className="text-title-3 text-foreground mb-4">Как получить +{getPointsText(pointsOnRegistration)} при регистрации?</h3>
             <p className="text-body text-muted-foreground mb-3">
               Поинты автоматически начисляются на ваш счет сразу после создания аккаунта.
             </p>
@@ -246,7 +247,7 @@ export default function PricingPage() {
         ) : (
           <div className="space-y-6">
             <p className="text-headline text-muted-foreground">
-              Зарегистрируйтесь и получите +{getPointsText(config.REGISTRATION_POINTS)} для бесплатного тестирования
+              Зарегистрируйтесь и получите +{getPointsText(pointsOnRegistration)} для бесплатного тестирования
             </p>
             <a href="/studio" className="btn-ios-primary px-8 py-3 text-headline inline-flex items-center">
               <Sparkles className="w-5 h-5 mr-3" />

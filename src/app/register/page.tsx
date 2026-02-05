@@ -12,10 +12,10 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/components/ui/use-toast"
 import { useAuth } from "@/contexts/auth-context"
+import { useGenerationPoints } from "@/hooks/use-generation-points"
 import { ArrowLeft, Eye, EyeOff } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { config } from "@/lib/config"
 import { getPointsText } from "@/lib/grammar"
 import { TelegramLoginButton } from "@/components/telegram-login-button"
 import { Separator } from "@/components/ui/separator"
@@ -51,6 +51,7 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const { register: registerUser, loginWithTelegram } = useAuth()
+  const { pointsOnRegistration } = useGenerationPoints()
   const router = useRouter()
   const { toast } = useToast()
   const queryClient = useQueryClient()
@@ -111,7 +112,7 @@ export default function RegisterPage() {
         if (result.data?.isNewUser) {
           toast({
             title: "Успешная регистрация через Telegram!",
-            description: `Добро пожаловать в 24reshai! Вы получили ${getPointsText(config.REGISTRATION_POINTS)} при регистрации.`,
+            description: `Добро пожаловать в 24reshai! Вы получили ${getPointsText(pointsOnRegistration)} при регистрации.`,
           })
         } else {
           toast({

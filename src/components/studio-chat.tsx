@@ -44,9 +44,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useSessionHistory } from "@/hooks/use-session-detail"
+import { useGenerationPoints } from "@/hooks/use-generation-points"
 import Image from "next/image"
 import { ASPECT_RATIOS, DEFAULT_ASPECT_RATIO, type AspectRatio } from "@/lib/constants"
-import { getRequiredPoints } from "@/lib/config"
 import { getPointsText } from "@/lib/grammar"
 
 interface StudioChatProps {
@@ -61,6 +61,7 @@ export function StudioChat({
   className 
 }: StudioChatProps) {
   const { avatar, setBalance, refreshPoints } = useAuth()
+  const { getRequiredPoints } = useGenerationPoints()
   // Используем ref для стабильной ссылки на refreshPoints, чтобы избежать пересоздания startPolling
   const refreshPointsRef = useRef(refreshPoints)
   useEffect(() => {
