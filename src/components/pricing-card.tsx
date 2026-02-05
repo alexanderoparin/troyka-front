@@ -16,13 +16,20 @@ interface PricingCardProps {
 
 export function PricingCard({ plan, isPopular = false, className }: PricingCardProps) {
   const { isAuthenticated } = useAuth()
-  const { pointsPerImage } = useGenerationPoints()
+  const { data: generationPoints, pointsPerImage } = useGenerationPoints()
   const { toast } = useToast()
   const [isProcessing, setIsProcessing] = useState(false)
 
-  const generationsCount = Math.floor(plan.credits / pointsPerImage)
-  // Используем unitPriceRubComputed с бэка (цена за генерацию в копейках), если есть, иначе считаем на фронте
-  const pricePerGeneration = plan.unitPriceRubComputed ? plan.unitPriceRubComputed : (plan.priceRub / generationsCount)
+  const pro = generationPoints?.pointsPerImagePro ?? { '1K': 4, '2K': 4, '4K': 5 }
+  const planPriceRub = plan.priceRub / 100
+
+  // 1K и 2К объединены в одну строку (используем поинты для 1K)
+  const models: { label: string; pointsPerImage: number }[] = [
+    { label: 'Nano Banana', pointsPerImage },
+    { label: 'Nano Banana PRO 1K и 2K', pointsPerImage: pro['1K'] },
+    { label: 'Nano Banana PRO 4K', pointsPerImage: pro['4K'] },
+  ]
+
   const isPlanPopular = isPopular || plan.isPopular
 
   const handlePurchase = async () => {
@@ -86,34 +93,28 @@ export function PricingCard({ plan, isPopular = false, className }: PricingCardP
             {formatCurrency(plan.priceRub / 100)}
           </div>
           <p className="text-callout text-muted-foreground">
-            {plan.credits} поинтов • ~{generationsCount} генераций
+            {plan.credits} поинтов
           </p>
         </div>
       </div>
 
       <div className="space-y-6">
-        {/* Features */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <Check className="h-5 w-5 text-blue-500" />
-            <span className="text-body text-foreground">{generationsCount} изображений</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Check className="h-5 w-5 text-blue-500" />
-            <span className="text-body text-foreground">~{formatCurrency(pricePerGeneration / 100)} за генерацию</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Check className="h-5 w-5 text-blue-500" />
-            <span className="text-body text-foreground">Высокое разрешение</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Check className="h-5 w-5 text-blue-500" />
-            <span className="text-body text-foreground">Коммерческое использование</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Check className="h-5 w-5 text-blue-500" />
-            <span className="text-body text-foreground">Поинты не сгорают</span>
-          </div>
+        {/* По моделям: изображений и стоимость за генерацию */}
+        <div className="space-y-3 rounded-lg bg-muted/40 dark:bg-muted/20 border border-border/40 p-3 sm:p-4">
+          {models.map(({ label, pointsPerImage: pts }) => {
+            const imagesCount = Math.floor(plan.credits / pts)
+            const pricePerGen = imagesCount > 0 ? planPriceRub / imagesCount : 0
+            return (
+              <div key={label} className="flex flex-col gap-0.5">
+                <span className="text-callout font-semibold text-foreground">{label}</span>
+                <span className="text-footnote text-muted-foreground block">
+                  {imagesCount} изображений
+                  <br />
+                  ~{formatCurrency(pricePerGen)} за генерацию
+                </span>
+              </div>
+            )
+          })}
         </div>
 
         {/* Purchase Button */}

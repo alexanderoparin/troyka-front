@@ -13,7 +13,7 @@ import Link from "next/link"
 
 export default function PricingPage() {
   const { data: plans = [], isLoading, error } = usePricingPlans()
-  const { pointsPerImage, pointsOnRegistration } = useGenerationPoints()
+  const { pointsOnRegistration } = useGenerationPoints()
   const { isAuthenticated, points } = useAuth()
 
   return (
@@ -190,13 +190,6 @@ export default function PricingPage() {
 
         <div className="grid md:grid-cols-2 gap-6">
           <div className="card-ios p-6 animate-ios-fade-in bg-slate-50 dark:bg-card border-slate-200 dark:border-border">
-            <h3 className="text-title-3 text-foreground mb-4">Как работает система поинтов?</h3>
-            <p className="text-body text-muted-foreground">
-              1 генерация изображения = {pointsPerImage} поинта. Поинты не сгорают и остаются на вашем счету навсегда.
-            </p>
-          </div>
-
-          <div className="card-ios p-6 animate-ios-fade-in bg-slate-50 dark:bg-card border-slate-200 dark:border-border" style={{ animationDelay: '0.1s' }}>
             <h3 className="text-title-3 text-foreground mb-4">Безопасны ли платежи?</h3>
             <p className="text-body text-muted-foreground">
               Да, все платежи проходят через защищенный шлюз Робокассы с SSL-шифрованием. Мы не храним данные ваших карт.
