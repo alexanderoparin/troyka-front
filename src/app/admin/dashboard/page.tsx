@@ -1340,7 +1340,9 @@ export default function AdminDashboardPage() {
             <CardContent>
               {systemHistory.length > 0 ? (
                 <div className="space-y-3">
-                  {systemHistory.map((item) => (
+                  {[...systemHistory]
+                    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                    .map((item) => (
                     <div
                       key={item.id}
                       className="border rounded-lg p-4 hover:bg-muted/50 transition-colors"
