@@ -1,7 +1,7 @@
 "use client"
 
 import { Badge } from '@/components/ui/badge'
-import { Sparkles, Shield, ArrowRight, Star, Users, Clock, Target, Zap, Wand2, Brain, Rocket, CheckCircle2 } from 'lucide-react'
+import { Sparkles, ArrowRight, Star, Users, Clock, Target, Zap, Wand2, Brain, Rocket } from 'lucide-react'
 import Link from 'next/link'
 import { useAuth } from '@/contexts/auth-context'
 import { useGenerationPoints } from '@/hooks/use-generation-points'
@@ -12,7 +12,6 @@ export default function HomePage() {
   const { isAuthenticated } = useAuth()
   const { pointsPerImage, pointsOnRegistration, data } = useGenerationPoints()
   const pro = data.pointsPerImagePro
-  const minProPoints = Math.min(pro['1K'], pro['2K'], pro['4K'])
 
   return (
     <div className="relative space-y-8 sm:space-y-12 lg:space-y-16 min-h-screen">
@@ -82,46 +81,14 @@ export default function HomePage() {
                 </Link>
               </div>
 
-              {/* Модель | Стоимость | Результат */}
-              <div className="w-full max-w-md lg:max-w-none animate-ios-fade-in" style={{ animationDelay: '0.3s' }}>
-                {!isAuthenticated && (
-                  <div className="flex items-center justify-center gap-2 p-3 rounded-xl bg-muted/50 dark:bg-muted/20 border border-border/50 mb-4">
+              {!isAuthenticated && (
+                <div className="w-full max-w-md lg:max-w-none animate-ios-fade-in" style={{ animationDelay: '0.3s' }}>
+                  <div className="flex items-center justify-center gap-2 p-3 rounded-xl bg-muted/50 dark:bg-muted/20 border border-border/50">
                     <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                     <span className="text-sm font-medium">{getPointsText(pointsOnRegistration)} за регистрацию</span>
                   </div>
-                )}
-                <div className="rounded-xl border border-border/50 overflow-hidden bg-muted/30 dark:bg-muted/10 shadow-sm">
-                  <div className="grid grid-cols-3 gap-2 sm:gap-4 px-4 py-3 text-xs sm:text-sm font-semibold text-muted-foreground border-b border-border/50 bg-gradient-to-r from-muted/80 to-muted/40 dark:from-muted/30 dark:to-muted/10">
-                    <span className="flex items-center gap-1.5"><Sparkles className="w-3.5 h-3.5" /> Модель</span>
-                    <span className="flex items-center gap-1.5"><Zap className="w-3.5 h-3.5" /> Стоимость</span>
-                    <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> Результат</span>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2 sm:gap-4 px-4 py-3.5 items-center bg-blue-500/5 dark:bg-blue-500/10 border-b border-border/30">
-                    <span className="font-semibold text-foreground flex items-center gap-2">
-                      <span className="w-8 h-8 rounded-lg bg-blue-500/20 dark:bg-blue-500/30 flex items-center justify-center flex-shrink-0">
-                        <Zap className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                      </span>
-                      Nano Banana
-                    </span>
-                    <span className="text-sm">{pointsPerImage} поинта за 1 генерацию</span>
-                    <span className="text-sm flex items-center gap-1.5 text-green-600 dark:text-green-400">
-                      <Clock className="w-3.5 h-3.5" /> 5-10 сек
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2 sm:gap-4 px-4 py-3.5 items-center bg-primary/5 dark:bg-primary/10">
-                    <span className="font-semibold text-foreground flex items-center gap-2">
-                      <span className="w-8 h-8 rounded-lg bg-primary/20 dark:bg-primary/30 flex items-center justify-center flex-shrink-0">
-                        <Sparkles className="w-4 h-4 text-primary" />
-                      </span>
-                      Nano Banana PRO
-                    </span>
-                    <span className="text-sm">от {minProPoints} поинтов за 1 генерацию</span>
-                    <span className="text-sm flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
-                      <Clock className="w-3.5 h-3.5" /> 10-100 сек
-                    </span>
-                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Right Side - Image Gallery */}
@@ -132,46 +99,83 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Stats Section */}
+      {/* 1. Стоимость генераций */}
       <section className="space-y-8 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-            <div className="card-ios p-6 text-center animate-ios-fade-in">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-blue-500/20 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <Rocket className="w-6 h-6 text-primary" />
-              </div>
-              <div className="text-2xl sm:text-3xl font-bold text-foreground mb-1">5-10 сек</div>
-              <div className="text-xs sm:text-sm text-muted-foreground">Время генерации</div>
-            </div>
-            
-            <div className="card-ios p-6 text-center animate-ios-fade-in" style={{ animationDelay: '0.1s' }}>
-              <div className="w-12 h-12 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <Wand2 className="w-6 h-6 text-green-500" />
-              </div>
-              <div className="text-2xl sm:text-3xl font-bold text-foreground mb-1">Студийное</div>
-              <div className="text-xs sm:text-sm text-muted-foreground">Качество</div>
-            </div>
-            
-            <div className="card-ios p-6 text-center animate-ios-fade-in" style={{ animationDelay: '0.2s' }}>
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <Brain className="w-6 h-6 text-purple-500" />
-              </div>
-              <div className="text-2xl sm:text-3xl font-bold text-foreground mb-1">AI</div>
-              <div className="text-xs sm:text-sm text-muted-foreground">Технологии</div>
-            </div>
-            
-            <div className="card-ios p-6 text-center animate-ios-fade-in" style={{ animationDelay: '0.3s' }}>
-              <div className="w-12 h-12 bg-gradient-to-br from-orange-500/20 to-amber-500/20 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <Users className="w-6 h-6 text-orange-500" />
-              </div>
-              <div className="text-2xl sm:text-3xl font-bold text-foreground mb-1">100%</div>
-              <div className="text-xs sm:text-sm text-muted-foreground">Удовлетворенность</div>
-            </div>
+        <div className="max-w-7xl mx-auto animate-ios-fade-in">
+          <div className="rounded-xl border border-border/50 overflow-hidden bg-muted/30 dark:bg-muted/10 shadow-sm">
+            <table className="w-full text-center table-fixed">
+              <colgroup>
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '20%' }} />
+              </colgroup>
+              <thead>
+                <tr className="text-xs sm:text-sm font-semibold text-muted-foreground border-b border-border/50 bg-gradient-to-r from-muted/80 to-muted/40 dark:from-muted/30 dark:to-muted/10">
+                  <th className="px-4 py-3 font-medium"><span className="flex items-center justify-center gap-1.5"><Sparkles className="w-3.5 h-3.5" /> Модель</span></th>
+                  <th className="px-4 py-3 font-medium">Разрешение</th>
+                  <th className="px-4 py-3 font-medium"><span className="flex items-center justify-center gap-1.5"><Clock className="w-3.5 h-3.5" /> Результат</span></th>
+                  <th className="px-4 py-3 font-medium">Качество</th>
+                  <th className="px-4 py-3 font-medium"><span className="flex items-center justify-center gap-1.5"><Zap className="w-3.5 h-3.5" /> Стоимость за 1 генерацию</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="bg-blue-500/5 dark:bg-blue-500/10 border-b-2 border-border">
+                  <td className="px-4 py-3.5 align-middle">
+                    <span className="font-semibold text-foreground flex items-center justify-center gap-2">
+                      <span className="w-8 h-8 rounded-lg bg-blue-500/20 dark:bg-blue-500/30 flex items-center justify-center flex-shrink-0">
+                        <Zap className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                      </span>
+                      Nano Banana
+                    </span>
+                  </td>
+                  <td className="px-4 py-3.5 text-sm">1K</td>
+                  <td className="px-4 py-3.5 text-sm text-green-600 dark:text-green-400">
+                    <span className="flex items-center justify-center gap-1.5"><Clock className="w-3.5 h-3.5" /> 5-10 сек</span>
+                  </td>
+                  <td className="px-4 py-3.5 text-sm">хорошее</td>
+                  <td className="px-4 py-3.5 text-sm">{getPointsText(pointsPerImage)}</td>
+                </tr>
+                <tr className="border-b border-border/30">
+                  <td rowSpan={3} className="px-4 py-3.5 align-middle border-r border-border/30 bg-blue-500/5 dark:bg-blue-500/10">
+                    <span className="font-semibold text-foreground flex items-center justify-center gap-2">
+                      <span className="w-8 h-8 rounded-lg bg-blue-500/20 dark:bg-blue-500/30 flex items-center justify-center flex-shrink-0">
+                        <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                      </span>
+                      Nano Banana PRO
+                    </span>
+                  </td>
+                  <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">1K</td>
+                  <td className="px-4 py-3.5 text-sm text-amber-600 dark:text-amber-400 bg-blue-500/5 dark:bg-blue-500/10">
+                    <span className="flex items-center justify-center gap-1.5"><Clock className="w-3.5 h-3.5" /> 10-30 сек</span>
+                  </td>
+                  <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">отличное</td>
+                  <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">{getPointsText(pro['1K'])}</td>
+                </tr>
+                <tr className="border-b border-border/30">
+                  <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">2K</td>
+                  <td className="px-4 py-3.5 text-sm text-amber-600 dark:text-amber-400 bg-blue-500/5 dark:bg-blue-500/10">
+                    <span className="flex items-center justify-center gap-1.5"><Clock className="w-3.5 h-3.5" /> 20-60 сек</span>
+                  </td>
+                  <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">отличное</td>
+                  <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">{getPointsText(pro['2K'])}</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">4K</td>
+                  <td className="px-4 py-3.5 text-sm text-amber-600 dark:text-amber-400 bg-blue-500/5 dark:bg-blue-500/10">
+                    <span className="flex items-center justify-center gap-1.5"><Clock className="w-3.5 h-3.5" /> 30-150 сек</span>
+                  </td>
+                  <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">отличное</td>
+                  <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">{getPointsText(pro['4K'])}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* 2. Почему выбирают 24reshai */}
       <section className="space-y-8 sm:space-y-12 px-4">
         <div className="text-center space-y-3 sm:space-y-4 max-w-3xl mx-auto">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
@@ -182,77 +186,37 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto">
-          <div className="card-ios p-8 animate-ios-fade-in group hover:shadow-2xl hover:shadow-primary/10 transition-all duration-300">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500/20 to-primary/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-              <Target className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+        {/* 3. Карточки */}
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+            <div className="card-ios p-6 text-center animate-ios-fade-in">
+              <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-blue-500/20 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <Rocket className="w-6 h-6 text-primary" />
+              </div>
+              <div className="text-2xl sm:text-3xl font-bold text-foreground mb-1">5-10 сек</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Время генерации</div>
             </div>
-            <h3 className="text-title-3 text-foreground mb-3 font-semibold">100% Точность товара</h3>
-            <p className="text-body text-muted-foreground mb-6">
-              Каждая деталь товара передается с максимальной точностью и реализмом
-            </p>
-            <ul className="space-y-3 text-callout text-muted-foreground">
-              <li className="flex items-center gap-3">
-                <CheckCircle2 className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                <span>Сохранение всех характеристик товара</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <CheckCircle2 className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                <span>Точная передача цветов и текстур</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <CheckCircle2 className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                <span>Реалистичное освещение и тени</span>
-              </li>
-            </ul>
-          </div>
-
-          <div className="card-ios p-8 animate-ios-fade-in group hover:shadow-2xl hover:shadow-green-500/10 transition-all duration-300" style={{ animationDelay: '0.1s' }}>
-            <div className="w-16 h-16 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-              <Zap className="w-8 h-8 text-green-600 dark:text-green-400" />
+            <div className="card-ios p-6 text-center animate-ios-fade-in" style={{ animationDelay: '0.1s' }}>
+              <div className="w-12 h-12 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <Wand2 className="w-6 h-6 text-green-500" />
+              </div>
+              <div className="text-2xl sm:text-3xl font-bold text-foreground mb-1">Студийное</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Качество</div>
             </div>
-            <h3 className="text-title-3 text-foreground mb-3 font-semibold">Мгновенная генерация</h3>
-            <p className="text-body text-muted-foreground mb-6">
-              От идеи до готового изображения всего за 5-10 секунд без ожидания
-            </p>
-            <ul className="space-y-3 text-callout text-muted-foreground">
-              <li className="flex items-center gap-3">
-                <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
-                <span>Быстрая обработка запросов</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
-                <span>Множество стилей и фонов</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
-                <span>Профессиональное качество</span>
-              </li>
-            </ul>
-          </div>
-
-          <div className="card-ios p-8 animate-ios-fade-in group hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 sm:col-span-2 lg:col-span-1" style={{ animationDelay: '0.2s' }}>
-            <div className="w-16 h-16 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-              <Shield className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+            <div className="card-ios p-6 text-center animate-ios-fade-in" style={{ animationDelay: '0.2s' }}>
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <Brain className="w-6 h-6 text-purple-500" />
+              </div>
+              <div className="text-2xl sm:text-3xl font-bold text-foreground mb-1">AI</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Технологии</div>
             </div>
-            <h3 className="text-title-3 text-foreground mb-3 font-semibold">Безопасность данных</h3>
-            <p className="text-body text-muted-foreground mb-6">
-              Ваши изображения защищены и доступны только вам с полной конфиденциальностью
-            </p>
-            <ul className="space-y-3 text-callout text-muted-foreground">
-              <li className="flex items-center gap-3">
-                <CheckCircle2 className="w-4 h-4 text-purple-500 flex-shrink-0" />
-                <span>Приватное хранилище</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <CheckCircle2 className="w-4 h-4 text-purple-500 flex-shrink-0" />
-                <span>Защищенная передача данных</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <CheckCircle2 className="w-4 h-4 text-purple-500 flex-shrink-0" />
-                <span>Соответствие GDPR</span>
-              </li>
-            </ul>
+            <div className="card-ios p-6 text-center animate-ios-fade-in" style={{ animationDelay: '0.3s' }}>
+              <div className="w-12 h-12 bg-gradient-to-br from-orange-500/20 to-amber-500/20 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <Users className="w-6 h-6 text-orange-500" />
+              </div>
+              <div className="text-2xl sm:text-3xl font-bold text-foreground mb-1">100%</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Удовлетворенность</div>
+            </div>
           </div>
         </div>
       </section>
