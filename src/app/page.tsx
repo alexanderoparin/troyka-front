@@ -10,7 +10,9 @@ import { getPointsText } from '@/lib/grammar'
 
 export default function HomePage() {
   const { isAuthenticated } = useAuth()
-  const { pointsPerImage, pointsOnRegistration } = useGenerationPoints()
+  const { pointsPerImage, pointsOnRegistration, data } = useGenerationPoints()
+  const pro = data.pointsPerImagePro
+  const minProPoints = Math.min(pro['1K'], pro['2K'], pro['4K'])
 
   return (
     <div className="relative space-y-8 sm:space-y-12 lg:space-y-16 min-h-screen">
@@ -80,21 +82,44 @@ export default function HomePage() {
                 </Link>
               </div>
 
-              {/* Features - Quick Stats */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-md lg:max-w-none animate-ios-fade-in" style={{ animationDelay: '0.3s' }}>
+              {/* Модель | Стоимость | Результат */}
+              <div className="w-full max-w-md lg:max-w-none animate-ios-fade-in" style={{ animationDelay: '0.3s' }}>
                 {!isAuthenticated && (
-                  <div className="flex items-center justify-center gap-2 p-3 rounded-xl bg-muted/50 dark:bg-muted/20 border border-border/50">
+                  <div className="flex items-center justify-center gap-2 p-3 rounded-xl bg-muted/50 dark:bg-muted/20 border border-border/50 mb-4">
                     <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                     <span className="text-sm font-medium">{getPointsText(pointsOnRegistration)} за регистрацию</span>
                   </div>
                 )}
-                <div className="flex items-center justify-center gap-2 p-3 rounded-xl bg-muted/50 dark:bg-muted/20 border border-border/50">
-                  <Zap className="w-4 h-4 text-blue-500" />
-                  <span className="text-sm font-medium">{pointsPerImage} поинта = 1 генерация</span>
-                </div>
-                <div className="flex items-center justify-center gap-2 p-3 rounded-xl bg-muted/50 dark:bg-muted/20 border border-border/50">
-                  <Clock className="w-4 h-4 text-green-500" />
-                  <span className="text-sm font-medium">Результат за 5-10 секунд</span>
+                <div className="rounded-xl border border-border/50 overflow-hidden bg-muted/30 dark:bg-muted/10 shadow-sm">
+                  <div className="grid grid-cols-3 gap-2 sm:gap-4 px-4 py-3 text-xs sm:text-sm font-semibold text-muted-foreground border-b border-border/50 bg-gradient-to-r from-muted/80 to-muted/40 dark:from-muted/30 dark:to-muted/10">
+                    <span className="flex items-center gap-1.5"><Sparkles className="w-3.5 h-3.5" /> Модель</span>
+                    <span className="flex items-center gap-1.5"><Zap className="w-3.5 h-3.5" /> Стоимость</span>
+                    <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> Результат</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 sm:gap-4 px-4 py-3.5 items-center bg-blue-500/5 dark:bg-blue-500/10 border-b border-border/30">
+                    <span className="font-semibold text-foreground flex items-center gap-2">
+                      <span className="w-8 h-8 rounded-lg bg-blue-500/20 dark:bg-blue-500/30 flex items-center justify-center flex-shrink-0">
+                        <Zap className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                      </span>
+                      Nano Banana
+                    </span>
+                    <span className="text-sm">{pointsPerImage} поинта за 1 генерацию</span>
+                    <span className="text-sm flex items-center gap-1.5 text-green-600 dark:text-green-400">
+                      <Clock className="w-3.5 h-3.5" /> 5-10 сек
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 sm:gap-4 px-4 py-3.5 items-center bg-primary/5 dark:bg-primary/10">
+                    <span className="font-semibold text-foreground flex items-center gap-2">
+                      <span className="w-8 h-8 rounded-lg bg-primary/20 dark:bg-primary/30 flex items-center justify-center flex-shrink-0">
+                        <Sparkles className="w-4 h-4 text-primary" />
+                      </span>
+                      Nano Banana PRO
+                    </span>
+                    <span className="text-sm">от {minProPoints} поинтов за 1 генерацию</span>
+                    <span className="text-sm flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
+                      <Clock className="w-3.5 h-3.5" /> 10-100 сек
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
