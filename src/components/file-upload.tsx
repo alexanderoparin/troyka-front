@@ -59,11 +59,11 @@ export function FileUpload({
           continue;
         }
 
-        // Проверяем размер файла (максимум 10MB)
-        if (file.size > 10 * 1024 * 1024) {
+        // До 30 MB — большие файлы сжимаются на сервере
+        if (file.size > 30 * 1024 * 1024) {
           toast({
             title: "Ошибка",
-            description: `Файл ${file.name} слишком большой (максимум 10MB)`,
+            description: `Файл ${file.name} слишком большой (максимум 30 MB)`,
             variant: "destructive",
           });
           continue;
@@ -173,7 +173,7 @@ export function FileUpload({
                 Перетащите файлы сюда или нажмите для выбора
               </p>
               <p className="text-xs text-muted-foreground">
-                Поддерживаются: JPG, PNG, GIF (максимум 10MB)
+                Поддерживаются: JPG, PNG, GIF (максимум 30 MB)
               </p>
             </div>
 

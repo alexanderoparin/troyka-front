@@ -506,14 +506,14 @@ export function StudioChat({
       return
     }
 
-    // Проверяем размер файла (максимум 10MB для загрузки, но предупреждаем если > 7MB для LaoZhang)
-    const maxUploadSize = 10 * 1024 * 1024; // 10MB
-    const laoZhangLimit = 7 * 1024 * 1024; // 7MB - лимит для LaoZhang/Gemini API
+    // До 30 MB принимаем — на бэкенде файл будет сжат при необходимости. Предупреждаем, если > 7 MB (лимит LaoZhang).
+    const maxUploadSize = 30 * 1024 * 1024; // 30MB — большие файлы сжимаются на сервере
+    const laoZhangLimit = 7 * 1024 * 1024; // 7MB — выше этого показываем предупреждение
     
     if (file.size > maxUploadSize) {
       toast({
         title: "Ошибка",
-        description: "Файл слишком большой (максимум 10MB)",
+        description: "Файл слишком большой (максимум 30 MB)",
         variant: "destructive",
       })
       return

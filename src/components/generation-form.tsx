@@ -230,11 +230,11 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
       return
     }
 
-    // Проверяем размер файла (максимум 10MB)
-    if (file.size > 10 * 1024 * 1024) {
+    // До 30 MB — большие файлы сжимаются на сервере
+    if (file.size > 30 * 1024 * 1024) {
       toast({
         title: "Ошибка",
-        description: "Файл слишком большой (максимум 10MB)",
+        description: "Файл слишком большой (максимум 30 MB)",
         variant: "destructive",
       })
       return
