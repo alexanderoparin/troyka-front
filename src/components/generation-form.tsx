@@ -239,7 +239,7 @@ export function GenerationForm({ onGenerationComplete, initialPrompt = "", initi
       })
       return
     }
-    
+
     try {
       const response = await apiClient.uploadFile(file)
       if (response.data) {

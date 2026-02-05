@@ -39,6 +39,8 @@ export interface ImageRequest {
 export interface ImageResponse {
   imageUrls: string[];
   balance?: number;
+  /** Предупреждение при сжатии загруженных изображений (лимиты 7 MB на файл, 20 MB на запрос). */
+  warningMessage?: string;
 }
 
 // Queue generation interfaces

@@ -538,22 +538,18 @@ export function StudioChat({
       if (response.data) {
         setUploadedImages(prev => [...prev, response.data!])
         
-        // Сначала показываем уведомление об успешной загрузке
         toast({
           title: "Изображение загружено",
           description: "Изображение готово для использования",
           duration: 2000,
         })
-        
-        // Если файл большой, показываем уведомление о сжатии после небольшой задержки
         if (isLargeFile) {
-          setTimeout(() => {
-            toast({
-              title: "Большой файл",
-              description: `Файл превышает рекомендуемый размер (${(file.size / 1024 / 1024).toFixed(1)}MB). Изображение будет автоматически сжато перед отправкой.`,
-              duration: 4000,
-            })
-          }, 2500)
+          toast({
+            title: "Обратите внимание",
+            description: "Файл больше 7 MB и будет сжат перед отправкой на генерацию.",
+            variant: "default",
+            duration: 5000,
+          })
         }
       } else {
         throw new Error(response.error || "Ошибка загрузки файла")

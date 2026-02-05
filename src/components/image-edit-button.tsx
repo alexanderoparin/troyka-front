@@ -105,7 +105,6 @@ export function ImageEditButton({
           description: `Списано ${getPointsText(requiredPoints)}`,
           duration: 1000,
         });
-        
         if (onImageEdited) {
           onImageEdited(response.data.imageUrls);
         }
