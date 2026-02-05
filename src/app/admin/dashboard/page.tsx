@@ -54,6 +54,7 @@ export default function AdminDashboardPage() {
   const [error, setError] = useState<string | null>(null)
   const [paymentSearch, setPaymentSearch] = useState("")
   const [userSearch, setUserSearch] = useState("")
+  const [userPaymentFilter, setUserPaymentFilter] = useState<'all' | 'with_payment' | 'without_payment'>('all')
   const [systemStatus, setSystemStatus] = useState<SystemStatusWithMetadata | null>(null)
   const [systemHistory, setSystemHistory] = useState<SystemStatusHistoryDTO[]>([])
   const [statusMessage, setStatusMessage] = useState("")
@@ -229,12 +230,17 @@ export default function AdminDashboardPage() {
     p.userId.toString().includes(paymentSearch)
   )
 
-  const filteredUsers = users.filter(u =>
-    (u.username && u.username.toLowerCase().includes(userSearch.toLowerCase())) ||
-    (u.email && u.email.toLowerCase().includes(userSearch.toLowerCase())) ||
-    (u.telegramUsername && u.telegramUsername.toLowerCase().includes(userSearch.toLowerCase())) ||
-    u.id.toString().includes(userSearch)
-  )
+  const filteredUsers = users.filter(u => {
+    const matchesSearch =
+      (u.username && u.username.toLowerCase().includes(userSearch.toLowerCase())) ||
+      (u.email && u.email.toLowerCase().includes(userSearch.toLowerCase())) ||
+      (u.telegramUsername && u.telegramUsername.toLowerCase().includes(userSearch.toLowerCase())) ||
+      u.id.toString().includes(userSearch)
+    if (!matchesSearch) return false
+    if (userPaymentFilter === 'with_payment') return u.hasSuccessfulPayment === true
+    if (userPaymentFilter === 'without_payment') return u.hasSuccessfulPayment !== true
+    return true
+  })
 
   const loadUserStatistics = async () => {
     if (selectedUserIdsForStats.length === 0) {
@@ -321,14 +327,16 @@ export default function AdminDashboardPage() {
   }
 
   const filteredUsersForSelection = users.filter(u => {
-    if (!userSearchFilter.trim()) return true
-    const searchLower = userSearchFilter.toLowerCase()
-    return (
-      (u.username && u.username.toLowerCase().includes(searchLower)) ||
-      (u.email && u.email.toLowerCase().includes(searchLower)) ||
-      (u.telegramUsername && u.telegramUsername.toLowerCase().includes(searchLower)) ||
+    const matchesSearch = !userSearchFilter.trim() || (
+      (u.username && u.username.toLowerCase().includes(userSearchFilter.toLowerCase())) ||
+      (u.email && u.email.toLowerCase().includes(userSearchFilter.toLowerCase())) ||
+      (u.telegramUsername && u.telegramUsername.toLowerCase().includes(userSearchFilter.toLowerCase())) ||
       u.id.toString().includes(userSearchFilter)
     )
+    if (!matchesSearch) return false
+    if (userPaymentFilter === 'with_payment') return u.hasSuccessfulPayment === true
+    if (userPaymentFilter === 'without_payment') return u.hasSuccessfulPayment !== true
+    return true
   })
 
   if (isLoading) {
@@ -1017,6 +1025,38 @@ export default function AdminDashboardPage() {
                 <Button onClick={loadData} variant="outline" size="sm" className="flex-shrink-0">
                   <RefreshCw className="w-4 h-4" />
                 </Button>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs text-muted-foreground">Оплата:</span>
+                <div className="flex rounded-md border border-border overflow-hidden">
+                  <Button
+                    type="button"
+                    variant={userPaymentFilter === 'all' ? 'secondary' : 'ghost'}
+                    size="sm"
+                    className="rounded-none border-r border-border"
+                    onClick={() => setUserPaymentFilter('all')}
+                  >
+                    Все
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={userPaymentFilter === 'with_payment' ? 'secondary' : 'ghost'}
+                    size="sm"
+                    className="rounded-none border-r border-border"
+                    onClick={() => setUserPaymentFilter('with_payment')}
+                  >
+                    С оплатой
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={userPaymentFilter === 'without_payment' ? 'secondary' : 'ghost'}
+                    size="sm"
+                    className="rounded-none"
+                    onClick={() => setUserPaymentFilter('without_payment')}
+                  >
+                    Без оплаты
+                  </Button>
+                </div>
               </div>
             </div>
           </CardHeader>
