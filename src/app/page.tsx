@@ -114,9 +114,9 @@ export default function HomePage() {
               <thead>
                 <tr className="text-xs sm:text-sm font-semibold text-muted-foreground border-b border-border/50 bg-gradient-to-r from-muted/80 to-muted/40 dark:from-muted/30 dark:to-muted/10">
                   <th className="px-4 py-3 font-medium"><span className="flex items-center justify-center gap-1.5"><Sparkles className="w-3.5 h-3.5" /> Модель</span></th>
+                  <th className="px-4 py-3 font-medium">Качество</th>
                   <th className="px-4 py-3 font-medium">Разрешение</th>
                   <th className="px-4 py-3 font-medium"><span className="flex items-center justify-center gap-1.5"><Clock className="w-3.5 h-3.5" /> Результат</span></th>
-                  <th className="px-4 py-3 font-medium">Качество</th>
                   <th className="px-4 py-3 font-medium"><span className="flex items-center justify-center gap-1.5"><Zap className="w-3.5 h-3.5" /> Стоимость за 1 генерацию</span></th>
                 </tr>
               </thead>
@@ -130,11 +130,11 @@ export default function HomePage() {
                       Nano Banana
                     </span>
                   </td>
+                  <td className="px-4 py-3.5 text-sm">хорошее</td>
                   <td className="px-4 py-3.5 text-sm">1K</td>
                   <td className="px-4 py-3.5 text-sm text-green-600 dark:text-green-400">
-                    <span className="flex items-center justify-center gap-1.5"><Clock className="w-3.5 h-3.5" /> 5-10 сек</span>
+                    <span className="flex items-center justify-center gap-1.5"><Clock className="w-3.5 h-3.5" /> 5-10 секунд</span>
                   </td>
-                  <td className="px-4 py-3.5 text-sm">хорошее</td>
                   <td className="px-4 py-3.5 text-sm">{getPointsText(pointsPerImage)}</td>
                 </tr>
                 <tr className="border-b border-border/30">
@@ -146,27 +146,25 @@ export default function HomePage() {
                       Nano Banana PRO
                     </span>
                   </td>
+                  <td rowSpan={3} className="px-4 py-3.5 text-sm align-middle bg-blue-500/5 dark:bg-blue-500/10">отличное</td>
                   <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">1K</td>
                   <td className="px-4 py-3.5 text-sm text-amber-600 dark:text-amber-400 bg-blue-500/5 dark:bg-blue-500/10">
-                    <span className="flex items-center justify-center gap-1.5"><Clock className="w-3.5 h-3.5" /> 10-30 сек</span>
+                    <span className="flex items-center justify-center gap-1.5"><Clock className="w-3.5 h-3.5" /> 10-30 секунд</span>
                   </td>
-                  <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">отличное</td>
                   <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">{getPointsText(pro['1K'])}</td>
                 </tr>
                 <tr className="border-b border-border/30">
                   <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">2K</td>
                   <td className="px-4 py-3.5 text-sm text-amber-600 dark:text-amber-400 bg-blue-500/5 dark:bg-blue-500/10">
-                    <span className="flex items-center justify-center gap-1.5"><Clock className="w-3.5 h-3.5" /> 20-60 сек</span>
+                    <span className="flex items-center justify-center gap-1.5"><Clock className="w-3.5 h-3.5" /> 20-60 секунд</span>
                   </td>
-                  <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">отличное</td>
                   <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">{getPointsText(pro['2K'])}</td>
                 </tr>
                 <tr>
                   <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">4K</td>
                   <td className="px-4 py-3.5 text-sm text-amber-600 dark:text-amber-400 bg-blue-500/5 dark:bg-blue-500/10">
-                    <span className="flex items-center justify-center gap-1.5"><Clock className="w-3.5 h-3.5" /> 30-150 сек</span>
+                    <span className="flex items-center justify-center gap-1.5"><Clock className="w-3.5 h-3.5" /> 30-150 секунд</span>
                   </td>
-                  <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">отличное</td>
                   <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">{getPointsText(pro['4K'])}</td>
                 </tr>
               </tbody>
@@ -176,7 +174,7 @@ export default function HomePage() {
       </section>
 
       {/* 2. Почему выбирают 24reshai */}
-      <section className="space-y-8 sm:space-y-12 px-4">
+      <section className="space-y-8 sm:space-y-12 px-4 pt-12 sm:pt-16">
         <div className="text-center space-y-3 sm:space-y-4 max-w-3xl mx-auto">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
             Почему выбирают 24reshai
@@ -189,28 +187,28 @@ export default function HomePage() {
         {/* 3. Карточки */}
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-            <div className="card-ios p-6 text-center animate-ios-fade-in">
+            <div className="card-ios p-6 text-center animate-ios-fade-in bg-slate-50 dark:bg-card border border-slate-200 dark:border-border">
               <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-blue-500/20 rounded-xl flex items-center justify-center mx-auto mb-3">
                 <Rocket className="w-6 h-6 text-primary" />
               </div>
-              <div className="text-2xl sm:text-3xl font-bold text-foreground mb-1">5-10 сек</div>
+              <div className="text-2xl sm:text-3xl font-bold text-foreground mb-1">от 5 секунд</div>
               <div className="text-xs sm:text-sm text-muted-foreground">Время генерации</div>
             </div>
-            <div className="card-ios p-6 text-center animate-ios-fade-in" style={{ animationDelay: '0.1s' }}>
+            <div className="card-ios p-6 text-center animate-ios-fade-in bg-slate-50 dark:bg-card border border-slate-200 dark:border-border" style={{ animationDelay: '0.1s' }}>
               <div className="w-12 h-12 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-xl flex items-center justify-center mx-auto mb-3">
                 <Wand2 className="w-6 h-6 text-green-500" />
               </div>
               <div className="text-2xl sm:text-3xl font-bold text-foreground mb-1">Студийное</div>
               <div className="text-xs sm:text-sm text-muted-foreground">Качество</div>
             </div>
-            <div className="card-ios p-6 text-center animate-ios-fade-in" style={{ animationDelay: '0.2s' }}>
+            <div className="card-ios p-6 text-center animate-ios-fade-in bg-slate-50 dark:bg-card border border-slate-200 dark:border-border" style={{ animationDelay: '0.2s' }}>
               <div className="w-12 h-12 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl flex items-center justify-center mx-auto mb-3">
                 <Brain className="w-6 h-6 text-purple-500" />
               </div>
               <div className="text-2xl sm:text-3xl font-bold text-foreground mb-1">AI</div>
               <div className="text-xs sm:text-sm text-muted-foreground">Технологии</div>
             </div>
-            <div className="card-ios p-6 text-center animate-ios-fade-in" style={{ animationDelay: '0.3s' }}>
+            <div className="card-ios p-6 text-center animate-ios-fade-in bg-slate-50 dark:bg-card border border-slate-200 dark:border-border" style={{ animationDelay: '0.3s' }}>
               <div className="w-12 h-12 bg-gradient-to-br from-orange-500/20 to-amber-500/20 rounded-xl flex items-center justify-center mx-auto mb-3">
                 <Users className="w-6 h-6 text-orange-500" />
               </div>
