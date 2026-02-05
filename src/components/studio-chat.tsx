@@ -141,6 +141,7 @@ export function StudioChat({
   })
   
   const [uploadedImages, setUploadedImages] = useState<string[]>([])
+  const [isUploading, setIsUploading] = useState(false)
   const [isFocused, setIsFocused] = useState(false)
   const [selectedImageForModal, setSelectedImageForModal] = useState<string | null>(null)
   const [isDragOver, setIsDragOver] = useState(false)
@@ -532,6 +533,7 @@ export function StudioChat({
     // Флаг для отслеживания большого файла
     const isLargeFile = file.size > laoZhangLimit
 
+    setIsUploading(true)
     try {
       // Загружаем файл на сервер
       const response = await apiClient.uploadFile(file)
@@ -560,6 +562,8 @@ export function StudioChat({
         description: error.message || "Не удалось загрузить файл",
         variant: "destructive",
       })
+    } finally {
+      setIsUploading(false)
     }
   }, [toast, uploadedImages.length])
 
@@ -607,8 +611,8 @@ export function StudioChat({
       if (item.type.startsWith('image/')) {
         const file = item.getAsFile()
         if (file) {
+          setIsUploading(true)
           try {
-            // Загружаем файл на сервер
             const response = await apiClient.uploadFile(file)
             if (response.data) {
               setUploadedImages([response.data])
@@ -625,6 +629,8 @@ export function StudioChat({
               description: error.message || "Не удалось загрузить файл",
               variant: "destructive",
             })
+          } finally {
+            setIsUploading(false)
           }
         }
         break
@@ -1463,6 +1469,13 @@ export function StudioChat({
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
                 >
+          {/* Индикатор загрузки и обработки изображения */}
+          {isUploading && (
+            <div className="flex items-center gap-2 mb-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin flex-shrink-0" />
+              <span>Загрузка и обработка изображения...</span>
+            </div>
+          )}
           {/* Загруженные изображения */}
           {uploadedImages.length > 0 && (
             <div className="mb-1">
