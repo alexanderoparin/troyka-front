@@ -7,6 +7,7 @@ import { apiClient, GenerationPointsResponse } from '@/lib/api-client'
 const FALLBACK: GenerationPointsResponse = {
   pointsPerImage: 2,
   pointsPerImagePro: { '1K': 8, '2K': 9, '4K': 15 },
+  pointsPerImageSeedream: 4,
   pointsOnRegistration: 4,
 }
 
@@ -29,11 +30,15 @@ export function useGenerationPoints() {
 
   function getRequiredPoints(
     numImages: number,
-    model: 'nano-banana' | 'nano-banana-pro' = 'nano-banana',
+    model: 'nano-banana' | 'nano-banana-pro' | 'seedream-4.5' = 'nano-banana',
     resolution: '1K' | '2K' | '4K' = '1K'
   ): number {
     if (model === 'nano-banana-pro') {
       const pointsPerImage = data.pointsPerImagePro[resolution] ?? data.pointsPerImagePro['1K']
+      return numImages * pointsPerImage
+    }
+    if (model === 'seedream-4.5') {
+      const pointsPerImage = data.pointsPerImageSeedream ?? 4
       return numImages * pointsPerImage
     }
     return numImages * data.pointsPerImage

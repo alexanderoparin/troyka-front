@@ -419,7 +419,7 @@ export function SessionHistory({
                         <span>{message.imageCount} {getImageText(message.imageCount)}</span>
                         {(() => {
                           const modelName = message.modelType 
-                            ? (message.modelType === 'nano-banana' ? 'Nano Banana' : 'Nano Banana PRO')
+                            ? (message.modelType === 'nano-banana' ? 'Nano Banana' : message.modelType === 'nano-banana-pro' ? 'Nano Banana PRO' : message.modelType === 'seedream-4.5' ? 'Seedream 4.5' : 'Nano Banana')
                             : 'Nano Banana';
                           return (
                             <>

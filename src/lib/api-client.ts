@@ -32,8 +32,10 @@ export interface ImageRequest {
   sessionId?: number;
   styleId?: number;
   aspectRatio?: string;
-  model?: 'nano-banana' | 'nano-banana-pro';
+  model?: 'nano-banana' | 'nano-banana-pro' | 'seedream-4.5';
   resolution?: '1K' | '2K' | '4K';
+  /** Для Seedream 4.5: image_size (square_hd, square, portrait_4_3, ...). */
+  seedreamImageSize?: string;
 }
 
 export interface ImageResponse {
@@ -179,6 +181,8 @@ export interface PricingPlanResponse {
 export interface GenerationPointsResponse {
   pointsPerImage: number;
   pointsPerImagePro: Record<'1K' | '2K' | '4K', number>;
+  /** Поинтов за одно изображение Seedream 4.5 */
+  pointsPerImageSeedream?: number;
   pointsOnRegistration: number;
 }
 
@@ -640,9 +644,12 @@ class ApiClient {
   }
 
   // Функции конвертации для отправки на бэкенд
-  private convertModelToEnum(model: 'nano-banana' | 'nano-banana-pro' | undefined): 'NANO_BANANA' | 'NANO_BANANA_PRO' | undefined {
+  private convertModelToEnum(model: 'nano-banana' | 'nano-banana-pro' | 'seedream-4.5' | undefined): 'NANO_BANANA' | 'NANO_BANANA_PRO' | 'SEEDREAM_4_5' | undefined {
     if (!model) return undefined;
-    return model === 'nano-banana' ? 'NANO_BANANA' : 'NANO_BANANA_PRO';
+    if (model === 'nano-banana') return 'NANO_BANANA';
+    if (model === 'nano-banana-pro') return 'NANO_BANANA_PRO';
+    if (model === 'seedream-4.5') return 'SEEDREAM_4_5';
+    return 'NANO_BANANA';
   }
 
   private convertResolutionToEnum(resolution: '1K' | '2K' | '4K' | undefined): 'RESOLUTION_1K' | 'RESOLUTION_2K' | 'RESOLUTION_4K' | undefined {

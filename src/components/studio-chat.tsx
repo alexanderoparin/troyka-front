@@ -46,7 +46,7 @@ import {
 import { useSessionHistory } from "@/hooks/use-session-detail"
 import { useGenerationPoints } from "@/hooks/use-generation-points"
 import Image from "next/image"
-import { ASPECT_RATIOS, DEFAULT_ASPECT_RATIO, type AspectRatio } from "@/lib/constants"
+import { ASPECT_RATIOS, DEFAULT_ASPECT_RATIO, DEFAULT_SEEDREAM_IMAGE_SIZE, SEEDREAM_IMAGE_SIZES, type AspectRatio, type SeedreamImageSizeValue } from "@/lib/constants"
 import { getPointsText } from "@/lib/grammar"
 
 interface StudioChatProps {
@@ -110,14 +110,13 @@ export function StudioChat({
     }
     return 'Реалистичный'
   })
-  const [model, setModel] = useState<'nano-banana' | 'nano-banana-pro'>(() => {
+  const [model, setModel] = useState<'nano-banana' | 'nano-banana-pro' | 'seedream-4.5'>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('studio-model')
       if (saved) {
-        // Конвертируем старые enum значения в новые
         if (saved === 'NANO_BANANA' || saved === 'nano-banana') return 'nano-banana'
         if (saved === 'NANO_BANANA_PRO' || saved === 'nano-banana-pro') return 'nano-banana-pro'
-        // Если значение не распознано, возвращаем дефолт
+        if (saved === 'SEEDREAM_4_5' || saved === 'seedream-4.5') return 'seedream-4.5'
         return 'nano-banana'
       }
       return 'nano-banana'
@@ -138,6 +137,15 @@ export function StudioChat({
       return '1K'
     }
     return '1K'
+  })
+  const [seedreamImageSize, setSeedreamImageSize] = useState<SeedreamImageSizeValue>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('studio-seedreamImageSize')
+      const valid = SEEDREAM_IMAGE_SIZES.some((s) => s.value === saved)
+      if (saved && valid) return saved as SeedreamImageSizeValue
+      return DEFAULT_SEEDREAM_IMAGE_SIZE
+    }
+    return DEFAULT_SEEDREAM_IMAGE_SIZE
   })
   
   const [uploadedImages, setUploadedImages] = useState<string[]>([])
@@ -424,6 +432,11 @@ export function StudioChat({
       localStorage.setItem('studio-resolution', resolution)
     }
   }, [resolution])
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('studio-seedreamImageSize', seedreamImageSize)
+    }
+  }, [seedreamImageSize])
   
   useEffect(() => {
     // Пропускаем сохранение во время инициализации (чтобы избежать дублирования запросов)
@@ -729,14 +742,15 @@ export function StudioChat({
       // Вызываем API для отправки в очередь (передаем styleId, на бэке промпт стиля будет добавлен к промпту перед отправкой в FalAI)
       // Валидация sessionId - если undefined, не включаем в запрос (бэкенд создаст новую сессию)
       const request = {
-        prompt: prompt, // Оригинальный промпт пользователя
+        prompt: prompt,
         inputImageUrls: validImageUrls.length > 0 ? validImageUrls : [],
         numImages: numImages,
         ...(sessionId != null && !isNaN(sessionId) ? { sessionId: sessionId } : {}),
         styleId: styleId,
         aspectRatio: aspectRatio,
         model: model,
-        resolution: model === 'nano-banana-pro' ? resolution : undefined
+        resolution: model === 'nano-banana-pro' ? resolution : undefined,
+        ...(model === 'seedream-4.5' ? { seedreamImageSize } : {}),
       }
       
       const response = await apiClient.submitToQueue(request)
@@ -821,7 +835,7 @@ export function StudioChat({
     } finally {
       setIsGenerating(false)
     }
-  }, [prompt, numImages, aspectRatio, toast, artStyle, sessionId, uploadedImages, artStyles, startPolling, model, resolution, onGenerationComplete, updateHistoryAfterGeneration, getImageText])
+  }, [prompt, numImages, aspectRatio, seedreamImageSize, toast, artStyle, sessionId, uploadedImages, artStyles, startPolling, model, resolution, onGenerationComplete, updateHistoryAfterGeneration, getImageText])
 
   const handleImageExpand = (imageUrl: string) => {
     setSelectedImageForModal(imageUrl)
@@ -1249,7 +1263,7 @@ export function StudioChat({
                               <span>{message.imageUrls.length} {getImageText(message.imageUrls.length)}</span>
                               {(() => {
                                 const modelName = message.modelType 
-                                  ? (message.modelType === 'nano-banana' ? 'Nano Banana' : 'Nano Banana PRO')
+                                  ? (message.modelType === 'nano-banana' ? 'Nano Banana' : message.modelType === 'nano-banana-pro' ? 'Nano Banana PRO' : message.modelType === 'seedream-4.5' ? 'Seedream 4.5' : 'Nano Banana')
                                   : 'Nano Banana';
                                 return (
                                   <>
@@ -1586,19 +1600,36 @@ export function StudioChat({
                                 <span className="text-muted-foreground">{numImages}</span>
                               </DropdownMenuItem>
                               
-                              {/* Соотношение сторон */}
-                              <DropdownMenuItem
-                                onClick={(e) => {
-                                  e.preventDefault()
-                                  const currentIndex = ASPECT_RATIOS.indexOf(aspectRatio)
-                                  const nextIndex = (currentIndex + 1) % ASPECT_RATIOS.length
-                                  setAspectRatio(ASPECT_RATIOS[nextIndex])
-                                }}
-                                className="flex items-center justify-between"
-                              >
-                                <span>Соотношение</span>
-                                <span className="text-muted-foreground text-xs">{aspectRatio}</span>
-                              </DropdownMenuItem>
+                              {/* Соотношение сторон / Размер (для Seedream) */}
+                              {model === 'seedream-4.5' ? (
+                                <DropdownMenuItem
+                                  onClick={(e) => {
+                                    e.preventDefault()
+                                    const currentIndex = SEEDREAM_IMAGE_SIZES.findIndex((s) => s.value === seedreamImageSize)
+                                    const nextIndex = (currentIndex + 1) % SEEDREAM_IMAGE_SIZES.length
+                                    setSeedreamImageSize(SEEDREAM_IMAGE_SIZES[nextIndex].value)
+                                  }}
+                                  className="flex items-center justify-between"
+                                >
+                                  <span>Размер</span>
+                                  <span className="text-muted-foreground text-xs truncate max-w-[120px]">
+                                    {SEEDREAM_IMAGE_SIZES.find((s) => s.value === seedreamImageSize)?.label ?? seedreamImageSize}
+                                  </span>
+                                </DropdownMenuItem>
+                              ) : (
+                                <DropdownMenuItem
+                                  onClick={(e) => {
+                                    e.preventDefault()
+                                    const currentIndex = ASPECT_RATIOS.indexOf(aspectRatio)
+                                    const nextIndex = (currentIndex + 1) % ASPECT_RATIOS.length
+                                    setAspectRatio(ASPECT_RATIOS[nextIndex])
+                                  }}
+                                  className="flex items-center justify-between"
+                                >
+                                  <span>Соотношение</span>
+                                  <span className="text-muted-foreground text-xs">{aspectRatio}</span>
+                                </DropdownMenuItem>
+                              )}
                               
                               {/* Стиль */}
                               <DropdownMenuItem
@@ -1620,13 +1651,18 @@ export function StudioChat({
                               <DropdownMenuItem
                                 onClick={(e) => {
                                   e.preventDefault()
-                                  setModel(prev => prev === 'nano-banana' ? 'nano-banana-pro' : 'nano-banana')
+                                  const next: Record<string, 'nano-banana' | 'nano-banana-pro' | 'seedream-4.5'> = {
+                                    'nano-banana': 'nano-banana-pro',
+                                    'nano-banana-pro': 'seedream-4.5',
+                                    'seedream-4.5': 'nano-banana',
+                                  }
+                                  setModel(prev => next[prev] ?? 'nano-banana')
                                 }}
                                 className="flex items-center justify-between"
                               >
                                 <span>Модель</span>
                                 <span className="text-muted-foreground text-xs">
-                                  {model === 'nano-banana' ? 'Nano Banana' : 'PRO'}
+                                  {model === 'nano-banana' ? 'Nano Banana' : model === 'nano-banana-pro' ? 'PRO' : 'Seedream 4.5'}
                                 </span>
                               </DropdownMenuItem>
                               
@@ -1805,32 +1841,60 @@ export function StudioChat({
                             </DropdownMenuContent>
                           </DropdownMenu>
                           
-                          {/* Соотношение сторон */}
-                          <DropdownMenu>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="h-10 w-14 p-0 text-xs bg-muted/80 hover:bg-muted/95 border border-border/80"
-                                  >
-                                    {aspectRatio}
-                                  </Button>
-                                </DropdownMenuTrigger>
-                              </TooltipTrigger>
-                              <TooltipContent className="z-[140]">
-                                <p>Соотношение сторон</p>
-                              </TooltipContent>
-                            </Tooltip>
-                            <DropdownMenuContent className="w-32 z-[150]" align="start">
-                              {ASPECT_RATIOS.map((ratio) => (
-                                <DropdownMenuItem key={ratio} onClick={() => setAspectRatio(ratio)}>
-                                  {ratio}
-                                </DropdownMenuItem>
-                              ))}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          {/* Соотношение сторон или Размер (Seedream) */}
+                          {model === 'seedream-4.5' ? (
+                            <DropdownMenu>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="h-10 px-2 text-xs bg-muted/80 hover:bg-muted/95 border border-border/80 whitespace-nowrap max-w-[180px] truncate"
+                                    >
+                                      {SEEDREAM_IMAGE_SIZES.find((s) => s.value === seedreamImageSize)?.label ?? seedreamImageSize}
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent className="z-[140]">
+                                  <p>Размер изображения</p>
+                                </TooltipContent>
+                              </Tooltip>
+                              <DropdownMenuContent className="w-56 z-[150]" align="start">
+                                {SEEDREAM_IMAGE_SIZES.map((s) => (
+                                  <DropdownMenuItem key={s.value} onClick={() => setSeedreamImageSize(s.value)}>
+                                    {s.label}
+                                  </DropdownMenuItem>
+                                ))}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          ) : (
+                            <DropdownMenu>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="h-10 w-14 p-0 text-xs bg-muted/80 hover:bg-muted/95 border border-border/80"
+                                    >
+                                      {aspectRatio}
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent className="z-[140]">
+                                  <p>Соотношение сторон</p>
+                                </TooltipContent>
+                              </Tooltip>
+                              <DropdownMenuContent className="w-32 z-[150]" align="start">
+                                {ASPECT_RATIOS.map((ratio) => (
+                                  <DropdownMenuItem key={ratio} onClick={() => setAspectRatio(ratio)}>
+                                    {ratio}
+                                  </DropdownMenuItem>
+                                ))}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
                           
                           {/* Модель */}
                           <DropdownMenu>
@@ -1842,7 +1906,7 @@ export function StudioChat({
                                     size="sm"
                                     className="h-10 px-2 text-xs bg-muted/80 hover:bg-muted/95 border border-border/80 whitespace-nowrap"
                                   >
-                                    {model === 'nano-banana' ? 'Nano Banana' : 'PRO'}
+                                    {model === 'nano-banana' ? 'Nano Banana' : model === 'nano-banana-pro' ? 'PRO' : 'Seedream 4.5'}
                                   </Button>
                                 </DropdownMenuTrigger>
                               </TooltipTrigger>
@@ -1856,6 +1920,9 @@ export function StudioChat({
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => setModel('nano-banana-pro')}>
                                 Nano Banana PRO
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => setModel('seedream-4.5')}>
+                                Seedream 4.5
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
