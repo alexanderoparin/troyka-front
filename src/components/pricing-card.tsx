@@ -21,6 +21,7 @@ export function PricingCard({ plan, isPopular = false, className }: PricingCardP
   const [isProcessing, setIsProcessing] = useState(false)
 
   const pro = generationPoints?.pointsPerImagePro ?? { '1K': 4, '2K': 4, '4K': 5 }
+  const seedreamPoints = generationPoints?.pointsPerImageSeedream ?? 4
   const planPriceRub = plan.priceRub / 100
 
   // 1K и 2К объединены в одну строку (используем поинты для 1K)
@@ -28,6 +29,7 @@ export function PricingCard({ plan, isPopular = false, className }: PricingCardP
     { label: 'Nano Banana', pointsPerImage },
     { label: 'Nano Banana PRO 1K и 2K', pointsPerImage: pro['1K'] },
     { label: 'Nano Banana PRO 4K', pointsPerImage: pro['4K'] },
+    { label: 'Seedream 4.5', pointsPerImage: seedreamPoints },
   ]
 
   const isPlanPopular = isPopular || plan.isPopular

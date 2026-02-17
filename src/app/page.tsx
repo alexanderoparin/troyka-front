@@ -12,6 +12,7 @@ export default function HomePage() {
   const { isAuthenticated } = useAuth()
   const { pointsPerImage, pointsOnRegistration, data } = useGenerationPoints()
   const pro = data.pointsPerImagePro
+  const seedreamPoints = data.pointsPerImageSeedream ?? 4
 
   return (
     <div className="relative space-y-8 sm:space-y-12 lg:space-y-16 min-h-screen">
@@ -160,12 +161,42 @@ export default function HomePage() {
                   </td>
                   <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">{getPointsText(pro['2K'])}</td>
                 </tr>
-                <tr>
+                <tr className="border-b-2 border-border">
                   <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">4K</td>
                   <td className="px-4 py-3.5 text-sm text-amber-600 dark:text-amber-400 bg-blue-500/5 dark:bg-blue-500/10">
                     <span className="flex items-center justify-center gap-1.5"><Clock className="w-3.5 h-3.5" /> 30-150 секунд</span>
                   </td>
                   <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">{getPointsText(pro['4K'])}</td>
+                </tr>
+                <tr className="border-b border-border/30">
+                  <td rowSpan={3} className="px-4 py-3.5 align-middle border-r border-border/30 bg-blue-500/5 dark:bg-blue-500/10">
+                    <span className="font-semibold text-foreground flex items-center justify-center gap-2">
+                      <span className="w-8 h-8 rounded-lg bg-blue-500/20 dark:bg-blue-500/30 flex items-center justify-center flex-shrink-0">
+                        <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                      </span>
+                      Seedream 4.5
+                    </span>
+                  </td>
+                  <td rowSpan={3} className="px-4 py-3.5 text-sm align-middle bg-blue-500/5 dark:bg-blue-500/10">отличное</td>
+                  <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">1K</td>
+                  <td className="px-4 py-3.5 text-sm text-amber-600 dark:text-amber-400 bg-blue-500/5 dark:bg-blue-500/10">
+                    <span className="flex items-center justify-center gap-1.5"><Clock className="w-3.5 h-3.5" /> 10-30 секунд</span>
+                  </td>
+                  <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">{getPointsText(seedreamPoints)}</td>
+                </tr>
+                <tr className="border-b border-border/30">
+                  <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">2K</td>
+                  <td className="px-4 py-3.5 text-sm text-amber-600 dark:text-amber-400 bg-blue-500/5 dark:bg-blue-500/10">
+                    <span className="flex items-center justify-center gap-1.5"><Clock className="w-3.5 h-3.5" /> 20-60 секунд</span>
+                  </td>
+                  <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">{getPointsText(seedreamPoints)}</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">4K</td>
+                  <td className="px-4 py-3.5 text-sm text-amber-600 dark:text-amber-400 bg-blue-500/5 dark:bg-blue-500/10">
+                    <span className="flex items-center justify-center gap-1.5"><Clock className="w-3.5 h-3.5" /> 30-150 секунд</span>
+                  </td>
+                  <td className="px-4 py-3.5 text-sm bg-blue-500/5 dark:bg-blue-500/10">{getPointsText(seedreamPoints)}</td>
                 </tr>
               </tbody>
             </table>
