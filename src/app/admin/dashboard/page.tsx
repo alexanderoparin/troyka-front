@@ -1700,7 +1700,7 @@ export default function AdminDashboardPage() {
                   {blockedRegistrationStats.last30DaysCount === 0 && (
                     <div className="text-center py-8 text-muted-foreground">
                       <CheckCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <p className="text-lg">Нет блокированных регистраций за последние 30 дней</p>
+                      <p className="text-lg">Нет блокированных регистраций (временные email) за последние 30 дней</p>
                     </div>
                   )}
                 </>
@@ -1712,6 +1712,42 @@ export default function AdminDashboardPage() {
               )}
             </CardContent>
           </Card>
+
+          {blockedRegistrationStats && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Ban className="h-5 w-5" />
+                  Попытки регистрации с одного IP за короткое время
+                </CardTitle>
+                <CardDescription>
+                  Блокировки из-за превышения лимита регистраций с одного IP (час/день)
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  <div className="border rounded-lg p-4">
+                    <div className="text-sm text-muted-foreground mb-1">Сегодня</div>
+                    <div className="text-2xl font-bold">{blockedRegistrationStats.ipRateLimitTodayCount ?? 0}</div>
+                  </div>
+                  <div className="border rounded-lg p-4">
+                    <div className="text-sm text-muted-foreground mb-1">За 7 дней</div>
+                    <div className="text-2xl font-bold">{blockedRegistrationStats.ipRateLimitLast7DaysCount ?? 0}</div>
+                  </div>
+                  <div className="border rounded-lg p-4">
+                    <div className="text-sm text-muted-foreground mb-1">За 30 дней</div>
+                    <div className="text-2xl font-bold">{blockedRegistrationStats.ipRateLimitLast30DaysCount ?? 0}</div>
+                  </div>
+                </div>
+                {(blockedRegistrationStats.ipRateLimitLast30DaysCount ?? 0) === 0 && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <CheckCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p className="text-lg">Нет блокировок по IP за последние 30 дней</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </div>
       ) : null}
       </div>

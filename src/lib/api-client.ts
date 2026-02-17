@@ -396,6 +396,10 @@ export interface BlockedRegistrationStatsDTO {
   todayCount: number;
   last7DaysCount: number;
   last30DaysCount: number;
+  /** Блокировки по IP (превышение лимита с одного IP) за сегодня / 7 / 30 дней */
+  ipRateLimitTodayCount?: number;
+  ipRateLimitLast7DaysCount?: number;
+  ipRateLimitLast30DaysCount?: number;
   countByDomain: Record<string, number>;
   countByIpAddress: Record<string, number>;
   recentMetrics: BlockedRegistrationMetricDTO[];
