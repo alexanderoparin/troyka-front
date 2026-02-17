@@ -13,22 +13,20 @@ export type AspectRatio = typeof ASPECT_RATIOS[number];
  */
 export const DEFAULT_ASPECT_RATIO: AspectRatio = '1:1';
 
-/**
- * Варианты размера изображения для Seedream 4.5 (FAL).
- * Формат как в UI FAL: подпись и разрешение в скобках.
- */
+/** Варианты размера для Seedream 4.5 (FAL), по возрастанию разрешения. */
 export const SEEDREAM_IMAGE_SIZES = [
-  { label: 'Square_HD (1024x1024)', value: 'square_hd' },
-  { label: 'Square (512x512)', value: 'square' },
-  { label: 'Portrait 3:4 (768x1024)', value: 'portrait_4_3' },
-  { label: 'Portrait 9:16 (576x1024)', value: 'portrait_16_9' },
-  { label: 'Landscape 4:3 (1024x768)', value: 'landscape_4_3' },
-  { label: 'Landscape 16:9 (1024x576)', value: 'landscape_16_9' },
-  { label: 'Auto 2K (2048x2048)', value: 'auto_2K' },
-  { label: 'Auto 4K (4096x4096)', value: 'auto_4K' },
+  { label: '1K Landscape 16:9 (1024×576)', value: 'landscape_16_9' },
+  { label: '1K Portrait 9:16 (576×1024)', value: 'portrait_16_9' },
+  { label: '1K Landscape 4:3 (1024×768)', value: 'landscape_4_3' },
+  { label: '1K Portrait 3:4 (768×1024)', value: 'portrait_4_3' },
+  { label: '1K Square_HD (1024×1024)', value: 'square_hd' },
+  { label: '2K Square (2048×2048)', value: 'auto_2K' },
+  { label: '4K Landscape 4:3 (4096×3072)', value: '4k_landscape_4_3' },
+  { label: '4K Portrait 4:3 (3072×4096)', value: '4k_portrait_4_3' },
+  { label: '4K Square (4096×4096)', value: 'auto_4K' },
 ] as const;
 
 export type SeedreamImageSizeValue = typeof SEEDREAM_IMAGE_SIZES[number]['value'];
 
-export const DEFAULT_SEEDREAM_IMAGE_SIZE: SeedreamImageSizeValue = 'auto_2K';
+export const DEFAULT_SEEDREAM_IMAGE_SIZE: SeedreamImageSizeValue = '4k_landscape_4_3';
 

@@ -747,7 +747,10 @@ export function StudioChat({
         numImages: numImages,
         ...(sessionId != null && !isNaN(sessionId) ? { sessionId: sessionId } : {}),
         styleId: styleId,
-        aspectRatio: aspectRatio,
+        // Для Seedream сохраняем в историю подпись размера (Auto 2K и т.д.), а не соотношение сторон
+        aspectRatio: model === 'seedream-4.5'
+          ? (SEEDREAM_IMAGE_SIZES.find((s) => s.value === seedreamImageSize)?.label ?? seedreamImageSize)
+          : aspectRatio,
         model: model,
         resolution: model === 'nano-banana-pro' ? resolution : undefined,
         ...(model === 'seedream-4.5' ? { seedreamImageSize } : {}),
