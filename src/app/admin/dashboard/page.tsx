@@ -1,7 +1,7 @@
 "use client"
 
 import { useAuth } from "@/contexts/auth-context"
-import { apiClient, AdminPaymentDTO, AdminUserDTO, AdminStatsDTO, UserStatisticsDTO, SystemStatus, SystemStatusRequest, SystemStatusHistoryDTO, SystemStatusWithMetadata, GenerationProviderDTO, ProviderFallbackStatsDTO, BlockedRegistrationStatsDTO } from "@/lib/api-client"
+import { apiClient, AdminPaymentDTO, AdminUserDTO, AdminStatsDTO, UserStatisticsDTO, SystemStatus, SystemStatusRequest, SystemStatusHistoryDTO, SystemStatusWithMetadata, ModelProviderSettingsDTO, ProviderFallbackStatsDTO, BlockedRegistrationStatsDTO } from "@/lib/api-client"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -67,7 +67,7 @@ export default function AdminDashboardPage() {
   const [statisticsEndDate, setStatisticsEndDate] = useState<string>("")
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false)
   const [userSearchFilter, setUserSearchFilter] = useState<string>("")
-  const [providers, setProviders] = useState<GenerationProviderDTO[]>([])
+  const [providers, setProviders] = useState<ModelProviderSettingsDTO[]>([])
   const [isSwitchingProvider, setIsSwitchingProvider] = useState(false)
   const [fallbackStats, setFallbackStats] = useState<ProviderFallbackStatsDTO | null>(null)
   const [blockedRegistrationStats, setBlockedRegistrationStats] = useState<BlockedRegistrationStatsDTO | null>(null)
@@ -1398,73 +1398,77 @@ export default function AdminDashboardPage() {
               Управление провайдерами генерации
             </CardTitle>
             <CardDescription>
-              Выберите активного провайдера для генерации изображений
+              Выберите активного провайдера для каждой модели генерации
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {providers.length > 0 ? (
-              <div className="space-y-4">
-                {providers.map((provider) => (
-                  <div
-                    key={provider.code}
-                    className={cn(
-                      "border rounded-lg p-4 transition-colors",
-                      provider.active
-                        ? "border-primary bg-primary/5"
-                        : "hover:bg-muted/50"
-                    )}
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-lg font-semibold">{provider.displayName}</h3>
-                          {provider.active && (
-                            <Badge variant="default" className="bg-green-500 hover:bg-green-600">
-                              Активен
-                            </Badge>
+              <div className="space-y-6">
+                {providers.map((modelSettings) => (
+                  <div key={modelSettings.modelType} className="border rounded-lg p-4 space-y-3">
+                    <h3 className="text-lg font-semibold">{modelSettings.modelDisplayName}</h3>
+                    <p className="text-xs text-muted-foreground">Модель: {modelSettings.modelType}</p>
+                    <div className="space-y-3">
+                      {modelSettings.providers.map((provider) => (
+                        <div
+                          key={provider.code}
+                          className={cn(
+                            "border rounded-lg p-4 transition-colors",
+                            provider.active
+                              ? "border-primary bg-primary/5"
+                              : "hover:bg-muted/50"
                           )}
-                          {!provider.available && (
-                            <Badge variant="destructive">Недоступен</Badge>
-                          )}
-                        </div>
-                        <p className="text-sm text-muted-foreground mb-4">
-                          Код провайдера: <code className="px-1.5 py-0.5 bg-muted rounded text-xs">{provider.code}</code>
-                        </p>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            onClick={async () => {
-                              if (provider.active) {
-                                toast({
-                                  title: "Информация",
-                                  description: "Этот провайдер уже активен",
-                                })
-                                return
-                              }
-                              if (!provider.available) {
-                                toast({
-                                  title: "Ошибка",
-                                  description: "Провайдер недоступен",
-                                  variant: "destructive",
-                                })
-                                return
-                              }
-                              setIsSwitchingProvider(true)
-                              try {
-                                const response = await apiClient.setActiveProvider(provider.code)
-                                if (response.data) {
-                                  toast({
-                                    title: "Успешно",
-                                    description: `Провайдер ${provider.displayName} установлен как активный`,
-                                  })
-                                  // Обновляем список провайдеров
-                                  const providersResponse = await apiClient.getGenerationProviders()
-                                  if (providersResponse.data) {
-                                    setProviders(providersResponse.data)
-                                  }
-                                } else {
-                                  toast({
-                                    title: "Ошибка",
-                                    description: response.error || "Не удалось переключить провайдера",
+                        >
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <h4 className="font-medium">{provider.displayName}</h4>
+                                {provider.active && (
+                                  <Badge variant="default" className="bg-green-500 hover:bg-green-600">
+                                    Активен
+                                  </Badge>
+                                )}
+                                {!provider.available && (
+                                  <Badge variant="destructive">Недоступен</Badge>
+                                )}
+                              </div>
+                              <p className="text-sm text-muted-foreground mb-4">
+                                Код: <code className="px-1.5 py-0.5 bg-muted rounded text-xs">{provider.code}</code>
+                              </p>
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  onClick={async () => {
+                                    if (provider.active) {
+                                      toast({
+                                        title: "Информация",
+                                        description: "Этот провайдер уже активен для этой модели",
+                                      })
+                                      return
+                                    }
+                                    if (!provider.available) {
+                                      toast({
+                                        title: "Ошибка",
+                                        description: "Провайдер недоступен",
+                                        variant: "destructive",
+                                      })
+                                      return
+                                    }
+                                    setIsSwitchingProvider(true)
+                                    try {
+                                      const response = await apiClient.setActiveProvider(modelSettings.modelType, provider.code)
+                                      if (response.data) {
+                                        toast({
+                                          title: "Успешно",
+                                          description: `Для ${modelSettings.modelDisplayName} установлен провайдер ${provider.displayName}`,
+                                        })
+                                        const providersResponse = await apiClient.getGenerationProviders()
+                                        if (providersResponse.data) {
+                                          setProviders(providersResponse.data)
+                                        }
+                                      } else {
+                                        toast({
+                                          title: "Ошибка",
+                                          description: response.error || "Не удалось переключить провайдера",
                                     variant: "destructive",
                                   })
                                 }
@@ -1498,6 +1502,9 @@ export default function AdminDashboardPage() {
                           </Button>
                         </div>
                       </div>
+                    </div>
+                    </div>
+                      ))}
                     </div>
                   </div>
                 ))}

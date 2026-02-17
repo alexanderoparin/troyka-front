@@ -373,6 +373,13 @@ export interface GenerationProviderDTO {
   active: boolean;
 }
 
+/** Настройки провайдеров для одной модели (список провайдеров с активным). */
+export interface ModelProviderSettingsDTO {
+  modelType: string;
+  modelDisplayName: string;
+  providers: GenerationProviderDTO[];
+}
+
 // Provider fallback statistics interfaces
 export interface BlockedRegistrationMetricDTO {
   id: number;
@@ -1373,14 +1380,14 @@ class ApiClient {
   }
 
   // Generation providers methods
-  async getGenerationProviders(): Promise<ApiResponse<GenerationProviderDTO[]>> {
-    return this.request<GenerationProviderDTO[]>('/api/admin/generation-providers');
+  async getGenerationProviders(): Promise<ApiResponse<ModelProviderSettingsDTO[]>> {
+    return this.request<ModelProviderSettingsDTO[]>('/api/admin/generation-providers');
   }
 
-  async setActiveProvider(provider: string): Promise<ApiResponse<{ message: string }>> {
+  async setActiveProvider(modelType: string, provider: string): Promise<ApiResponse<{ message: string }>> {
     return this.request<{ message: string }>('/api/admin/generation-providers/active', {
       method: 'PUT',
-      body: JSON.stringify({ provider }),
+      body: JSON.stringify({ modelType, provider }),
     });
   }
 
