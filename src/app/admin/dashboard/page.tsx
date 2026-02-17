@@ -1401,43 +1401,41 @@ export default function AdminDashboardPage() {
               Выберите активного провайдера для каждой модели генерации
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-4">
             {providers.length > 0 ? (
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {providers.map((modelSettings) => (
-                  <div key={modelSettings.modelType} className="border rounded-lg p-4 space-y-3">
-                    <h3 className="text-lg font-semibold">{modelSettings.modelDisplayName}</h3>
-                    <p className="text-xs text-muted-foreground">Модель: {modelSettings.modelType}</p>
-                    <div className="space-y-3">
+                  <div key={modelSettings.modelType} className="border rounded-lg p-3 space-y-2">
+                    <div className="flex items-baseline gap-2">
+                      <h3 className="text-base font-semibold">{modelSettings.modelDisplayName}</h3>
+                      <span className="text-xs text-muted-foreground">({modelSettings.modelType})</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
                       {modelSettings.providers.map((provider) => (
                         <div
                           key={provider.code}
                           className={cn(
-                            "border rounded-lg p-4 transition-colors",
+                            "border rounded-md px-3 py-2 flex items-center justify-between gap-3 min-w-0 transition-colors",
                             provider.active
                               ? "border-primary bg-primary/5"
                               : "hover:bg-muted/50"
                           )}
                         >
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-3 mb-2">
-                                <h4 className="font-medium">{provider.displayName}</h4>
-                                {provider.active && (
-                                  <Badge variant="default" className="bg-green-500 hover:bg-green-600">
-                                    Активен
-                                  </Badge>
-                                )}
-                                {!provider.available && (
-                                  <Badge variant="destructive">Недоступен</Badge>
-                                )}
-                              </div>
-                              <p className="text-sm text-muted-foreground mb-4">
-                                Код: <code className="px-1.5 py-0.5 bg-muted rounded text-xs">{provider.code}</code>
-                              </p>
-                              <div className="flex items-center gap-2">
-                                <Button
-                                  onClick={async () => {
+                          <div className="flex items-center gap-2 min-w-0 flex-1">
+                            <span className="font-medium text-sm truncate">{provider.displayName}</span>
+                            {provider.active && (
+                              <Badge variant="default" className="shrink-0 bg-green-500 hover:bg-green-600 text-xs">
+                                Активен
+                              </Badge>
+                            )}
+                            {!provider.available && (
+                              <Badge variant="destructive" className="shrink-0 text-xs">Недоступен</Badge>
+                            )}
+                            <code className="text-xs text-muted-foreground shrink-0 hidden sm:inline">{provider.code}</code>
+                          </div>
+                          <Button
+                            size="sm"
+                            onClick={async () => {
                                     if (provider.active) {
                                       toast({
                                         title: "Информация",
@@ -1484,7 +1482,7 @@ export default function AdminDashboardPage() {
                             }}
                             disabled={provider.active || !provider.available || isSwitchingProvider}
                             variant={provider.active ? "default" : "outline"}
-                            className="w-full sm:w-auto"
+                            className="shrink-0"
                           >
                             {isSwitchingProvider ? (
                               <>
@@ -1501,9 +1499,6 @@ export default function AdminDashboardPage() {
                             )}
                           </Button>
                         </div>
-                      </div>
-                    </div>
-                    </div>
                       ))}
                     </div>
                   </div>
