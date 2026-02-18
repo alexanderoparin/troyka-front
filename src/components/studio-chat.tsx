@@ -152,6 +152,7 @@ export function StudioChat({
   const [isUploading, setIsUploading] = useState(false)
   const [isFocused, setIsFocused] = useState(false)
   const [selectedImageForModal, setSelectedImageForModal] = useState<string | null>(null)
+  const [imageModalRetry, setImageModalRetry] = useState(0)
   const [isDragOver, setIsDragOver] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isEditingMode, setIsEditingMode] = useState(false)
@@ -160,6 +161,10 @@ export function StudioChat({
   const [activeQueueRequests, setActiveQueueRequests] = useState<Map<number, QueueRequestStatus>>(new Map())
   const pollingIntervalsRef = useRef<Map<number, NodeJS.Timeout>>(new Map())
   
+  useEffect(() => {
+    setImageModalRetry(0)
+  }, [selectedImageForModal])
+
   // Загружаем стили из базы данных и сохраненный стиль пользователя при монтировании компонента
   useEffect(() => {
     // Предотвращаем повторные вызовы в StrictMode
@@ -2069,6 +2074,7 @@ export function StudioChat({
             </Button>
             <div className="relative w-full h-full flex items-center justify-center">
               <Image
+                key={`${selectedImageForModal}-${imageModalRetry}`}
                 src={apiClient.getFileUrl(selectedImageForModal)}
                 alt="Полноразмерное изображение"
                 fill
@@ -2076,6 +2082,9 @@ export function StudioChat({
                 priority
                 quality={100}
                 sizes="100vw"
+                onError={() => {
+                  if (imageModalRetry < 2) setImageModalRetry((r) => r + 1)
+                }}
               />
             </div>
           </div>

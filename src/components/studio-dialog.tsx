@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useCallback } from "react"
+import React, { useState, useCallback, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
@@ -35,7 +35,12 @@ export function StudioDialog({
   const [generatedImages, setGeneratedImages] = useState<string[]>([])
   const [selectedImages, setSelectedImages] = useState<string[]>([])
   const [selectedImageForModal, setSelectedImageForModal] = useState<string | null>(null)
+  const [imageModalRetry, setImageModalRetry] = useState(0)
   const { toast } = useToast()
+
+  useEffect(() => {
+    setImageModalRetry(0)
+  }, [selectedImageForModal])
 
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) {
@@ -258,6 +263,7 @@ export function StudioDialog({
             </Button>
             <div className="relative w-full h-full flex items-center justify-center">
               <Image
+                key={`${selectedImageForModal}-${imageModalRetry}`}
                 src={selectedImageForModal}
                 alt="Полноразмерное изображение"
                 fill
@@ -265,6 +271,9 @@ export function StudioDialog({
                 priority
                 quality={100}
                 unoptimized={false}
+                onError={() => {
+                  if (imageModalRetry < 2) setImageModalRetry((r) => r + 1)
+                }}
               />
             </div>
           </div>
