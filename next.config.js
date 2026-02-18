@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Таймаут загрузки upstream-картинки (/_next/image ходит за url=...). По умолчанию ~7 с — бэкенд+FAL могут не успеть.
+  experimental: {
+    imgOptTimeoutInSeconds: 90,
+  },
   images: {
     domains: [
       'v3b.fal.media',
